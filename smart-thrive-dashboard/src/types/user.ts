@@ -3,6 +3,7 @@ import { BaseEntity } from "./base";
 import { Student } from "./student";
 import { Blog } from "./blog";
 
+
 export enum Gender {
   Male = 'Male',
   Female = 'Female',

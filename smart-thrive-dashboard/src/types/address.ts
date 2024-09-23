@@ -1,5 +1,5 @@
-import { Provider } from "./provider";
 import { BaseEntity } from "./base";
+import { Provider } from "./provider";
 
 export interface Address extends BaseEntity {
   providerId?: string;

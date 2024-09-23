@@ -6,7 +6,7 @@ class Const {
   private static readonly BLOG = "blogs";
 
   //#region URL FE
-  static readonly URL_BASE = ``;
+  static readonly URL_BASE = `http://localhost:3000`;
 
   static readonly URL_ORDER = `${this.URL_BASE}/${Const.ORDER}`;
   static readonly URL_ORDER_NEW = `${Const.URL_ORDER}/${Const.NEW}`;
