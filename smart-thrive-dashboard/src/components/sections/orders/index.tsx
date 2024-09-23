@@ -76,6 +76,7 @@ import {
 import Link from "next/link";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
+import { Const } from "@/lib/const";
 
 const DATE_REQUIRED_ERROR = "Date is required.";
 const FormSchema = z.object({
@@ -468,7 +469,7 @@ export default function DataTableOrders() {
 
           <Link
             className="text-primary-foreground sm:whitespace-nowrap"
-            href={`/dashboard/${stringObject.toLowerCase()}/new`}
+            href={`${Const.URL_ORDER_NEW}`}
           >
             <Button size="sm" className="h-8 gap-1">
               <PlusCircle className="fill-primary-background h-3.5 w-3.5" />
