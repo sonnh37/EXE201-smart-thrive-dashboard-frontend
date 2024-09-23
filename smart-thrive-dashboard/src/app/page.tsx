@@ -6,7 +6,7 @@ import {Breadcrumbs} from "@/components/common/breadcrumb";
 
 const breadcrumbItems = [{title: "Dashboard", link: "/"}];
 
-export default function Home() {
+export default function HomePage() {
     return (
         <ContentLayout title="Dashboard">
             <Breadcrumbs items={breadcrumbItems}/>
