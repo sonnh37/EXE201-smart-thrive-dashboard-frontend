@@ -1,23 +1,41 @@
 class Const {
-    private static readonly DASHBOARD = "";
-    private static readonly ORDER = "album";
-    private static readonly NEW = "new";
-    private static readonly PACKAGE = "outfit";
-    private static readonly COURSE = "service";
-    private static readonly BLOG = "photo";
+  private static readonly ORDER = "orders";
+  private static readonly NEW = "new";
+  private static readonly PACKAGE = "packages";
+  private static readonly COURSE = "courses";
+  private static readonly BLOG = "blogs";
 
-    static readonly DASHBOARD_URL = `/${Const.DASHBOARD}`;
-    static readonly DASHBOARD_ORDER_URL = `/${Const.DASHBOARD}/${Const.ORDER}`;
-    static readonly DASHBOARD_ORDER_NEW_URL = `${Const.DASHBOARD_ORDER_URL}/${Const.NEW}`;
+  //#region URL FE
+  static readonly URL_BASE = ``;
 
-    static readonly DASHBOARD_BLOG_URL = `/${Const.DASHBOARD}/${Const.BLOG}`;
-    static readonly DASHBOARD_BLOG_NEW_URL = `${Const.DASHBOARD_BLOG_URL}/${Const.NEW}`;
+  static readonly URL_ORDER = `${this.URL_BASE}/${Const.ORDER}`;
+  static readonly URL_ORDER_NEW = `${Const.URL_ORDER}/${Const.NEW}`;
 
-    static readonly DASHBOARD_COURSE_URL = `/${Const.DASHBOARD}/${Const.COURSE}`;
-    static readonly DASHBOARD_COURSE_NEW_URL = `${Const.DASHBOARD_COURSE_URL}/${Const.NEW}`;
+  static readonly URL_BLOG = `${this.URL_BASE}/${Const.BLOG}`;
+  static readonly URL_BLOG_NEW = `${Const.URL_BLOG}/${Const.NEW}`;
 
-    static readonly DASHBOARD_PACKAGE_URL = `/${Const.DASHBOARD}/${Const.PACKAGE}`;
-    static readonly DASHBOARD_PACKAGE_NEW_URL = `${Const.DASHBOARD_PACKAGE_URL}/${Const.NEW}`;
+  static readonly URL_COURSE = `${this.URL_BASE}/${Const.COURSE}`;
+  static readonly URL_COURSE_NEW = `${Const.URL_COURSE}/${Const.NEW}`;
+
+  static readonly URL_PACKAGE = `${this.URL_BASE}/${Const.PACKAGE}`;
+  static readonly URL_PACKAGE_NEW = `${Const.URL_PACKAGE}/${Const.NEW}`;
+  //#endregion
+
+  //#region API
+  static readonly API_BASE = `https://localhost:9876/api`;
+
+  static readonly API_ORDER = `${this.API_BASE}/${Const.ORDER}`;
+  static readonly API_ORDER_NEW = `${Const.API_ORDER}/${Const.NEW}`;
+
+  static readonly API_BLOG = `${this.API_BASE}/${Const.BLOG}`;
+  static readonly API_BLOG_NEW = `${Const.API_BLOG}/${Const.NEW}`;
+
+  static readonly API_COURSE = `${this.API_BASE}/${Const.COURSE}`;
+  static readonly API_COURSE_NEW = `${Const.API_COURSE}/${Const.NEW}`;
+
+  static readonly API_PACKAGE = `${this.API_BASE}/${Const.PACKAGE}`;
+  static readonly API_PACKAGE_NEW = `${Const.API_PACKAGE}/${Const.NEW}`;
+  //#endregion
 }
 
-export {Const};
+export { Const };
