@@ -15,6 +15,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { Const } from "@/lib/const";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface ActionsProps {
   id: string;
@@ -22,6 +24,7 @@ interface ActionsProps {
 
 const Actions: React.FC<ActionsProps> = ({ id }) => {
   const router = useRouter();
+  const queryClient = useQueryClient(); 
 
   const handleEditClick = () => {
     router.push(`/order/${id}`);
@@ -33,10 +36,8 @@ const Actions: React.FC<ActionsProps> = ({ id }) => {
 
   const handleDeleteClick = async () => {
     try {
-      const response = await axios.delete(`https://localhost:7192/orders`, {
-        params: { Id: id },
-      });
-
+      const response = await axios.delete(`${Const.API_ORDER}/${id}`);
+      
       if (response.status === 200) {
         Swal.fire({
           title: "Success!",
@@ -44,6 +45,7 @@ const Actions: React.FC<ActionsProps> = ({ id }) => {
           icon: "success",
           confirmButtonText: "OK",
         });
+        queryClient.invalidateQueries({ queryKey: ["data"] });
       }
     } catch (error) {
       console.error(`Failed to delete order with ID: ${id}`, error);

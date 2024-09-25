@@ -74,6 +74,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import { MixerHorizontalIcon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
+import { CSVLink } from "react-csv";
 import {
   CalendarIcon,
   File,
@@ -457,10 +458,13 @@ export default function DataTableOrders() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button size="sm" variant="outline" className="h-8 gap-1">
-            <File className="h-3.5 w-3.5" />
-            <span className=" sm:whitespace-nowrap">Export</span>
-          </Button>
+          <CSVLink filename="export_data.csv" data={data?.data?.results ?? []}>
+            <Button size="sm" variant="outline" className="h-8 gap-1">
+              <File className="h-3.5 w-3.5" />
+              <span className=" sm:whitespace-nowrap">Export CSV</span>
+            </Button>
+            
+          </CSVLink>
 
           <Link
             className="text-primary-foreground sm:whitespace-nowrap"
