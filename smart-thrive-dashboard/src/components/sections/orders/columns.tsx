@@ -120,6 +120,9 @@ export const columns: ColumnDef<Order>[] = [
 
       return <Badge variant={badgeVariant}>{statusText}</Badge>;
     },
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
   {
     accessorKey: "isDeleted",
@@ -132,10 +135,9 @@ export const columns: ColumnDef<Order>[] = [
       return <Badge variant="destructive">Deactivate</Badge>;
     },
     filterFn: (row, id, value) => {
-      const isDeletedValue = row.getValue(id) as boolean;
-      return value.includes(isDeletedValue.toString()); // Chuyển đổi boolean sang string để so sánh
+      return value.includes(row.getValue(id));
     },
-    enableGlobalFilter: false,
+    //enableGlobalFilter: false,
   },
   {
     id: "actions",

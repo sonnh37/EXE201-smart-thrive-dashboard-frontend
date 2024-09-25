@@ -8,16 +8,16 @@ class Const {
   //#region URL FE
   static readonly URL_BASE = `http://localhost:3000`;
 
-  static readonly URL_ORDER = `${this.URL_BASE}/${Const.ORDER}`;
+  static readonly URL_ORDER = `/${Const.ORDER}`;
   static readonly URL_ORDER_NEW = `${Const.URL_ORDER}/${Const.NEW}`;
 
-  static readonly URL_BLOG = `${this.URL_BASE}/${Const.BLOG}`;
+  static readonly URL_BLOG = `/${Const.BLOG}`;
   static readonly URL_BLOG_NEW = `${Const.URL_BLOG}/${Const.NEW}`;
 
-  static readonly URL_COURSE = `${this.URL_BASE}/${Const.COURSE}`;
+  static readonly URL_COURSE = `/${Const.COURSE}`;
   static readonly URL_COURSE_NEW = `${Const.URL_COURSE}/${Const.NEW}`;
 
-  static readonly URL_PACKAGE = `${this.URL_BASE}/${Const.PACKAGE}`;
+  static readonly URL_PACKAGE = `/${Const.PACKAGE}`;
   static readonly URL_PACKAGE_NEW = `${Const.URL_PACKAGE}/${Const.NEW}`;
   //#endregion
 

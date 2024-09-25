@@ -23,7 +23,7 @@ import { CheckIcon, PlusCircle } from "lucide-react";
 
 export type FilterOption = {
   label: string;
-  value: string;
+  value: any;
   icon?: React.ComponentType<{ className?: string }>;
 };
 
@@ -39,8 +39,8 @@ export function DataTableFacetedFilter<TData, TValue>({
   options,
 }: DataTableFacetedFilter<TData, TValue>) {
   const facets = column?.getFacetedUniqueValues();
-  const selectedValues = new Set(column?.getFilterValue() as string[]);
-  console.log("checky", column?.getFilterValue());
+  const selectedValues = new Set(column?.getFilterValue() as any[]);
+
   return (
     <Popover>
       <PopoverTrigger asChild>

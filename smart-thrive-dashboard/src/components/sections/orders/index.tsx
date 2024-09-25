@@ -1,7 +1,12 @@
 import { DataTablePagination } from "@/components/common/data-table-custom-api/data-table-pagination";
 import { TableComponent } from "@/components/common/data-table-custom-api/table-component";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  keepPreviousData,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import {
+  ColumnFilter,
   ColumnFiltersState,
   getCoreRowModel,
   getFilteredRowModel,
@@ -80,6 +85,8 @@ import Link from "next/link";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { Const } from "@/lib/const";
+import { useDebounce } from "@/hooks/use-debounce";
+import { debounce, filter } from "lodash";
 
 const DATE_REQUIRED_ERROR = "Date is required.";
 const FormSchema = z.object({
@@ -133,30 +140,27 @@ export default function DataTableOrders() {
     control: form.control,
   });
 
+  //const formValues = useDebounce(formWatch, 500); // Đợi 500ms trước khi gọi API
+
+  //const debouncedColumnFilters = useDebounce(columnFilters, 100); // Đợi 500ms trước khi gọi API
+
   const getQueryParams = useCallback((): OrderGetAllQuery => {
-    // Create an object to hold the column filter values
     const filterParams: Record<string, any> = {};
-  
-    // Map over the column filters to create a key-value pair for each filter
+
     columnFilters.forEach((filter) => {
       filterParams[filter.id] = filter.value;
     });
-  
+
     return {
       pageNumber: pagination.pageIndex + 1,
       pageSize: pagination.pageSize,
       sortField: sorting.length > 0 ? sorting[0]?.id : "CreatedDate",
       sortOrder: sorting.length > 0 ? (sorting[0]?.desc ? -1 : 1) : -1,
       isPagination: true,
-      fromDate: formValues?.date?.from?.toISOString(),
-      toDate: formValues?.date?.to?.toISOString(),
-      description: formValues?.description!,
-      // isDeleted: Array.isArray(formValues?.isDeleted) 
-      // ? formValues.isDeleted.filter((item): item is boolean => typeof item === 'boolean') 
-      // : formValues?.isDeleted !== undefined 
-      // ? [formValues.isDeleted as boolean] 
-      // : [],
-      ...filterParams,  // Spread the filterParams object into the final query params
+      fromDate: formValues?.date?.from?.toISOString() || undefined,
+      toDate: formValues?.date?.to?.toISOString() || undefined,
+
+      ...filterParams,
     };
   }, [pagination, sorting, formValues, columnFilters]);
 
@@ -165,13 +169,9 @@ export default function DataTableOrders() {
   const { data, isFetching, error } = useQuery({
     queryKey: ["data", queryParams],
     queryFn: () => fetchOrders(queryParams),
-    placeholderData: (previousData, previousQuery) => previousData,
+    placeholderData: keepPreviousData,
     enabled: shouldFetch,
   });
-
-  useEffect(() => {
-    console.log("Should fetch:", shouldFetch);
-  }, [shouldFetch]);
 
   const handleFilterClick = () => {
     setIsSheetOpen(true);
@@ -213,19 +213,6 @@ export default function DataTableOrders() {
     }
   }, [pagination]);
 
-  if (isFetching && !isClicked)
-    return (
-      <div>
-        <DataTableSkeleton
-          columnCount={5}
-          searchableColumnCount={1}
-          filterableColumnCount={1}
-          cellWidths={["10rem", "40rem", "12rem", "12rem", "8rem"]}
-          shrinkZero
-        />
-      </div>
-    );
-
   if (error) return <div>Error loading data</div>;
 
   const isFiltered = table.getState().columnFilters.length > 0;
@@ -241,7 +228,9 @@ export default function DataTableOrders() {
         <div className="flex flex-1 items-center space-x-2">
           <Input
             placeholder="Filter tasks..."
-            value={(table.getColumn("description")?.getFilterValue() as string) ?? ""}
+            value={
+              (table.getColumn("description")?.getFilterValue() as string) ?? ""
+            }
             onChange={(event) =>
               table.getColumn("description")?.setFilterValue(event.target.value)
             }
@@ -256,13 +245,13 @@ export default function DataTableOrders() {
             />
           )}
 
-          {/* {table.getColumn("status") && (
+          {table.getColumn("status") && (
             <DataTableFacetedFilter
               column={table.getColumn("status")}
               title="Status"
               options={status_order_options}
             />
-          )} */}
+          )}
 
           {isFiltered && (
             <Button
@@ -356,23 +345,6 @@ export default function DataTableOrders() {
                             </Popover>
                             <FormDescription>
                               The date you want to add a comment for.
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="title"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Title</FormLabel>
-                            <FormControl>
-                              <Input placeholder="shadcn" {...field} />
-                            </FormControl>
-                            <FormDescription>
-                              This is your public display name.
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -501,8 +473,20 @@ export default function DataTableOrders() {
           </Link>
         </div>
       </div>
-      <TableComponent table={table} />
-      <DataTablePagination table={table} />
+      {isFetching ? (
+        <DataTableSkeleton
+          columnCount={5}
+          searchableColumnCount={1}
+          filterableColumnCount={1}
+          cellWidths={["10rem", "40rem", "12rem", "12rem", "8rem"]}
+          shrinkZero
+        />
+      ) : (
+        <>
+          <TableComponent table={table} />
+          <DataTablePagination table={table} />
+        </>
+      )}
     </div>
   );
 }

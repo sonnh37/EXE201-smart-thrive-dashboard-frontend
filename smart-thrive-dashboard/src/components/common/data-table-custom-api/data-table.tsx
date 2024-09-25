@@ -17,10 +17,9 @@ import {
 import {keepPreviousData, useQuery,} from '@tanstack/react-query'
 
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/components/ui/table"
-import {DataTablePagination} from "@/components/dashboard/data-table/data-table-pagination";
-import {BaseQueryableQuery} from "@/types/queries/base-query";
-import {DataTableToolbar} from "@/components/dashboard/data-table/data-table-toolbar";
-import BarLoader from "@/components/common/bar-loader"
+import { BaseQueryableQuery } from "@/types/request/base-query"
+import { DataTablePagination } from "./data-table-pagination"
+import { DataTableToolbar } from "./data-table-toolbar"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
@@ -44,8 +43,6 @@ export function DataTable<TData, TValue>({
         pageSize: 10,
     });
 
-    const isDeletedFilter = columnFilters.find(filter => filter.id === 'isDeleted');
-    const isDeleted = isDeletedFilter ? isDeletedFilter.value as boolean : undefined;
 
     const [queryParams, setQueryParams] = React.useState<BaseQueryableQuery>({
         pageNumber: pagination.pageIndex + 1,
@@ -56,8 +53,6 @@ export function DataTable<TData, TValue>({
     });
 
     useEffect(() => {
-        const isDeletedFilter = columnFilters.find(filter => filter.id === 'isDeleted');
-        const isDeleted = isDeletedFilter ? isDeletedFilter.value as boolean : undefined;
         setQueryParams({
             pageNumber: pagination.pageIndex + 1,
             pageSize: pagination.pageSize,

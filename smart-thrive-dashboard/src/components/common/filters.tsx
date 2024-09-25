@@ -21,12 +21,12 @@ export const label_options = [
 ];
 
 export const isDeleted_options = [
-    {label: "Active", value: "false"},
-    {label: "Deactivated", value: "true"},
+    {label: "Active", value: false},
+    {label: "Deactivated", value: true},
 ];
 
 export const status_order_options = [
-    {label: "Pending", value: OrderStatus.Pending.toString()},
-    {label: "Completed", value: OrderStatus.Completed.toString()},
-    {label: "Cancelled", value: OrderStatus.Cancelled.toString()},
+    {label: "Pending", value: OrderStatus.Pending},
+    {label: "Cancelled", value: OrderStatus.Cancelled},
+    {label: "Completed", value: OrderStatus.Completed},
 ];

@@ -5,6 +5,7 @@ import { LuPackage2 } from "react-icons/lu";
 import { SiCoursera } from "react-icons/si";
 import { TbBrandBlogger } from "react-icons/tb";
 import { Const } from "./const";
+import Image from "next/image";
 
 type Submenu = {
   href: string;
@@ -33,7 +34,7 @@ export function getMenuList(pathname: string): Group[] {
         {
           href: "/",
           label: "Dashboard",
-          active: pathname.includes("/"),
+          active: pathname == "/",
           icon: LayoutGrid, // Component type
           submenus: [],
         },
@@ -47,7 +48,14 @@ export function getMenuList(pathname: string): Group[] {
           label: "Orders",
           active: pathname.includes(Const.URL_ORDER),
           icon: () => (
-            <LiaFileInvoiceDollarSolid className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+            <Image
+              src="/invoice.png"
+              width={500}
+              height={500}
+              alt="Gallery Icon"
+              className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0"
+            />
+            // <LiaFileInvoiceDollarSolid className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
           ),
           submenus: [
             {
