@@ -8,6 +8,7 @@ export const fetchOrders = (
   query: OrderGetAllQuery
 ): Promise<BusinessResult<PagedResponse<Order>>> => {
 
+  console.log("check", query);
   const cleanedQuery: Record<string, any> = {};
     for (const key in query) {
         if (query[key as keyof OrderGetAllQuery] !== undefined && query[key as keyof OrderGetAllQuery] !== null) {

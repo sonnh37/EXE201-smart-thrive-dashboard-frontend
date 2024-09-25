@@ -1,32 +1,6 @@
-import {Bug, CheckCircle2, Circle, HelpCircle, PackagePlus, ScrollText, Timer, XCircle,} from "lucide-react";
+import { OrderStatus } from "@/types/enums/order";
+import { Bug, PackagePlus, ScrollText } from "lucide-react";
 
-export const status_options = [
-    {
-        value: "backlog",
-        label: "Backlog",
-        icon: HelpCircle,
-    },
-    {
-        value: "todo",
-        label: "Todo",
-        icon: Circle,
-    },
-    {
-        value: "in-progress",
-        label: "In Progress",
-        icon: Timer,
-    },
-    {
-        value: "done",
-        label: "Done",
-        icon: CheckCircle2,
-    },
-    {
-        value: "canceled",
-        label: "Canceled",
-        icon: XCircle,
-    },
-];
 
 export const label_options = [
     {
@@ -49,4 +23,10 @@ export const label_options = [
 export const isDeleted_options = [
     {label: "Active", value: "false"},
     {label: "Deactivated", value: "true"},
+];
+
+export const status_order_options = [
+    {label: "Pending", value: OrderStatus.Pending.toString()},
+    {label: "Completed", value: OrderStatus.Completed.toString()},
+    {label: "Cancelled", value: OrderStatus.Cancelled.toString()},
 ];

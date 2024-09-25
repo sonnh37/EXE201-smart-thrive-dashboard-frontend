@@ -16,7 +16,10 @@ import { columns } from "./columns";
 
 import { DataTableFacetedFilter } from "@/components/common/data-table-custom-api/data-table-faceted-filter";
 import { DataTableSkeleton } from "@/components/common/data-table-custom-api/data-table-skelete";
-import { isDeleted_options } from "@/components/common/filters";
+import {
+  isDeleted_options,
+  status_order_options,
+} from "@/components/common/filters";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -93,7 +96,6 @@ const FormSchema = z.object({
       return !!date.to;
     }, "End Date is required.")
     .optional(),
-  title: z.string().optional(),
   description: z.string().optional(),
   isDeleted: z.boolean().nullable().optional(),
 });
@@ -118,7 +120,6 @@ export default function DataTableOrders() {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      title: "",
       description: "",
       date: {
         from: undefined,
@@ -133,6 +134,14 @@ export default function DataTableOrders() {
   });
 
   const getQueryParams = useCallback((): OrderGetAllQuery => {
+    // Create an object to hold the column filter values
+    const filterParams: Record<string, any> = {};
+  
+    // Map over the column filters to create a key-value pair for each filter
+    columnFilters.forEach((filter) => {
+      filterParams[filter.id] = filter.value;
+    });
+  
     return {
       pageNumber: pagination.pageIndex + 1,
       pageSize: pagination.pageSize,
@@ -142,9 +151,14 @@ export default function DataTableOrders() {
       fromDate: formValues?.date?.from?.toISOString(),
       toDate: formValues?.date?.to?.toISOString(),
       description: formValues?.description!,
-      isDeleted: formValues?.isDeleted!,
+      // isDeleted: Array.isArray(formValues?.isDeleted) 
+      // ? formValues.isDeleted.filter((item): item is boolean => typeof item === 'boolean') 
+      // : formValues?.isDeleted !== undefined 
+      // ? [formValues.isDeleted as boolean] 
+      // : [],
+      ...filterParams,  // Spread the filterParams object into the final query params
     };
-  }, [pagination, sorting, formValues]);
+  }, [pagination, sorting, formValues, columnFilters]);
 
   const queryParams = useMemo(() => getQueryParams(), [getQueryParams]);
 
@@ -227,19 +241,28 @@ export default function DataTableOrders() {
         <div className="flex flex-1 items-center space-x-2">
           <Input
             placeholder="Filter tasks..."
-            value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
+            value={(table.getColumn("description")?.getFilterValue() as string) ?? ""}
             onChange={(event) =>
-              table.getColumn("title")?.setFilterValue(event.target.value)
+              table.getColumn("description")?.setFilterValue(event.target.value)
             }
             className="h-8 w-[150px] lg:w-[250px]"
           />
+
           {table.getColumn("isDeleted") && (
             <DataTableFacetedFilter
               column={table.getColumn("isDeleted")}
-              title="Status"
+              title="Is deleted"
               options={isDeleted_options}
             />
           )}
+
+          {/* {table.getColumn("status") && (
+            <DataTableFacetedFilter
+              column={table.getColumn("status")}
+              title="Status"
+              options={status_order_options}
+            />
+          )} */}
 
           {isFiltered && (
             <Button

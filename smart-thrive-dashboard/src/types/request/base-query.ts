@@ -9,7 +9,7 @@ export interface BaseQueryableQuery {
     id?: string;
     createdBy?: string;
     UpdatedBy?: string;
-    isDeleted?: boolean;
+    isDeleted?: boolean[];
 }
 
 export enum SortOrder {
