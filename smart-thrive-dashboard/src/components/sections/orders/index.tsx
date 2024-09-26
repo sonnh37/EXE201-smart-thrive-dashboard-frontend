@@ -123,7 +123,9 @@ export default function DataTableOrders() {
   const [shouldFetch, setShouldFetch] = useState(true);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
   const side = "left";
+  const [initialColumnValues, setInitialColumnValues] = useState<Record<string, any>>({});
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -213,6 +215,24 @@ export default function DataTableOrders() {
       scrollRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [pagination]);
+
+  useEffect(() => {
+    if (columnFilters.length > 0 || formValues) {
+      setPagination((prev) => ({
+        ...prev,
+        pageIndex: 0, // Reset page index
+      }));
+    }
+  }, [columnFilters, formValues]);
+
+  useEffect(() => {
+    const description = table.getColumn("description")?.getFilterValue() as string;
+    if (description && description.length > 0) {
+      setIsTyping(true);
+    } else {
+      setIsTyping(false);
+    }
+  }, [table.getColumn("description")?.getFilterValue()]);
 
   if (error) return <div>Error loading data</div>;
 
@@ -426,7 +446,7 @@ export default function DataTableOrders() {
                 variant="outline"
                 size="sm"
                 className="ml-auto hidden h-8 lg:flex"
-              >
+                >
                 <MixerHorizontalIcon className="mr-2 h-4 w-4" />
                 View
               </Button>
@@ -470,14 +490,18 @@ export default function DataTableOrders() {
             className="text-primary-foreground sm:whitespace-nowrap"
             href={`${Const.URL_ORDER_NEW}`}
           >
-            <Button size="sm" className="h-8 gap-1">
-              <PlusCircle className="fill-primary-background h-3.5 w-3.5" />
+            <Button size="sm" 
+                  className="space-x-2 shadow-[0_4px_14px_0_rgb(0,118,255,79%)] hover:shadow-[0_6px_20px_rgba(0,118,255,23%)] font-light transition duration-300 ease-linear"
+                  >
+              <PlusCircle
+               className="fill-primary-background h-3.5 w-3.5" 
+               />
               Add {stringObject.toLowerCase()}
             </Button>
           </Link>
         </div>
       </div>
-      {isFetching ? (
+      {(isFetching && !isTyping) ? (
         <DataTableSkeleton
           columnCount={5}
           searchableColumnCount={1}
