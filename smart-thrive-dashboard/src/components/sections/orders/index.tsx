@@ -66,6 +66,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { CiFilter } from "react-icons/ci";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { fetchOrder, fetchOrders } from "@/services/order-service";
@@ -75,6 +76,9 @@ import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import { MixerHorizontalIcon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
 import { CSVLink } from "react-csv";
+import { FiFilter } from "react-icons/fi";
+import { MdOutlineFileDownload } from "react-icons/md";
+
 import {
   CalendarIcon,
   File,
@@ -88,6 +92,7 @@ import { z } from "zod";
 import { Const } from "@/lib/const";
 import { useDebounce } from "@/hooks/use-debounce";
 import { debounce, filter } from "lodash";
+import { motion } from "framer-motion";
 
 const DATE_REQUIRED_ERROR = "Date is required.";
 const FormSchema = z.object({
@@ -125,7 +130,9 @@ export default function DataTableOrders() {
   const [isClicked, setIsClicked] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const side = "left";
-  const [initialColumnValues, setInitialColumnValues] = useState<Record<string, any>>({});
+  const [initialColumnValues, setInitialColumnValues] = useState<
+    Record<string, any>
+  >({});
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -142,10 +149,6 @@ export default function DataTableOrders() {
   const formValues = useWatch({
     control: form.control,
   });
-
-  //const formValues = useDebounce(formWatch, 500); // Đợi 500ms trước khi gọi API
-
-  //const debouncedColumnFilters = useDebounce(columnFilters, 100); // Đợi 500ms trước khi gọi API
 
   const getQueryParams = useCallback((): OrderGetAllQuery => {
     const filterParams: Record<string, any> = {};
@@ -226,7 +229,9 @@ export default function DataTableOrders() {
   }, [columnFilters, formValues]);
 
   useEffect(() => {
-    const description = table.getColumn("description")?.getFilterValue() as string;
+    const description = table
+      .getColumn("description")
+      ?.getFilterValue() as string;
     if (description && description.length > 0) {
       setIsTyping(true);
     } else {
@@ -299,8 +304,8 @@ export default function DataTableOrders() {
                   className="h-8 gap-1"
                   onClick={handleFilterClick}
                 >
-                  <SlidersHorizontal className="h-3.5 w-3.5" />
-                  <span className=" sm:whitespace-nowrap">Filter Advanced</span>
+                  <FiFilter className="h-4 w-4" />
+                  {/* <span className=" sm:whitespace-nowrap">Filter Advanced</span> */}
                 </Button>
               </SheetTrigger>
 
@@ -446,9 +451,9 @@ export default function DataTableOrders() {
                 variant="outline"
                 size="sm"
                 className="ml-auto hidden h-8 lg:flex"
-                >
-                <MixerHorizontalIcon className="mr-2 h-4 w-4" />
-                View
+              >
+                <MixerHorizontalIcon className="h-4 w-4" />
+                {/* View */}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[150px]">
@@ -480,28 +485,31 @@ export default function DataTableOrders() {
 
           <CSVLink filename="export_data.csv" data={data?.data?.results ?? []}>
             <Button size="sm" variant="outline" className="h-8 gap-1">
-              <File className="h-3.5 w-3.5" />
-              <span className=" sm:whitespace-nowrap">Export CSV</span>
+              <MdOutlineFileDownload className="h-4 w-4" />
+              {/* <span className=" sm:whitespace-nowrap">Export CSV</span> */}
             </Button>
-            
           </CSVLink>
 
           <Link
             className="text-primary-foreground sm:whitespace-nowrap"
             href={`${Const.URL_ORDER_NEW}`}
           >
-            <Button size="sm" 
-                  className="space-x-2 shadow-[0_4px_14px_0_rgb(0,118,255,79%)] hover:shadow-[0_6px_20px_rgba(0,118,255,23%)] font-light transition duration-300 ease-linear"
-                  >
-              <PlusCircle
-               className="fill-primary-background h-3.5 w-3.5" 
-               />
-              Add {stringObject.toLowerCase()}
-            </Button>
+            <motion.div
+            whileHover={{ scale: 1.1, boxShadow: "0px 6px 20px rgba(0,118,255,0.23)" }}
+            whileTap={{ scale: 0.95 }}
+            >
+              <Button
+                size="sm"
+                className="space-x-2 shadow-[0_4px_14px_0_rgb(0,118,255,79%)] hover:shadow-[0_6px_20px_rgba(0,118,255,23%)] font-light transition duration-300 ease-linear"
+              >
+                <PlusCircle className="fill-primary-background h-5 w-5" />
+                {/* Add */}
+              </Button>
+            </motion.div>
           </Link>
         </div>
       </div>
-      {(isFetching && !isTyping) ? (
+      {isFetching && !isTyping ? (
         <DataTableSkeleton
           columnCount={5}
           searchableColumnCount={1}

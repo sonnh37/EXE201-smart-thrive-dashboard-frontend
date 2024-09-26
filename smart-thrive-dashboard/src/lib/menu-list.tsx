@@ -75,7 +75,13 @@ export function getMenuList(pathname: string): Group[] {
           label: "Packages",
           active: pathname.includes(Const.URL_PACKAGE),
           icon: () => (
-            <LuPackage2 className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+            <Image
+            src="/package.png"
+            width={500}
+            height={500}
+            alt="Gallery Icon"
+            className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0"
+          />
           ),
           submenus: [
             {
@@ -95,8 +101,14 @@ export function getMenuList(pathname: string): Group[] {
           label: "Courses",
           active: pathname.includes(Const.URL_COURSE),
           icon: () => (
-            <SiCoursera className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-          ),
+            <Image
+            src="/course.png"
+            width={500}
+            height={500}
+            alt="Gallery Icon"
+            className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0"
+          />
+        ),
           submenus: [
             {
               href: Const.URL_COURSE,
@@ -115,8 +127,13 @@ export function getMenuList(pathname: string): Group[] {
           label: "Blogs",
           active: pathname.includes(Const.URL_BLOG),
           icon: () => (
-            <TbBrandBlogger className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-          ),
+            <Image
+            src="/blog.png"
+            width={500}
+            height={500}
+            alt="Gallery Icon"
+            className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0"
+          />),
           submenus: [
             {
               href: Const.URL_BLOG,
