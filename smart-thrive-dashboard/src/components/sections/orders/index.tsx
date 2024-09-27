@@ -2,6 +2,7 @@ import { columns } from "./columns";
 
 import {
   isDeleted_options,
+  payment_order_options,
   status_order_options,
 } from "@/components/common/filters";
 import { fetchOrders } from "@/services/order-service";
@@ -14,6 +15,7 @@ import { FilterEnum } from "@/types/filter-enum";
 export default function DataTableOrders() {
   const filterEnums: FilterEnum[] = [
     { columnId: "status", title: "Status", options: status_order_options },
+    { columnId: "paymentMethod", title: "Payment method", options: payment_order_options },
     { columnId: "isDeleted", title: "Is deleted", options: isDeleted_options },
   ];
 

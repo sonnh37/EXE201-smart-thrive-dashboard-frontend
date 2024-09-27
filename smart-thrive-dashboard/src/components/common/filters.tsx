@@ -1,4 +1,4 @@
-import { OrderStatus } from "@/types/enums/order";
+import { OrderStatus, PaymentMethod } from "@/types/enums/order";
 import { Bug, PackagePlus, ScrollText } from "lucide-react";
 
 
@@ -30,3 +30,10 @@ export const status_order_options = [
     {label: "Cancelled", value: OrderStatus.Cancelled},
     {label: "Completed", value: OrderStatus.Completed},
 ];
+
+export const payment_order_options = [
+    {label: "Creadit card", value: PaymentMethod.CreditCard},
+    {label: "Paypal", value: PaymentMethod.Paypal},
+    {label: "Bank Transfer", value: PaymentMethod.BankTransfer},
+];
+
