@@ -44,13 +44,11 @@ export function CollapseMenuButton({
     const [isCollapsed, setIsCollapsed] = useState<boolean>(isSubmenuActive);
 
     const renderIcon = () => {
-        // Kiểm tra nếu icon là một function (LucideIcon)
         if (typeof icon === "function") {
             const IconComponent = icon as LucideIcon;
             return <IconComponent size={18}/>;
         }
 
-        // Kiểm tra nếu icon là một ReactNode hoặc là một Image
         return icon || (
             <Image
                 src="/default-icon.png"

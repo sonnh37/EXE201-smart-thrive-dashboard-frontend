@@ -20,7 +20,7 @@ import { Input } from "@/components/ui/input";
 
 import { Textarea } from "@/components/ui/textarea";
 
-import { useEffect, useRef, useState } from "react";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Form,
   FormControl,
@@ -30,6 +30,11 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { format } from "date-fns";
@@ -39,13 +44,8 @@ import {
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
+import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
 
 interface OrderFormProps {
   initialData: any | null;
@@ -96,8 +96,6 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
           const progress =
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
 
-          //setProgressUpload(progress) // to show progress upload
-
           switch (snapshot.state) {
             case "paused":
               console.log("Upload is paused");
@@ -108,12 +106,10 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
           }
         },
         (error) => {
-          // Xử lý lỗi
           console.error(error);
           setImgLoading(false);
         },
         () => {
-          // Upload hoàn tất, lấy URL ảnh
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             setImagePreview(downloadURL);
             setFirebaseLink(downloadURL);
@@ -131,7 +127,6 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
 
       deleteObject(imageRef)
         .then(() => {
-          // Remove the image from the state
           setImagePreview(null);
           setFirebaseLink(null);
           form.setValue("background", "");
@@ -146,10 +141,9 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      setLoading(true); // Bắt đầu trạng thái loading
+      setLoading(true);
 
       if (initialData) {
-        // API cập nhật order
         const response = await axios.put(
           `https://localhost:7192/orders`,
           values
@@ -161,7 +155,6 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
           confirmButtonText: "OK",
         });
       } else {
-        // API tạo order
         const response = await axios.post(
           "https://localhost:7192/orders",
           values
@@ -182,7 +175,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
         confirmButtonText: "OK",
       });
     } finally {
-      setLoading(false); // Kết thúc trạng thái loading
+      setLoading(false);
     }
   };
 
@@ -201,7 +194,6 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
 
   useEffect(() => {
     if (initialData) {
-      // Reset the form with initial data
       form.reset({
         id: initialData.id || "",
         title: initialData.title || "",
@@ -215,12 +207,10 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
         photos: initialData.photos || [],
       });
 
-      // Update local state for date
       setDate(
         initialData.createdDate ? new Date(initialData.createdDate) : new Date()
       );
 
-      // Update local state for image preview and link
       setImagePreview(initialData.background || "");
       setFirebaseLink(initialData.background || "");
     } else {
@@ -427,7 +417,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
                                 selectedDate
                                   ? new Date(selectedDate)
                                   : new Date()
-                              ); // Update form value
+                              ); 
                             };
                             return (
                               <FormItem>

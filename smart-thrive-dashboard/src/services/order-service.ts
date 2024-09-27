@@ -9,13 +9,10 @@ const cleanQueryParams = (query: OrderGetAllQuery) => {
   for (const key in query) {
     const value = query[key as keyof OrderGetAllQuery];
 
-    // Xử lý trường hợp isDeleted
     if (key === 'isDeleted') {
       if (Array.isArray(value)) {
-        // Nếu là mảng, thêm từng giá trị vào cleanedQuery
         cleanedQuery[key] = value.filter(item => item !== null).map(item => item.toString());
       } else if (value !== undefined && value !== null) {
-        // Nếu không phải là mảng, chuyển đổi thành chuỗi
         cleanedQuery[key] = [value.toString()];
       }
     } else if (Array.isArray(value)) {
@@ -36,11 +33,9 @@ export const fetchOrders = (
   const cleanedQuery = cleanQueryParams(query);
   const params = new URLSearchParams();
 
-  // Thêm các tham số vào params
   for (const key in cleanedQuery) {
     const value = cleanedQuery[key];
     if (Array.isArray(value)) {
-      // Nếu là mảng, thêm từng phần tử vào params
       value.forEach(val => {
         params.append(key, val);
       });

@@ -1,15 +1,12 @@
 "use client";
 
-import { ColumnDef } from "@tanstack/react-table";
-import React from "react";
-import { Checkbox } from "@/components/ui/checkbox";
-import Image from "next/image";
-import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
-import Actions from "./actions";
 import { DataTableColumnHeader } from "@/components/common/data-table-custom-api/data-table-column-header";
-import { Order } from "@/types/order";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { OrderStatus, PaymentMethod } from "@/types/enums/order";
+import { Order } from "@/types/order";
+import { ColumnDef } from "@tanstack/react-table";
+import Actions from "./actions";
 
 export const columns: ColumnDef<Order>[] = [
   {
@@ -81,10 +78,10 @@ export const columns: ColumnDef<Order>[] = [
     cell: ({ row }) => {
       const date = new Date(row.getValue("createdDate"));
       return date.toLocaleDateString("en-US", {
-        weekday: "short", // Thu
-        year: "numeric", // 2022
-        month: "short", // Oct
-        day: "numeric", // 20
+        weekday: "short",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
       });
     },
   },

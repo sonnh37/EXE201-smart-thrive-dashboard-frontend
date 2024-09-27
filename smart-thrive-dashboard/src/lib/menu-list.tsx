@@ -17,7 +17,7 @@ type Menu = {
   href: string;
   label: string;
   active: boolean;
-  icon: React.ElementType; // React component type
+  icon: React.ElementType;
   submenus: Submenu[];
 };
 
@@ -35,7 +35,7 @@ export function getMenuList(pathname: string): Group[] {
           href: "/",
           label: "Dashboard",
           active: pathname == "/",
-          icon: LayoutGrid, // Component type
+          icon: LayoutGrid,
           submenus: [],
         },
       ],
@@ -55,7 +55,6 @@ export function getMenuList(pathname: string): Group[] {
               alt="Gallery Icon"
               className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0"
             />
-            // <LiaFileInvoiceDollarSolid className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
           ),
           submenus: [
             {
@@ -156,14 +155,14 @@ export function getMenuList(pathname: string): Group[] {
           href: "/users",
           label: "Users",
           active: pathname.includes("/users"),
-          icon: Users, // Component type
+          icon: Users,
           submenus: [],
         },
         {
           href: "/account",
           label: "Account",
           active: pathname.includes("/account"),
-          icon: Settings, // Component type
+          icon: Settings, 
           submenus: [],
         },
       ],

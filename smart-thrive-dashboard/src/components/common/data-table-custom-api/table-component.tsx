@@ -10,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { DataTablePagination } from "./data-table-pagination";
 
 interface TableComponentProps<TData> {
   table: ReactTable<TData>;
@@ -21,7 +22,7 @@ export function TableComponent<TData>({ table }: TableComponentProps<TData>) {
     .flatMap((group) => group.headers).length;
 
   return (
-    <div className="rounded-md border">
+    <div className="rounded-md border  space-y-8">
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -62,6 +63,7 @@ export function TableComponent<TData>({ table }: TableComponentProps<TData>) {
           )}
         </TableBody>
       </Table>
+      <DataTablePagination table={table} />
     </div>
   );
 }

@@ -8,21 +8,18 @@ import { PackageXCourse } from "./package-x-course";
 export enum CourseType {
   Online = 1,
   Offline = 2,
-  // Add more types as needed
 }
 
 export enum CourseStatus {
   Active = 1,
   Inactive = 2,
   Completed = 3,
-  // Add more statuses as needed
 }
 
 export enum DayInWeek {
   Monday = 1,
   Tuesday = 2,
   Wednesday = 3,
-  // Add the rest of the week
 }
 
 export interface Course extends BaseEntity {
