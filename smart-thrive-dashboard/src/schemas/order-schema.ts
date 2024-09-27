@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const formOrderSchema = z.object({
+export const formOrderFilterAdvancedSchema = z.object({
   id: z.string().nullable().optional(),
   date: z
     .object({

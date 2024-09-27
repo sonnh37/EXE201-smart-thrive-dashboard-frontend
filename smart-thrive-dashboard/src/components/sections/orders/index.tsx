@@ -7,14 +7,14 @@ import {
 import { fetchOrders } from "@/services/order-service";
 
 import { DataTableGeneric } from "@/components/common/data-table-generic/data-table-generic";
-import { formOrderSchema } from "@/schemas/order-schema";
+import { formOrderFilterAdvancedSchema } from "@/schemas/order-schema";
 import { formFilterAdvanceds } from "./filter-advanced-form";
 import { FilterEnum } from "@/types/filter-enum";
 
 export default function DataTableOrders() {
   const filterEnums: FilterEnum[] = [
-    { columnId: "isDeleted", title: "Is deleted", options: isDeleted_options },
     { columnId: "status", title: "Status", options: status_order_options },
+    { columnId: "isDeleted", title: "Is deleted", options: isDeleted_options },
   ];
 
   return (
@@ -23,7 +23,7 @@ export default function DataTableOrders() {
       fetchData={fetchOrders}
       columnSearch="description"
       filterEnums={filterEnums}
-      formSchema={formOrderSchema}
+      formSchema={formOrderFilterAdvancedSchema}
       formFilterAdvanceds={formFilterAdvanceds}
     />
   );
