@@ -1,16 +1,16 @@
 export enum CourseType {
-  Online = 1,
-  Offline = 2,
+  Online,
+  Offline,
 }
 
 export enum CourseStatus {
-  Active = 1,
-  Inactive = 2,
-  Completed = 3,
+  Pending,
+  Approved,
+  Rejected,
 }
 
 export enum DayInWeek {
-  Monday = 1,
-  Tuesday = 2,
-  Wednesday = 3,
+  Monday,
+  Tuesday,
+  Wednesday,
 }

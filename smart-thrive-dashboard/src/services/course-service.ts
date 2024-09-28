@@ -17,21 +17,24 @@ export const fetchCourses = (
   console.log("check_service_course_query", cleanedQuery.toString());
 
   return axios
-    .get<BusinessResult<PagedResponse<Course>>>(`${Const.API_ORDER}?${cleanedQuery}`)
-    .then((response) => response.data)
+    .get<BusinessResult<PagedResponse<Course>>>(`${Const.API_COURSE}?${cleanedQuery}`)
+    .then((response) => {
+      console.log("check_result", response.data)
+      return response.data
+    })
     .catch(handleError);
 };
 
 export const fetchCourse = (id: string): Promise<BusinessResult<Course>> => {
   return axios
-    .get<BusinessResult<Course>>(`${Const.API_ORDER}/${id}`)
+    .get<BusinessResult<Course>>(`${Const.API_COURSE}/${id}`)
     .then((response) => response.data)
     .catch(handleError);
 };
 
 export const deleteCourse = (id: string): Promise<BusinessResult<null>> => {
   return axios
-    .delete<BusinessResult<null>>(`${Const.API_ORDER}/${id}`)
+    .delete<BusinessResult<null>>(`${Const.API_COURSE}/${id}`)
     .then((response) => response.data)
     .catch(handleError);
 };
