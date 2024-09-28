@@ -1,6 +1,6 @@
 "use client";
 
-import { DataTableColumnHeader } from "@/components/common/data-table-custom-api/data-table-column-header";
+import { DataTableColumnHeader } from "@/components/common/data-table-generic/data-table-column-header";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { OrderStatus, PaymentMethod } from "@/types/enums/order";

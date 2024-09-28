@@ -1,6 +1,3 @@
-import { DataTableFacetedFilter } from "@/components/common/data-table-custom-api/data-table-faceted-filter";
-import { DataTableSkeleton } from "@/components/common/data-table-custom-api/data-table-skelete";
-import { TableComponent } from "@/components/common/data-table-custom-api/table-component";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -56,6 +53,7 @@ import { FiFilter } from "react-icons/fi";
 import { MdOutlineFileDownload } from "react-icons/md";
 import { z, ZodObject } from "zod";
 import { DeleteBaseEntitysDialog } from "./delete-dialog-generic";
+import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 
 interface DataTableToolbarProps<TData> {
   form: UseFormReturn<
@@ -77,7 +75,7 @@ interface DataTableToolbarProps<TData> {
   renderFormFields: () => JSX.Element[];
 }
 
-export function DataTableToolbarGeneric<TData>({
+export function DataTableToolbar<TData>({
   form,
   table,
   filterEnums,

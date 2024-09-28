@@ -1,5 +1,4 @@
-import { DataTableSkeleton } from "@/components/common/data-table-custom-api/data-table-skelete";
-import { TableComponent } from "@/components/common/data-table-custom-api/table-component";
+import { DataTableSkeleton } from "@/components/common/data-table-generic/data-table-skelete";
 import { FormField } from "@/components/ui/form";
 import { FilterEnum } from "@/types/filter-enum";
 import { FormFilterAdvanced } from "@/types/form-filter-advanced";
@@ -25,7 +24,8 @@ import * as React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { z, ZodObject } from "zod";
-import { DataTableToolbarGeneric } from "./data-table-toolbar-generic";
+import { DataTableToolbar } from "./data-table-toolbar";
+import { DataTableComponent } from "./data-table-component";
 
 interface DataTableProps<TData> {
   columns: ColumnDef<TData>[];
@@ -39,7 +39,7 @@ interface DataTableProps<TData> {
   formFilterAdvanceds: FormFilterAdvanced[];
 }
 
-export function DataTableGeneric<TData>({
+export function DataTable<TData>({
   columns,
   fetchData,
   filterEnums,
@@ -58,10 +58,8 @@ export function DataTableGeneric<TData>({
     pageIndex: 0,
     pageSize: 10,
   });
-  const queryClient = useQueryClient();
   const [shouldFetch, setShouldFetch] = useState(true);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [isClicked, setIsClicked] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
 
   const getDefaultValues = () => {
@@ -125,7 +123,6 @@ export function DataTableGeneric<TData>({
   const handleFilterClick = () => {
     setIsSheetOpen(true);
     setShouldFetch(false);
-    setIsClicked(true);
   };
 
   const table = useReactTable({
@@ -148,10 +145,8 @@ export function DataTableGeneric<TData>({
   const handleSheetChange = (open: boolean) => {
     setIsSheetOpen(open);
     if (open) {
-      setIsClicked(false);
       setShouldFetch(false);
     } else {
-      setIsClicked(true);
       setShouldFetch(true);
     }
   };
@@ -194,7 +189,7 @@ export function DataTableGeneric<TData>({
   };
   return (
     <div ref={scrollRef} className="space-y-4">
-      <DataTableToolbarGeneric
+      <DataTableToolbar
         form={form}
         table={table}
         filterEnums={filterEnums}
@@ -202,10 +197,10 @@ export function DataTableGeneric<TData>({
         isFiltered={isFiltered}
         isSheetOpen={isSheetOpen}
         columnSearch={columnSearch}
-        handleFilterClick={handleFilterClick} // Truyền hàm này
-        handleSheetChange={handleSheetChange} // Truyền hàm này
-        handleClear={handleClear} // Truyền hàm này
-        renderFormFields={renderFormFields} // Truyền hàm này
+        handleFilterClick={handleFilterClick}
+        handleSheetChange={handleSheetChange}
+        handleClear={handleClear}
+        renderFormFields={renderFormFields}
       />
       {isFetching && !isTyping ? (
         <DataTableSkeleton
@@ -216,9 +211,7 @@ export function DataTableGeneric<TData>({
           shrinkZero
         />
       ) : (
-        <>
-          <TableComponent table={table} />
-        </>
+        <DataTableComponent table={table} />
       )}
     </div>
   );

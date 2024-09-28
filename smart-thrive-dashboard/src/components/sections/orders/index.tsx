@@ -7,10 +7,10 @@ import {
 } from "@/components/common/filters";
 import { deleteOrder, fetchOrders } from "@/services/order-service";
 
-import { DataTableGeneric } from "@/components/common/data-table-generic/data-table-generic";
 import { formOrderFilterAdvancedSchema } from "@/schemas/order-schema";
 import { formFilterAdvanceds } from "./filter-advanced-form";
 import { FilterEnum } from "@/types/filter-enum";
+import { DataTable } from "@/components/common/data-table-generic/data-table";
 
 export default function DataTableOrders() {
   const filterEnums: FilterEnum[] = [
@@ -24,7 +24,7 @@ export default function DataTableOrders() {
   ];
 
   return (
-    <DataTableGeneric
+    <DataTable
       deleteData={deleteOrder}
       columns={columns}
       fetchData={fetchOrders}

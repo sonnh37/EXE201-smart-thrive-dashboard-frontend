@@ -16,7 +16,7 @@ interface TableComponentProps<TData> {
   table: ReactTable<TData>;
 }
 
-export function TableComponent<TData>({ table }: TableComponentProps<TData>) {
+export function DataTableComponent<TData>({ table }: TableComponentProps<TData>) {
   const columnsLength = table
     .getHeaderGroups()
     .flatMap((group) => group.headers).length;
