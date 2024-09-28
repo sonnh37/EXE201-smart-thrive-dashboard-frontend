@@ -94,9 +94,6 @@ export function DataTableGeneric<TData>({
   const [isTyping, setIsTyping] = useState(false);
   const side = "left";
   const pathname = usePathname();
-  const [initialColumnValues, setInitialColumnValues] = useState<
-    Record<string, any>
-  >({});
 
   const getDefaultValues = () => {
     return formFilterAdvanceds.reduce(
@@ -107,7 +104,6 @@ export function DataTableGeneric<TData>({
         if ("defaultValue" in field) {
           acc[field.name] = field.defaultValue;
         }
-        console.log(field.name, field.defaultValue);
         return acc;
       },
       {} as Record<string, any>
@@ -201,13 +197,13 @@ export function DataTableGeneric<TData>({
   }, [columnFilters, formValues]);
 
   useEffect(() => {
-    const field = table.getColumn(columnSearch)?.getFilterValue() as string;
+    const field = formValues[columnSearch] as string;
     if (field && field.length > 0) {
       setIsTyping(true);
     } else {
       setIsTyping(false);
     }
-  }, [table.getColumn(columnSearch)?.getFilterValue()]);
+  }, [formValues[columnSearch]]);
 
   if (error) return <div>Error loading data</div>;
 
@@ -233,11 +229,9 @@ export function DataTableGeneric<TData>({
         <div className="flex flex-1 items-center space-x-2">
           <Input
             placeholder={`Enter ${columnSearch}...`}
-            value={
-              (table.getColumn(columnSearch)?.getFilterValue() as string) ?? ""
-            }
+            value={(form.getValues(columnSearch) as string) ?? ""}
             onChange={(event) =>
-              table.getColumn(columnSearch)?.setFilterValue(event.target.value)
+              (form.setValue(columnSearch,event.target.value))
             }
             className="h-8 w-[150px] lg:w-[250px]"
           />
@@ -373,7 +367,7 @@ export function DataTableGeneric<TData>({
             >
               <Button
                 size="sm"
-                className="space-x-2 shadow-[0_4px_14px_0_rgb(0,118,255,79%)] hover:shadow-[0_6px_20px_rgba(0,118,255,23%)] font-light transition duration-300 ease-linear"
+                className="shadow-[0_4px_14px_0_rgb(0,118,255,79%)] hover:shadow-[0_6px_20px_rgba(0,118,255,23%)] font-light transition duration-300 ease-linear"
               >
                 <PlusCircle className="fill-primary-background h-5 w-5" />
                 {/* Add */}

@@ -7,6 +7,7 @@ import { OrderStatus, PaymentMethod } from "@/types/enums/order";
 import { Order } from "@/types/order";
 import { ColumnDef } from "@tanstack/react-table";
 import Actions from "./actions";
+import Image from "next/image";
 
 export const columns: ColumnDef<Order>[] = [
   {
@@ -21,13 +22,19 @@ export const columns: ColumnDef<Order>[] = [
         aria-label="Select all"
       />
     ),
-    cell: ({ row }) => (
-      <Checkbox
+    cell: ({ row }) => {
+
+      const isDeleted = row.getValue("isDeleted") as boolean;
+      if (isDeleted) {
+        return <></>;
+      }
+      return <Checkbox
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
         aria-label="Select row"
-      />
-    ),
+      />;
+    },
+
     enableSorting: false,
     enableHiding: false,
   },
@@ -127,14 +134,29 @@ export const columns: ColumnDef<Order>[] = [
     cell: ({ row }) => {
       const isDeleted = row.getValue("isDeleted") as boolean;
       if (!isDeleted) {
-        return <Badge variant="secondary">Active</Badge>;
+        return (
+          <Image
+            src="/check.png"
+            width={500}
+            height={500}
+            alt="Gallery Icon"
+            className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0"
+          />
+        );
       }
-      return <Badge variant="destructive">Deactivate</Badge>;
+      return (
+        <Image
+          src="/uncheck.png"
+          width={500}
+          height={500}
+          alt="Gallery Icon"
+          className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0"
+        />
+      );
     },
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },
-    //enableGlobalFilter: false,
   },
   {
     id: "actions",

@@ -1,11 +1,7 @@
 import { LayoutGrid, Settings, Users } from "lucide-react";
-import React from "react";
-import { LiaFileInvoiceDollarSolid } from "react-icons/lia";
-import { LuPackage2 } from "react-icons/lu";
-import { SiCoursera } from "react-icons/si";
-import { TbBrandBlogger } from "react-icons/tb";
-import { Const } from "./const";
 import Image from "next/image";
+import React from "react";
+import { Const } from "./const";
 
 type Submenu = {
   href: string;

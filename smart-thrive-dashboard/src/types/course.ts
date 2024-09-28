@@ -4,23 +4,7 @@ import { Feedback } from "./feedback";
 import { Subject } from "./subject";
 import { Provider } from "./provider";
 import { PackageXCourse } from "./package-x-course";
-
-export enum CourseType {
-  Online = 1,
-  Offline = 2,
-}
-
-export enum CourseStatus {
-  Active = 1,
-  Inactive = 2,
-  Completed = 3,
-}
-
-export enum DayInWeek {
-  Monday = 1,
-  Tuesday = 2,
-  Wednesday = 3,
-}
+import { CourseStatus, CourseType, DayInWeek } from "./enums/course";
 
 export interface Course extends BaseEntity {
   subjectId?: string;
