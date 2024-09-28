@@ -54,12 +54,14 @@ import { useForm, useWatch } from "react-hook-form";
 import { FiFilter } from "react-icons/fi";
 import { MdOutlineFileDownload } from "react-icons/md";
 import { z, ZodObject } from "zod";
+import { DeleteBaseEntitysDialog } from "./delete-dialog-generic";
 
 interface DataTableProps<TData> {
   columns: ColumnDef<TData>[];
   fetchData: (
     queryParams: BaseQueryableQuery
   ) => Promise<BusinessResult<PagedResponse<TData>>>;
+  deleteData: (id: string) => Promise<BusinessResult<null>>;
   columnSearch: string;
   filterEnums: FilterEnum[];
   formSchema: ZodObject<any>;
@@ -70,6 +72,7 @@ export function DataTableGeneric<TData>({
   columns,
   fetchData,
   filterEnums,
+  deleteData,
   columnSearch,
   formSchema,
   formFilterAdvanceds,
@@ -266,6 +269,15 @@ export function DataTableGeneric<TData>({
         </div>
         <div className="ml-auto flex items-center gap-2">
           {/* Hand by hand */}
+          {table.getFilteredSelectedRowModel().rows.length > 0 ? (
+            <DeleteBaseEntitysDialog
+              list={table
+                .getFilteredSelectedRowModel()
+                .rows.map((row) => row.original)}
+              deleteData={deleteData}
+              onSuccess={() => table.toggleAllRowsSelected(false)}
+            />
+          ) : null}
           <Sheet key={side} open={isSheetOpen} onOpenChange={handleSheetChange}>
             <SheetTrigger>
               <Button

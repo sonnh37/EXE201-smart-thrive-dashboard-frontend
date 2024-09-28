@@ -139,8 +139,7 @@ export const columns: ColumnDef<Order>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const model = row.original;
-      return <Actions id={model.id} />;
+      return <Actions row={row} />;
     },
   },
 ];

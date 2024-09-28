@@ -5,7 +5,7 @@ import {
   payment_order_options,
   status_order_options,
 } from "@/components/common/filters";
-import { fetchOrders } from "@/services/order-service";
+import { deleteOrder, fetchOrders } from "@/services/order-service";
 
 import { DataTableGeneric } from "@/components/common/data-table-generic/data-table-generic";
 import { formOrderFilterAdvancedSchema } from "@/schemas/order-schema";
@@ -15,12 +15,17 @@ import { FilterEnum } from "@/types/filter-enum";
 export default function DataTableOrders() {
   const filterEnums: FilterEnum[] = [
     { columnId: "status", title: "Status", options: status_order_options },
-    { columnId: "paymentMethod", title: "Payment method", options: payment_order_options },
+    {
+      columnId: "paymentMethod",
+      title: "Payment method",
+      options: payment_order_options,
+    },
     { columnId: "isDeleted", title: "Is deleted", options: isDeleted_options },
   ];
 
   return (
     <DataTableGeneric
+      deleteData={deleteOrder}
       columns={columns}
       fetchData={fetchOrders}
       columnSearch="description"

@@ -68,3 +68,15 @@ export const fetchOrder = (id: string): Promise<BusinessResult<Order>> => {
       throw error;
     });
 };
+
+export const deleteOrder = (id: string): Promise<BusinessResult<null>> => {
+  return axios
+    .delete(`${Const.API_ORDER}/${id}`)
+    .then((response) => {
+      return response.data as BusinessResult<null>;
+    })
+    .catch((error) => {
+      console.error("Failed to delete order:", error);
+      throw error;
+    });
+};

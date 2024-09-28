@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import AdminPanelLayout from "@/components/common/admin-panel-layout";
 import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "next-themes";
+import { Toaster } from "sonner";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ export default function RootLayout({
           </ThemeProvider>
         </SessionProvider>
       </body>
+      <Toaster />
     </html>
   );
 }
