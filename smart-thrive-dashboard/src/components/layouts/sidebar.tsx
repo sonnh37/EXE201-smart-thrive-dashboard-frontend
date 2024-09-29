@@ -37,8 +37,8 @@ export function Sidebar() {
               width={50}
               height={50}
               alt="Gallery Icon"
-              className="rounded-full aspect-square object-cover bg-gradient-to-r from-indigo-500 to-sky-500 "
-            />
+              className="rounded-full aspect-square object-cover bg-gradient-to-r from-indigo-500 to-sky-500 [box-shadow:1px_1px_20px_var(--tw-shadow-color)] shad shadow-blue-500"
+              />
             {/* <PanelsTopLeft className="w-6 h-6 mr-1"/> */}
             <h1
               className={cn(

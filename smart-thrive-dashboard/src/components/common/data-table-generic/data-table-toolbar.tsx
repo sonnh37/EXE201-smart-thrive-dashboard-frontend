@@ -130,7 +130,7 @@ export function DataTableToolbar<TData>({
           </Button>
         )}
       </div>
-      <div className="ml-auto flex items-center gap-2">
+      <div className="ml-auto flex items-center gap-2 ">
         {/* Hand by hand */}
         {table.getFilteredSelectedRowModel().rows.length > 0 ? (
           <DeleteBaseEntitysDialog
@@ -154,7 +154,7 @@ export function DataTableToolbar<TData>({
             </Button>
           </SheetTrigger>
 
-          <SheetContent side={side}>
+          <SheetContent side={side} className="dark:backdrop-blur-3 dark:bg-white/5">
             <Form {...form}>
               <form className="space-y-8">
                 <SheetHeader>
