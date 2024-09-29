@@ -23,7 +23,7 @@ class Const {
   //#endregion
 
   //#region API
-  static readonly API_BASE = process.env.NEXT_PUBLIC_API_BASE + "/api";
+  static readonly API_BASE = process.env.NEXT_PUBLIC_API_BASE + "api";
 
   static readonly API_ORDER = `${this.API_BASE}/${Const.ORDER}`;
   static readonly API_ORDER_NEW = `${Const.API_ORDER}/${Const.NEW}`;

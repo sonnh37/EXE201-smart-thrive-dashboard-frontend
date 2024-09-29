@@ -4,6 +4,6 @@ export interface BlogGetAllQuery extends BaseQueryableQuery {
   userId?: string;
   title?: string;
   description?: string;
-  isActive: boolean;
+  isActive?: boolean;
   backgroundImage?: string;
 }

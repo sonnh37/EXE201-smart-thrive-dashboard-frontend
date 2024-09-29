@@ -5,7 +5,7 @@ export interface Blog extends BaseEntity {
   userId?: string;
   title?: string;
   description?: string;
-  isActive: boolean;
+  isActive?: boolean;
   backgroundImage?: string;
   user?: User;
 }

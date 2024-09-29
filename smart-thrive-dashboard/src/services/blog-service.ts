@@ -17,21 +17,24 @@ export const fetchBlogs = (
   console.log("check_service_blog_query", cleanedQuery.toString());
 
   return axios
-    .get<BusinessResult<PagedResponse<Blog>>>(`${Const.API_ORDER}?${cleanedQuery}`)
-    .then((response) => response.data)
+    .get<BusinessResult<PagedResponse<Blog>>>(`${Const.API_BLOG}?${cleanedQuery}`)
+    .then((response) => {
+      console.log("check_result", response.data)
+      return response.data
+    })
     .catch(handleError);
 };
 
 export const fetchBlog = (id: string): Promise<BusinessResult<Blog>> => {
   return axios
-    .get<BusinessResult<Blog>>(`${Const.API_ORDER}/${id}`)
+    .get<BusinessResult<Blog>>(`${Const.API_BLOG}/${id}`)
     .then((response) => response.data)
     .catch(handleError);
 };
 
 export const deleteBlog = (id: string): Promise<BusinessResult<null>> => {
   return axios
-    .delete<BusinessResult<null>>(`${Const.API_ORDER}/${id}`)
+    .delete<BusinessResult<null>>(`${Const.API_BLOG}/${id}`)
     .then((response) => response.data)
     .catch(handleError);
 };
