@@ -6,7 +6,8 @@ class Const {
   private static readonly BLOG = "blogs";
 
   //#region URL FE
-  static readonly URL_BASE = `http://localhost:3000`;
+
+  static readonly URL_BASE = process.env.NEXT_PUBLIC_URL_BASE;
 
   static readonly URL_ORDER = `/${Const.ORDER}`;
   static readonly URL_ORDER_NEW = `${Const.URL_ORDER}/${Const.NEW}`;
@@ -22,7 +23,7 @@ class Const {
   //#endregion
 
   //#region API
-  static readonly API_BASE = `https://localhost:9876/api`;
+  static readonly API_BASE = process.env.NEXT_PUBLIC_API_BASE + "/api";
 
   static readonly API_ORDER = `${this.API_BASE}/${Const.ORDER}`;
   static readonly API_ORDER_NEW = `${Const.API_ORDER}/${Const.NEW}`;
