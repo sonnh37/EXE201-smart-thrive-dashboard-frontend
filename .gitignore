@@ -402,3 +402,4 @@ FodyWeavers.xsd
 #
 /*/.vs/*/v17/DocumentLayout.json
 /*/package-lock.json
+*/.env
