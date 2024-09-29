@@ -39,22 +39,6 @@ export const columns: ColumnDef<Order>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "totalPrice",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Total Price" />
-    ),
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("totalPrice"));
-
-      const formatted = new Intl.NumberFormat("vi-VN", {
-        style: "currency",
-        currency: "VND",
-      }).format(amount);
-
-      return <div className="font-medium">{formatted}</div>;
-    },
-  },
-  {
     accessorKey: "paymentMethod",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Payment Method" />
@@ -126,6 +110,22 @@ export const columns: ColumnDef<Order>[] = [
     },
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
+    },
+  },
+  {
+    accessorKey: "totalPrice",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Total Price" />
+    ),
+    cell: ({ row }) => {
+      const amount = parseFloat(row.getValue("totalPrice"));
+
+      const formatted = new Intl.NumberFormat("vi-VN", {
+        style: "currency",
+        currency: "VND",
+      }).format(amount);
+
+      return <div className="font-medium">{formatted}</div>;
     },
   },
   {
