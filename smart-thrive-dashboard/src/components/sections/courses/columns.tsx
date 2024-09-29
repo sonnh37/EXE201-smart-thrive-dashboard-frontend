@@ -32,6 +32,24 @@ export const columns: ColumnDef<Course>[] = [
     enableHiding: false,
   },
   {
+    accessorKey: "backgroundImage",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Image" />
+    ),
+    cell: ({ row }) => {
+      const imageUrl = row.getValue("backgroundImage") as string;
+      return (
+        <Image 
+          src={imageUrl} 
+          alt="Background" 
+          width={100} 
+          height={100} 
+          style={{ objectFit: 'cover' }} 
+        />
+      );
+    },
+  },
+  {
     accessorKey: "name",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
@@ -41,12 +59,6 @@ export const columns: ColumnDef<Course>[] = [
     accessorKey: "code",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Code" />
-    ),
-  },
-  {
-    accessorKey: "backgroundImage",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Image" />
     ),
   },
   {
