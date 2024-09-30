@@ -258,17 +258,7 @@ export function Dashboard() {
                     <div className="col-span-4">
                       <BarGraph queryParams={getQueryParams} />
                     </div>
-                    <Card className="col-span-4 md:col-span-3">
-                      <CardHeader>
-                        <CardTitle>Recent Sales</CardTitle>
-                        <CardDescription>
-                          You made 265 sales this month.
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <RecentSales queryParams={getQueryParams} />
-                      </CardContent>
-                    </Card>
+                    <RecentSales queryParams={getQueryParams} />
                     <div className="col-span-4">
                       <AreaGraph />
                     </div>

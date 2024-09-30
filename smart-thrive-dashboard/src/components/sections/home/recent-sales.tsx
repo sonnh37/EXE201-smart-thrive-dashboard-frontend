@@ -18,7 +18,7 @@ interface RecentSalesProps {
 
 export const RecentSales: React.FC<RecentSalesProps> = ({ queryParams }) => {
   return (
-    <Card>
+    <Card className="col-span-4 md:col-span-3">
       <CardHeader className="px-7">
         <CardTitle>Recent Sales</CardTitle>
         <CardDescription>View your recent sales data.</CardDescription>
@@ -28,6 +28,7 @@ export const RecentSales: React.FC<RecentSalesProps> = ({ queryParams }) => {
           columns={columns}
           fetchData={fetchOrders}
           columnSearch="id"
+          className="h-60"
           defaultValues={queryParams}
         />
       </CardContent>

@@ -14,15 +14,22 @@ import { DataTablePagination } from "./data-table-pagination";
 
 interface TableComponentProps<TData> {
   table: ReactTable<TData>;
+  className?: string; // Add className prop
 }
 
-export function DataTableComponent<TData>({ table }: TableComponentProps<TData>) {
+export function DataTableComponent<TData>({
+  table,
+  className, // Destructure className
+}: TableComponentProps<TData>) {
   const columnsLength = table
     .getHeaderGroups()
     .flatMap((group) => group.headers).length;
 
   return (
-    <div className="rounded-md border  space-y-8">
+    <div
+      className={`rounded-md border ${className} space-y-8`}
+      style={{ overflowY: 'auto' }} // Set maxHeight and overflow
+    >
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (

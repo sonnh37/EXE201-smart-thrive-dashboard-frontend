@@ -38,6 +38,7 @@ interface DataTableProps<TData> {
   formSchema?: ZodObject<any>;
   formFilterAdvanceds?: FormFilterAdvanced[];
   defaultValues?: Record<string, any>;
+  className?: string;
 }
 
 export function DataTable<TData>({
@@ -49,6 +50,7 @@ export function DataTable<TData>({
   formSchema,
   formFilterAdvanceds = [],
   defaultValues: externalDefaultValues,
+  className,
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -239,7 +241,7 @@ export function DataTable<TData>({
           shrinkZero
         />
       ) : (
-        <DataTableComponent table={table} />
+        <DataTableComponent className={className} table={table} />
       )}
     </div>
   );

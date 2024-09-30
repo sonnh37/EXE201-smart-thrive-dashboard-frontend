@@ -74,10 +74,6 @@ export const BarGraph: React.FC<BarGraphProps> = ({ queryParams }) => {
     [orders] 
   );
 
-  useEffect(() => {
-    console.log("check_dashboard_total", total)
-  }, [total])
-
   return (
     <Card>
       <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
