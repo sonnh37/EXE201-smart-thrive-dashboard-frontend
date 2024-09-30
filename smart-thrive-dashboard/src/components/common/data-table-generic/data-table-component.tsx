@@ -14,12 +14,14 @@ import { DataTablePagination } from "./data-table-pagination";
 
 interface TableComponentProps<TData> {
   table: ReactTable<TData>;
-  className?: string; // Add className prop
+  className?: string;
+  renderFormFields?: () => JSX.Element[] | [];
 }
 
 export function DataTableComponent<TData>({
   table,
-  className, // Destructure className
+  className,
+  renderFormFields,
 }: TableComponentProps<TData>) {
   const columnsLength = table
     .getHeaderGroups()
@@ -28,7 +30,7 @@ export function DataTableComponent<TData>({
   return (
     <div
       className={`rounded-md border ${className} space-y-8`}
-      style={{ overflowY: 'auto' }} // Set maxHeight and overflow
+      style={{ overflowY: "auto" }} // Set maxHeight and overflow
     >
       <Table>
         <TableHeader>
@@ -70,7 +72,7 @@ export function DataTableComponent<TData>({
           )}
         </TableBody>
       </Table>
-      <DataTablePagination table={table} />
+      <DataTablePagination renderFormFields={renderFormFields} table={table} />
     </div>
   );
 }

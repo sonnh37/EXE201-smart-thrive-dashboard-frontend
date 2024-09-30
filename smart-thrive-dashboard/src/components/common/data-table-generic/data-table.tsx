@@ -241,7 +241,7 @@ export function DataTable<TData>({
           shrinkZero
         />
       ) : (
-        <DataTableComponent className={className} table={table} />
+        <DataTableComponent renderFormFields={renderFormFields} className={className} table={table} />
       )}
     </div>
   );
