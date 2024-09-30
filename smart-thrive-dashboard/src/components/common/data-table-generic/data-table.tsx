@@ -23,7 +23,7 @@ import {
 import * as React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import { z, ZodObject } from "zod";
+import { z, ZodObject, ZodType } from "zod";
 import { DataTableToolbar } from "./data-table-toolbar";
 import { DataTableComponent } from "./data-table-component";
 
@@ -32,21 +32,23 @@ interface DataTableProps<TData> {
   fetchData: (
     queryParams: BaseQueryableQuery
   ) => Promise<BusinessResult<PagedResponse<TData>>>;
-  deleteData: (id: string) => Promise<BusinessResult<null>>;
+  deleteData?: (id: string) => Promise<BusinessResult<null>>;
   columnSearch: string;
-  filterEnums: FilterEnum[];
-  formSchema: ZodObject<any>;
-  formFilterAdvanceds: FormFilterAdvanced[];
+  filterEnums?: FilterEnum[];
+  formSchema?: ZodObject<any>;
+  formFilterAdvanceds?: FormFilterAdvanced[];
+  defaultValues?: Record<string, any>;
 }
 
 export function DataTable<TData>({
   columns,
   fetchData,
-  filterEnums,
+  filterEnums = [],
   deleteData,
   columnSearch,
   formSchema,
-  formFilterAdvanceds,
+  formFilterAdvanceds = [],
+  defaultValues: externalDefaultValues,
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -61,6 +63,13 @@ export function DataTable<TData>({
   const [shouldFetch, setShouldFetch] = useState(true);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (externalDefaultValues) {
+      form.reset(externalDefaultValues);
+    }
+  }, [externalDefaultValues, queryClient]);
 
   const getDefaultValues = () => {
     return formFilterAdvanceds.reduce(
@@ -77,9 +86,28 @@ export function DataTable<TData>({
     );
   };
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: getDefaultValues(),
+  const defaultSchema = z.object({
+    id: z.string().nullable().optional(),
+    date: z
+      .object({
+        from: z.date().optional(),
+        to: z.date().optional(),
+      })
+      .refine((date) => !!date.to, { message: "End Date is required." })
+      .optional(),
+    description: z.string().nullable().optional(),
+    isDeleted: z.boolean().nullable().optional(),
+  });
+
+  const form = useForm<
+    z.infer<
+      typeof formSchema extends ZodType<any>
+        ? typeof formSchema
+        : typeof defaultSchema
+    >
+  >({
+    resolver: zodResolver(formSchema ?? defaultSchema),
+    defaultValues: externalDefaultValues || getDefaultValues(),
   });
 
   const formValues = useWatch({
@@ -161,13 +189,13 @@ export function DataTable<TData>({
   }, [columnFilters, formValues]);
 
   useEffect(() => {
-    const field = formValues[columnSearch] as string;
+    const field = formValues[columnSearch as keyof typeof formValues] as string | undefined;
     if (field && field.length > 0) {
       setIsTyping(true);
     } else {
       setIsTyping(false);
     }
-  }, [formValues[columnSearch]]);
+  }, [formValues[columnSearch as keyof typeof formValues]]);
 
   if (error) return <div>Error loading data</div>;
 

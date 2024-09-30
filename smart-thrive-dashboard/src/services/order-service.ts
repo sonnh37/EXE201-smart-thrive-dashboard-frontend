@@ -18,7 +18,10 @@ export const fetchOrders = (
 
   return axios
     .get<BusinessResult<PagedResponse<Order>>>(`${Const.API_ORDER}?${cleanedQuery}`)
-    .then((response) => response.data)
+    .then((response) => {
+      console.log("check_result", response.data)
+      return response.data
+    })
     .catch(handleError);
 };
 

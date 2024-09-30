@@ -35,7 +35,7 @@ interface DeleteBaseEntitysDialogProps<TData>
   showTrigger?: boolean;
   list: Row<TData>["original"][]
   onSuccess?: () => void;
-  deleteData: (id: string) => Promise<BusinessResult<null>>;
+  deleteData?: (id: string) => Promise<BusinessResult<null>>;
 }
 
 export function DeleteBaseEntitysDialog<TData>({
@@ -54,11 +54,16 @@ export function DeleteBaseEntitysDialog<TData>({
 
   function onDelete() {
     startDeleteTransition(async () => {
+      if (!deleteData) {
+        toast.error("Delete function is not defined.");
+        return; // Early return if deleteData is undefined
+      }
+  
       try {
         for (const task of list) {
           if (hasId(task)) {
             const response = await deleteData(task.id);
-            if (response.status == 1) {
+            if (response.status === 1) {
               toast.success(response.message);
             } else {
               toast.error(response.message);
@@ -77,6 +82,7 @@ export function DeleteBaseEntitysDialog<TData>({
       }
     });
   }
+  
 
   if (isDesktop) {
     return (

@@ -36,7 +36,5 @@ export const cleanQueryParams = (query: BaseQueryableQuery) => {
     }
   }
 
-  console.log("check_package_after", cleanedQuery)
-
   return params;
 };

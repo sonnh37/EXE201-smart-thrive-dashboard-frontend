@@ -6,7 +6,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { Form, FormField } from "@/components/ui/form";
+import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
   Sheet,
@@ -19,41 +19,20 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { FilterEnum } from "@/types/filter-enum";
-import { FormFilterAdvanced } from "@/types/form-filter-advanced";
-import { BaseQueryableQuery } from "@/types/request/base-query";
 import { BusinessResult } from "@/types/response/business-result";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import { MixerHorizontalIcon } from "@radix-ui/react-icons";
-import {
-  keepPreviousData,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  getCoreRowModel,
-  getFilteredRowModel,
-  PaginationState,
-  SortingState,
-  Table,
-  useReactTable,
-  VisibilityState,
-} from "@tanstack/react-table";
+import { Table } from "@tanstack/react-table";
 import { motion } from "framer-motion";
 import { PlusCircle, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import * as React from "react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CSVLink } from "react-csv";
-import { useForm, UseFormReturn, useWatch } from "react-hook-form";
+import { UseFormReturn } from "react-hook-form";
 import { FiFilter } from "react-icons/fi";
 import { MdOutlineFileDownload } from "react-icons/md";
-import { z, ZodObject } from "zod";
-import { DeleteBaseEntitysDialog } from "./delete-dialog-generic";
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
+import { DeleteBaseEntitysDialog } from "./delete-dialog-generic";
 
 interface DataTableToolbarProps<TData> {
   form: UseFormReturn<
@@ -65,14 +44,14 @@ interface DataTableToolbarProps<TData> {
   >;
   table: Table<TData>;
   filterEnums: FilterEnum[];
-  deleteData: (id: string) => Promise<BusinessResult<null>>;
+  deleteData?: (id: string) => Promise<BusinessResult<null>>;
   isFiltered: boolean;
   isSheetOpen: boolean;
   columnSearch: string;
   handleFilterClick: () => void; // Thêm hàm này
   handleSheetChange: (open: boolean) => void; // Thêm hàm này
   handleClear: () => void; // Thêm hàm này
-  renderFormFields: () => JSX.Element[];
+  renderFormFields?: () => JSX.Element[] | [];
 }
 
 export function DataTableToolbar<TData>({
@@ -86,22 +65,21 @@ export function DataTableToolbar<TData>({
   handleFilterClick,
   handleSheetChange,
   handleClear,
-  renderFormFields
+  renderFormFields,
 }: DataTableToolbarProps<TData>) {
   const side = "left";
   const pathname = usePathname();
   const getCurrentTableData = () => {
-    return table.getRowModel().rows.map(row => row.original);
+    return table.getRowModel().rows.map((row) => row.original);
   };
+  const fields = renderFormFields ? renderFormFields() : [];
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
         <Input
           placeholder={`Enter ${columnSearch}...`}
           value={(form.getValues(columnSearch) as string) ?? ""}
-          onChange={(event) =>
-            (form.setValue(columnSearch, event.target.value))
-          }
+          onChange={(event) => form.setValue(columnSearch, event.target.value)}
           className="h-8 w-[150px] lg:w-[250px]"
         />
         {filterEnums.map((filter: any) => {
@@ -132,7 +110,7 @@ export function DataTableToolbar<TData>({
       </div>
       <div className="ml-auto flex items-center gap-2 ">
         {/* Hand by hand */}
-        {table.getFilteredSelectedRowModel().rows.length > 0 ? (
+        {table.getFilteredSelectedRowModel().rows.length > 0 && deleteData ? (
           <DeleteBaseEntitysDialog
             list={table
               .getFilteredSelectedRowModel()
@@ -141,40 +119,43 @@ export function DataTableToolbar<TData>({
             onSuccess={() => table.toggleAllRowsSelected(false)}
           />
         ) : null}
-        <Sheet key={side} open={isSheetOpen} onOpenChange={handleSheetChange}>
-          <SheetTrigger>
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-8 gap-1"
-              onClick={handleFilterClick}
+        {fields.length > 0 && (
+          <Sheet key={side} open={isSheetOpen} onOpenChange={handleSheetChange}>
+            <SheetTrigger>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-8 gap-1"
+                onClick={handleFilterClick}
+              >
+                <FiFilter className="h-4 w-4" />
+                {/* <span className=" sm:whitespace-nowrap">Filter Advanced</span> */}
+              </Button>
+            </SheetTrigger>
+            <SheetContent
+              side={side}
+              className="dark:backdrop-blur-3 dark:bg-white/5"
             >
-              <FiFilter className="h-4 w-4" />
-              {/* <span className=" sm:whitespace-nowrap">Filter Advanced</span> */}
-            </Button>
-          </SheetTrigger>
-
-          <SheetContent side={side} className="dark:backdrop-blur-3 dark:bg-white/5">
-            <Form {...form}>
-              <form className="space-y-8">
-                <SheetHeader>
-                  <SheetTitle>Filter advanced</SheetTitle>
-                  <SheetDescription>
-                    This action can update when you click the button at the
-                    footer.
-                  </SheetDescription>
-                </SheetHeader>
-                <div className="grid gap-4 py-4">{renderFormFields()}</div>
-
-                <SheetFooter>
-                  <SheetClose asChild>
-                    <Button onClick={handleClear}>Clear filter</Button>
-                  </SheetClose>
-                </SheetFooter>
-              </form>
-            </Form>
-          </SheetContent>
-        </Sheet>
+              <Form {...form}>
+                <form className="space-y-8">
+                  <SheetHeader>
+                    <SheetTitle>Filter advanced</SheetTitle>
+                    <SheetDescription>
+                      This action can update when you click the button at the
+                      footer.
+                    </SheetDescription>
+                  </SheetHeader>
+                  <div className="grid gap-4 py-4">{fields}</div>
+                  <SheetFooter>
+                    <SheetClose asChild>
+                      <Button onClick={handleClear}>Clear filter</Button>
+                    </SheetClose>
+                  </SheetFooter>
+                </form>
+              </Form>
+            </SheetContent>
+          </Sheet>
+        )}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -223,6 +204,7 @@ export function DataTableToolbar<TData>({
           </Button>
         </CSVLink>
 
+        {fields.length > 0 && (
         <Link
           className="text-primary-foreground sm:whitespace-nowrap"
           href={`${pathname}/new`}
@@ -243,7 +225,8 @@ export function DataTableToolbar<TData>({
             </Button>
           </motion.div>
         </Link>
+        )}
       </div>
     </div>
-  )
+  );
 }

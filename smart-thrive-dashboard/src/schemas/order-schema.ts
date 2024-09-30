@@ -12,3 +12,7 @@ export const formOrderFilterAdvancedSchema = z.object({
   description: z.string().nullable().optional(),
   isDeleted: z.boolean().nullable().optional(),
 });
+
+export const formOrderDashboardSchema = z.object({
+  
+});
