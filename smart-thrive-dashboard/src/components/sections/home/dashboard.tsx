@@ -259,12 +259,12 @@ export function Dashboard() {
                       <BarGraph queryParams={getQueryParams} />
                     </div>
                     <RecentSales queryParams={getQueryParams} />
-                    <div className="col-span-4">
-                      <AreaGraph />
+                    <div className="col-span-full">
+                      <AreaGraph queryParams={getQueryParams}  />
                     </div>
-                    <div className="col-span-4 md:col-span-3">
-                      <PieGraph />
-                    </div>
+                    {/* <div className="col-span-4 md:col-span-3">
+                      <PieGraph queryParams={getQueryParams} />
+                    </div> */}
                   </div>
                 </TabsContent>
               ))}

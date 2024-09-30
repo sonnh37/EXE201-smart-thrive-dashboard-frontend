@@ -18,44 +18,60 @@ import {
   ChartTooltip,
   ChartTooltipContent
 } from '@/components/ui/chart';
-const chartData = [
-  { browser: 'chrome', visitors: 275, fill: 'var(--color-chrome)' },
-  { browser: 'safari', visitors: 200, fill: 'var(--color-safari)' },
-  { browser: 'firefox', visitors: 287, fill: 'var(--color-firefox)' },
-  { browser: 'edge', visitors: 173, fill: 'var(--color-edge)' },
-  { browser: 'other', visitors: 190, fill: 'var(--color-other)' }
-];
-
+import { fetchOrders } from '@/services/order-service';
+import { Order } from '@/types/order';
+import { OrderGetAllQuery } from '@/types/request/order-query';
 const chartConfig = {
-  visitors: {
+  price: {
     label: 'Visitors'
   },
-  chrome: {
-    label: 'Chrome',
-    color: 'hsl(var(--chart-1))'
-  },
-  safari: {
-    label: 'Safari',
-    color: 'hsl(var(--chart-2))'
-  },
-  firefox: {
-    label: 'Firefox',
-    color: 'hsl(var(--chart-3))'
-  },
-  edge: {
-    label: 'Edge',
-    color: 'hsl(var(--chart-4))'
-  },
+  
   other: {
     label: 'Other',
     color: 'hsl(var(--chart-5))'
   }
 } satisfies ChartConfig;
 
-export function PieGraph() {
-  const totalVisitors = React.useMemo(() => {
-    return chartData.reduce((acc, curr) => acc + curr.visitors, 0);
-  }, []);
+interface PieGraphProps {
+  queryParams: OrderGetAllQuery;
+}
+
+export const PieGraph: React.FC<PieGraphProps> = ({ queryParams }) => {
+  const [orders, setOrders] = React.useState<Order[]>([]);
+
+  const formattedData = React.useMemo(() => {
+    const dailyTotals: { [key: string]: number } = {};
+  
+    orders.forEach(order => {
+      const date = new Date(order.createdDate!).toLocaleDateString();
+      dailyTotals[date] = (dailyTotals[date] || 0) + (order.totalPrice ?? 0);
+    });
+  
+    // Chuyển đổi dailyTotals thành mảng để sử dụng cho BarChart
+    return Object.entries(dailyTotals).map(([date, total]) => ({
+      date: date,
+      order: total,
+    }));
+  }, [orders]);
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+        const response = await fetchOrders(queryParams);
+        console.log("check_dashboard_response", response.data)
+        setOrders(response.data?.results?? []);
+      };
+
+
+    fetchData();
+  }, [queryParams]);
+
+  const total = React.useMemo(
+    () => ({
+      order: orders.reduce((acc, curr) => acc + (curr.totalPrice ?? 0), 0),
+    }),
+    [orders] 
+  );
+
 
   return (
     <Card className="flex flex-col">
@@ -74,8 +90,8 @@ export function PieGraph() {
               content={<ChartTooltipContent hideLabel />}
             />
             <Pie
-              data={chartData}
-              dataKey="visitors"
+              data={formattedData}
+              dataKey="price"
               nameKey="browser"
               innerRadius={60}
               strokeWidth={5}
@@ -95,7 +111,7 @@ export function PieGraph() {
                           y={viewBox.cy}
                           className="fill-foreground text-3xl font-bold"
                         >
-                          {totalVisitors.toLocaleString()}
+                          {total.toLocaleString()}
                         </tspan>
                         <tspan
                           x={viewBox.cx}

@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { TrendingUp } from 'lucide-react';
-import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts';
+import { TrendingUp } from "lucide-react";
+import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 
 import {
   Card,
@@ -9,35 +9,67 @@ import {
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle
-} from '@/components/ui/card';
+  CardTitle,
+} from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
-  ChartTooltipContent
-} from '@/components/ui/chart';
-const chartData = [
-  { month: 'January', desktop: 186, mobile: 80 },
-  { month: 'February', desktop: 305, mobile: 200 },
-  { month: 'March', desktop: 237, mobile: 120 },
-  { month: 'April', desktop: 73, mobile: 190 },
-  { month: 'May', desktop: 209, mobile: 130 },
-  { month: 'June', desktop: 214, mobile: 140 }
-];
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import React, { useEffect } from "react";
+import { Order } from "@/types/order";
+import { fetchOrders } from "@/services/order-service";
+import { OrderGetAllQuery } from "@/types/request/order-query";
 
 const chartConfig = {
-  desktop: {
-    label: 'Desktop',
-    color: 'hsl(var(--chart-1))'
+  order: {
+    label: "Desktop",
+    color: "hsl(var(--chart-1))",
   },
-  mobile: {
-    label: 'Mobile',
-    color: 'hsl(var(--chart-2))'
-  }
 } satisfies ChartConfig;
+interface AreaGraphProps {
+  queryParams: OrderGetAllQuery;
+}
+export const AreaGraph: React.FC<AreaGraphProps> = ({ queryParams }) => {
+  const [activeChart, setActiveChart] =
+    React.useState<keyof typeof chartConfig>("order");
+  const [orders, setOrders] = React.useState<Order[]>([]);
 
-export function AreaGraph() {
+  const formattedData = React.useMemo(() => {
+    const dailyTotals: { [key: string]: number } = {};
+
+    orders.forEach((order) => {
+      const date = new Date(order.createdDate!).toLocaleDateString();
+      dailyTotals[date] = (dailyTotals[date] || 0) + (order.totalPrice ?? 0);
+    });
+
+    // Chuyển đổi dailyTotals thành mảng để sử dụng cho BarChart
+    return Object.entries(dailyTotals).map(([date, total]) => {
+      const month = new Date(date).toLocaleString('default', { month: 'long' }); // Get month name
+      return {
+        month: month,
+        order: total,
+      };
+    });
+  }, [orders]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await fetchOrders(queryParams);
+      console.log("check_dashboard_response", response.data);
+      setOrders(response.data?.results ?? []);
+    };
+
+    fetchData();
+  }, [queryParams]);
+
+  const total = React.useMemo(
+    () => ({
+      order: orders.reduce((acc, curr) => acc + (curr.totalPrice ?? 0), 0),
+    }),
+    [orders]
+  );
   return (
     <Card>
       <CardHeader>
@@ -53,10 +85,10 @@ export function AreaGraph() {
         >
           <AreaChart
             accessibilityLayer
-            data={chartData}
+            data={formattedData}
             margin={{
               left: 12,
-              right: 12
+              right: 12,
             }}
           >
             <CartesianGrid vertical={false} />
@@ -72,19 +104,11 @@ export function AreaGraph() {
               content={<ChartTooltipContent indicator="dot" />}
             />
             <Area
-              dataKey="mobile"
+              dataKey="order"
               type="natural"
-              fill="var(--color-mobile)"
+              fill="var(--color-order)"
               fillOpacity={0.4}
-              stroke="var(--color-mobile)"
-              stackId="a"
-            />
-            <Area
-              dataKey="desktop"
-              type="natural"
-              fill="var(--color-desktop)"
-              fillOpacity={0.4}
-              stroke="var(--color-desktop)"
+              stroke="var(--color-order)"
               stackId="a"
             />
           </AreaChart>
