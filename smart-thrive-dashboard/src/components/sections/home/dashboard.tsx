@@ -1,13 +1,19 @@
 import { AreaGraph } from "@/components/common/charts/area-graph";
 import { BarGraph } from "@/components/common/charts/bar-graph";
-import { PieGraph } from "@/components/common/charts/pie-graph";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
-  CardTitle,
+  CardTitle
 } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator
+} from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { OrderGetAllQuery } from "@/types/request/order-query";
 import {
@@ -18,18 +24,9 @@ import {
   startOfWeek,
   startOfYear,
 } from "date-fns";
+import { File } from "lucide-react";
 import { useEffect, useState } from "react";
 import { RecentSales } from "./recent-sales";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ListFilter, File } from "lucide-react";
-import { Button } from "@/components/ui/button";
 interface WeekRange {
   start: string;
   end: string;
@@ -37,8 +34,7 @@ interface WeekRange {
 
 const defaultQueryParams: OrderGetAllQuery = {
   isPagination: true,
-  pageNumber: 1,
-  pageSize: 10,
+  isFilter: true
 };
 export function Dashboard() {
   const [currentTab, setCurrentTab] = useState<string>("week");

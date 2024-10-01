@@ -49,7 +49,7 @@ export function DataTable<TData>({
   columnSearch,
   formSchema,
   formFilterAdvanceds = [],
-  defaultValues: externalDefaultValues,
+  defaultValues,
   className,
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -68,13 +68,13 @@ export function DataTable<TData>({
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    if (externalDefaultValues) {
-      form.reset(externalDefaultValues);
+    if (defaultValues) {
+      form.reset(defaultValues);
     }
-  }, [externalDefaultValues, queryClient]);
+  }, [defaultValues, queryClient]);
 
   const getDefaultValues = () => {
-    return formFilterAdvanceds.reduce(
+    const generatedDefaultValues = formFilterAdvanceds.reduce(
       (
         acc: { [x: string]: any },
         field: { name: string | number; defaultValue: any }
@@ -86,7 +86,16 @@ export function DataTable<TData>({
       },
       {} as Record<string, any>
     );
+
+    return {
+      ...generatedDefaultValues,
+      ...defaultValues,
+    };
   };
+
+  useEffect(() => {
+    console.log("check_defaultValue", getDefaultValues());
+  }, [getDefaultValues()]);
 
   const defaultSchema = z.object({
     id: z.string().nullable().optional(),
@@ -109,7 +118,7 @@ export function DataTable<TData>({
     >
   >({
     resolver: zodResolver(formSchema ?? defaultSchema),
-    defaultValues: externalDefaultValues || getDefaultValues(),
+    defaultValues: getDefaultValues(),
   });
 
   const formValues = useWatch({
@@ -135,6 +144,7 @@ export function DataTable<TData>({
       sortField: sorting.length > 0 ? sorting[0]?.id : "CreatedDate",
       sortOrder: sorting.length > 0 ? (sorting[0]?.desc ? -1 : 1) : -1,
       isPagination: true,
+      isFilter: true,
       fromDate: formValues?.date?.from?.toISOString() || undefined,
       toDate: formValues?.date?.to?.toISOString() || undefined,
       ...filterParams,
@@ -191,7 +201,9 @@ export function DataTable<TData>({
   }, [columnFilters, formValues]);
 
   useEffect(() => {
-    const field = formValues[columnSearch as keyof typeof formValues] as string | undefined;
+    const field = formValues[columnSearch as keyof typeof formValues] as
+      | string
+      | undefined;
     if (field && field.length > 0) {
       setIsTyping(true);
     } else {
@@ -241,7 +253,11 @@ export function DataTable<TData>({
           shrinkZero
         />
       ) : (
-        <DataTableComponent renderFormFields={renderFormFields} className={className} table={table} />
+        <DataTableComponent
+          renderFormFields={renderFormFields}
+          className={className}
+          table={table}
+        />
       )}
     </div>
   );

@@ -1,5 +1,6 @@
 export interface BaseQueryableQuery {
     isPagination: boolean;
+    isFilter: boolean;
     pageNumber?: number;
     pageSize?: number;
     sortField?: string;

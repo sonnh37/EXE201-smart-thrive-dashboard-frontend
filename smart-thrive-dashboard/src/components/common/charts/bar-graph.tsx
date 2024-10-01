@@ -58,7 +58,12 @@ export const BarGraph: React.FC<BarGraphProps> = ({ queryParams }) => {
 
   useEffect(() => {
     const fetchData = async () => {
-        const response = await fetchOrders(queryParams);
+      const params: OrderGetAllQuery = {
+        ...queryParams,
+        isPagination: false, 
+        isFilter: true
+      };
+        const response = await fetchOrders(params);
         console.log("check_dashboard_response", response.data)
         setOrders(response.data?.results?? []);
       };
