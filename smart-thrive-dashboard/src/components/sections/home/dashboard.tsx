@@ -34,7 +34,6 @@ interface WeekRange {
 
 const defaultQueryParams: OrderGetAllQuery = {
   isPagination: true,
-  isFilter: true
 };
 export function Dashboard() {
   const [currentTab, setCurrentTab] = useState<string>("week");

@@ -144,7 +144,6 @@ export function DataTable<TData>({
       sortField: sorting.length > 0 ? sorting[0]?.id : "CreatedDate",
       sortOrder: sorting.length > 0 ? (sorting[0]?.desc ? -1 : 1) : -1,
       isPagination: true,
-      isFilter: true,
       fromDate: formValues?.date?.from?.toISOString() || undefined,
       toDate: formValues?.date?.to?.toISOString() || undefined,
       ...filterParams,

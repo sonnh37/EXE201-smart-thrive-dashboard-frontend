@@ -59,7 +59,6 @@ export const AreaGraph: React.FC<AreaGraphProps> = ({ queryParams }) => {
       const params: OrderGetAllQuery = {
         ...queryParams,
         isPagination: false, 
-        isFilter: true
       };
       const response = await fetchOrders(params);
       console.log("check_dashboard_response", response.data);
