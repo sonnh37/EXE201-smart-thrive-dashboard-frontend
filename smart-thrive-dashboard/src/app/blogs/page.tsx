@@ -4,7 +4,7 @@ import {ContentLayout} from "@/components/common/content-layout";
 import DataTableBlogs from "@/components/sections/blogs";
 
 const breadcrumbItems = [
-    {title: "Dashboard", link: "/"},
+    {title: "Home", link: "/"},
     {title: "Blogs", link: "/blogs"},
 ];
 export default function Page() {

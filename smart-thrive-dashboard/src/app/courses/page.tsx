@@ -4,7 +4,7 @@ import {Breadcrumbs} from "@/components/common/breadcrumb";
 import DataTableCourses from "@/components/sections/courses";
 
 const breadcrumbItems = [
-    {title: "Dashboard", link: "/"},
+    {title: "Home", link: "/"},
     {title: "Courses", link: "/courses"},
 ];
 export default function Page() {

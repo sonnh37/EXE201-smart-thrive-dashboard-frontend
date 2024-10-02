@@ -43,12 +43,12 @@ export const BarGraph: React.FC<BarGraphProps> = ({ queryParams }) => {
 
   const formattedData = React.useMemo(() => {
     const dailyTotals: { [key: string]: number } = {};
-  
-    orders.forEach(order => {
+
+    orders.forEach((order) => {
       const date = new Date(order.createdDate!).toLocaleDateString();
       dailyTotals[date] = (dailyTotals[date] || 0) + (order.totalPrice ?? 0);
     });
-  
+
     // Chuyển đổi dailyTotals thành mảng để sử dụng cho BarChart
     return Object.entries(dailyTotals).map(([date, total]) => ({
       date: date,
@@ -60,13 +60,12 @@ export const BarGraph: React.FC<BarGraphProps> = ({ queryParams }) => {
     const fetchData = async () => {
       const params: OrderGetAllQuery = {
         ...queryParams,
-        isPagination: false, 
+        isPagination: false,
       };
-        const response = await fetchOrders(params);
-        console.log("check_dashboard_response", response.data)
-        setOrders(response.data?.results?? []);
-      };
-
+      const response = await fetchOrders(params);
+      console.log("check_dashboard_response", response.data);
+      setOrders(response.data?.results ?? []);
+    };
 
     fetchData();
   }, [queryParams]);
@@ -75,7 +74,7 @@ export const BarGraph: React.FC<BarGraphProps> = ({ queryParams }) => {
     () => ({
       order: orders.reduce((acc, curr) => acc + (curr.totalPrice ?? 0), 0),
     }),
-    [orders] 
+    [orders]
   );
 
   return (
@@ -101,7 +100,10 @@ export const BarGraph: React.FC<BarGraphProps> = ({ queryParams }) => {
                   {chartConfig[chart].label}
                 </span>
                 <span className="text-lg font-bold leading-none sm:text-3xl">
-                  {total[key as keyof typeof total].toLocaleString()}
+                  {total[key as keyof typeof total].toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })}
                 </span>
               </button>
             );

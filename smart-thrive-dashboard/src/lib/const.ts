@@ -1,5 +1,6 @@
 class Const {
   private static readonly ORDER = "orders";
+  private static readonly USER = "users";
   private static readonly NEW = "new";
   private static readonly PACKAGE = "packages";
   private static readonly COURSE = "courses";
@@ -27,6 +28,9 @@ class Const {
 
   static readonly API_ORDER = `${this.API_BASE}/${Const.ORDER}`;
   static readonly API_ORDER_NEW = `${Const.API_ORDER}/${Const.NEW}`;
+
+  static readonly API_USER = `${this.API_BASE}/${Const.USER}`;
+  static readonly API_USER_NEW = `${Const.API_USER}/${Const.NEW}`;
 
   static readonly API_BLOG = `${this.API_BASE}/${Const.BLOG}`;
   static readonly API_BLOG_NEW = `${Const.API_BLOG}/${Const.NEW}`;

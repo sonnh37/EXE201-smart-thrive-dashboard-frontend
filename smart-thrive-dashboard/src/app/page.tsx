@@ -4,11 +4,11 @@ import {ContentLayout} from "@/components/common/content-layout";
 import {Breadcrumbs} from "@/components/common/breadcrumb";
 import { Dashboard } from "@/components/sections/home/dashboard";
 
-const breadcrumbItems = [{title: "Dashboard", link: "/"}];
+const breadcrumbItems = [{title: "Home", link: "/"}];
 
 export default function HomePage() {
     return (
-        <ContentLayout title="Dashboard">
+        <ContentLayout title="Home">
             <Breadcrumbs items={breadcrumbItems}/>
             <Dashboard/>
         </ContentLayout>
