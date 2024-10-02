@@ -41,6 +41,23 @@ class Const {
   static readonly API_PACKAGE = `${this.API_BASE}/${Const.PACKAGE}`;
   static readonly API_PACKAGE_NEW = `${Const.API_PACKAGE}/${Const.NEW}`;
   //#endregion
+  static readonly FADE_BOTTOM_ANIMATION_VARIANTS = {
+    hidden: { opacity: 0, y: -10 },
+    show: { opacity: 1, y: 0, transition: { type: "spring" } }, // Tăng duration lên 0.5 giây
+  };
+  static readonly FADE_TOP_ANIMATION_VARIANTS = {
+    hidden: { opacity: 0, y: 10 },
+    show: { opacity: 1, y: 0, transition: { type: "spring" } }, // Tăng duration lên 0.5 giây
+  };
+  static readonly FADE_RIGHT_ANIMATION_VARIANTS = {
+    hidden: { opacity: 0, x: -10 },
+    show: { opacity: 1, x: 0, transition: { type: "spring" } }, // Tăng duration lên 0.5 giây
+  };
+
+  static readonly FADE_LEFT_ANIMATION_VARIANTS = {
+    hidden: { opacity: 0, x: 10 },
+    show: { opacity: 1, x: 0, transition: { type: "spring" } }, // Tăng duration lên 0.5 giây
+  };
 }
 
 export { Const };
