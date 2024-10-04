@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import SignupForm from "./signup-form";
 import SigninUsernameForm from "./signin-username-form"; // Form nhập username
 import SigninPasswordForm from "./signin-password-form"; // Form nhập password
+import { User } from "@/types/user";
 
 // Các biến định nghĩa animation
 const variants = {
@@ -40,9 +41,10 @@ const forms = [
 ];
 
 // Tạo kiểu dữ liệu cho form
-interface FormValues {
+export interface FormValues {
   username?: string;
   password?: string;
+  user?: User;
 }
 
 const TestPage = () => {
@@ -107,10 +109,12 @@ const TestPage = () => {
             {CurrentComponent && (
               <CurrentComponent
                 formValues={formValues}
+                handleNextStep={handleNextStep}
+                handlePrevStep={handlePrevStep}
                 updateFormValues={updateFormValues}
               />
             )}
-            {currentForm === "login" && currentFormData?.steps && (
+            {/* {currentForm === "login" && currentFormData?.steps && (
               <div className="flex justify-between mt-4">
                 {currentStep > 0 && (
                   <button
@@ -136,7 +140,7 @@ const TestPage = () => {
                   </button>
                 )}
               </div>
-            )}
+            )} */}
           </motion.div>
         </AnimatePresence>
       </div>

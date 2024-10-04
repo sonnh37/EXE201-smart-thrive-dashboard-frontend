@@ -3,3 +3,4 @@ export interface BusinessResult<Tdata> {
     message?: string;
     data?: Tdata; 
 }
+

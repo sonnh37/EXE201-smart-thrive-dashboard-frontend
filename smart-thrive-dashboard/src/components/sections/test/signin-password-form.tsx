@@ -1,22 +1,97 @@
-import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import * as z from "zod";
+import AutoForm, { AutoFormSubmit } from "@/components/ui/auto-form";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import React, { useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { FormValues } from ".";
+import { fetchUserByUsername, login } from "@/services/user-service";
+import { User } from "@/types/user";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
-const SigninPasswordForm = () => {
+const formSchema = z.object({
+  password: z.string(),
+});
+
+interface SigninPasswordFormProps {
+  formValues: FormValues;
+  updateFormValues: (values: FormValues) => void;
+  handleNextStep: () => void; // Thêm handleNextStep để chuyển bước
+  handlePrevStep: () => void; // Thêm handleNextStep để chuyển bước
+}
+
+const SigninPasswordForm: React.FC<SigninPasswordFormProps> = ({
+  formValues,
+  updateFormValues,
+  handleNextStep, // Nhận hàm từ cha
+  handlePrevStep, // Nhận hàm từ cha
+}) => {
+  const [values, setValues] = React.useState<
+    Partial<z.infer<typeof formSchema>>
+  >({
+    password: formValues.password || "", // Khởi tạo với giá trị từ cha
+  });
+
+  useEffect(() => {
+    updateFormValues(values as { password: string }); // Cập nhật giá trị mỗi khi thay đổi
+  }, [values]);
+
+  const router = useRouter();
+
+  const handleSubmit = async (data: z.infer<typeof formSchema>) => {
+    try {
+      const response = await login(formValues.username!, formValues.password!);
+      console.log("check_response", response);
+
+      if (response.status == 1) {
+        toast.success(response.message);
+        // router -> /
+        router.push("/")
+      } else {
+        toast.error(response.message);
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
+  };
+
   return (
-    <motion.div
-      key="login" // Đặt key cho từng trang
-    // Thay đổi thời gian chuyển động nếu cần
-    >
-      <h2 className="text-2xl font-bold mb-4">Login</h2>
-      <form>
-        <input type="password" placeholder="Password" className="mb-4" />
-        <button type="submit" className="btn">Login</button>
-      </form>
-      <p>
-        Don't have an account?{" "}
-        <a href="/auth/register" className="text-blue-600">Register</a>
-      </p>
-    </motion.div>
+    <div>
+      <div className="mx-auto my-6 max-w-lg">
+        <Card>
+          <CardHeader>
+            <CardTitle>Hi, {formValues.user?.firstName}</CardTitle>
+            <CardDescription>Enter your password to continue</CardDescription>
+          </CardHeader>
+
+          <CardContent>
+            <AutoForm
+              formSchema={formSchema}
+              values={values}
+              onValuesChange={setValues}
+              onSubmit={handleSubmit}
+            >
+              <div className="flex justify-between">
+                <Button
+                  onClick={handlePrevStep}
+                  type="button"
+                  variant="secondary"
+                >
+                  Previous
+                </Button>
+                <AutoFormSubmit>Submit</AutoFormSubmit>
+              </div>
+            </AutoForm>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   );
 };
 

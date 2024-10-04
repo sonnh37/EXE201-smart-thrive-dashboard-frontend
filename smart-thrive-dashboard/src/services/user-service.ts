@@ -17,7 +17,7 @@ export const fetchUsers = (
   console.log("check_service_user_query", cleanedQuery.toString());
 
   return axios
-    .get<BusinessResult<PagedResponse<User>>>(`${Const.API_ORDER}?${cleanedQuery}`)
+    .get<BusinessResult<PagedResponse<User>>>(`${Const.API_USER}?${cleanedQuery}`)
     .then((response) => {
       console.log("check_result", response.data)
       return response.data
@@ -25,16 +25,34 @@ export const fetchUsers = (
     .catch(handleError);
 };
 
+export const fetchUserByUsername = (username: string): Promise<BusinessResult<User>> => {
+  return axios
+    .get<BusinessResult<User>>(`${Const.API_USER}/${username}`)
+    .then((response) => response.data)
+    .catch(handleError);
+};
+
+export const login = (username: string, password: string): Promise<BusinessResult<User>> => {
+  console.log("check_query", username + password)
+  return axios
+    .post<BusinessResult<User>>(`${Const.API_USER}/login`, {
+      email: username, 
+      password: password,
+    })
+    .then((response) => response.data)
+    .catch(handleError);
+};
+
 export const fetchUser = (id: string): Promise<BusinessResult<User>> => {
   return axios
-    .get<BusinessResult<User>>(`${Const.API_ORDER}/${id}`)
+    .get<BusinessResult<User>>(`${Const.API_USER}/${id}`)
     .then((response) => response.data)
     .catch(handleError);
 };
 
 export const deleteUser = (id: string): Promise<BusinessResult<null>> => {
   return axios
-    .delete<BusinessResult<null>>(`${Const.API_ORDER}/${id}`)
+    .delete<BusinessResult<null>>(`${Const.API_USER}/${id}`)
     .then((response) => response.data)
     .catch(handleError);
 };
