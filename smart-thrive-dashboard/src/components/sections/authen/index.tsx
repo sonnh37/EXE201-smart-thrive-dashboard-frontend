@@ -1,74 +1,128 @@
 import { useState } from "react";
-import LeftOverlayContent from "./left-overlay-content";
-import RightOverlayContent from "./right-overlay-content";
-import SigninForm from "./signin-form";
-import SignupForm from "./signup-form";
 import { AnimatePresence, motion } from "framer-motion";
+import SignupForm from "./signup-form";
+import SigninUsernameForm from "./signin-username-form";
+import SigninPasswordForm from "./signin-password-form";
+import { User } from "@/types/user";
 
-const AuthSlider = () => {
-  const [isAnimated, setIsAnimated] = useState(false);
-  const overlayBg =
-    "bg-gradient-to-r from-blue-800 via-purple-800 to-indigo-800";
-
-  return (
-    <div className="h-screen w-screen bg-purple-100 p-4 flex flex-col items-center justify-center">
-      <div className="h-4/5 w-4/5 bg-white relative overflow-hidden rounded-lg">
-        <div
-          id="signin"
-          className={`bg-white absolute top-0 left-0 h-full w-1/2 flex justify-center items-center transition-all duration-700 ease-in-out z-[21] ${isAnimated ? "translate-x-full opacity-0" : ""
-            }`}
-        >
-          <SigninForm />
-        </div>
-
-        <div
-          id="signup"
-          className={`absolute top-0 left-0 h-full w-1/2 flex justify-center items-center transition-all duration-700 ease-in-out ${isAnimated
-            ? "translate-x-full opacity-100 z-50 animate-show"
-            : "opacity-0 z-10"
-            }`}
-        >
-          <div className="h-full w-full flex justify-center items-center">
-            <SignupForm />
-          </div>
-        </div>
-
-        <div
-          id="overlay-container"
-          className={`absolute top-0 left-1/2 w-1/2 h-full overflow-hidden transition transition-transform duration-700 ease-in-out z-100 ${isAnimated ? "-translate-x-full" : ""
-            }`}
-        >
-          <div
-            id="overlay"
-            className={`${overlayBg} relative -left-full h-full w-[200%] transform transition transition-transform duration-700 ease-in-out ${isAnimated ? "translate-x-1/2" : "translate-x-0"
-              }`}
-          >
-            <div
-              id="overlay-left"
-              className={`w-1/2 h-full absolute flex justify-center items-center top-0 transform -translate-x-[20%] transition transition-transform duration-700 ease-in-out ${isAnimated ? "translate-x-0" : "-translate-x-[20%]"
-                }`}
-            >
-              <LeftOverlayContent
-                isAnimated={isAnimated}
-                setIsAnimated={setIsAnimated}
-              />
-            </div>
-            <div
-              id="overlay-right"
-              className={`w-1/2 h-full absolute flex justify-center items-center top-0 right-0 transform transition transition-transform duration-700 ease-in-out ${isAnimated ? "translate-x-[20%]" : "translate-x-0"
-                }`}
-            >
-              <RightOverlayContent
-                isAnimated={isAnimated}
-                setIsAnimated={setIsAnimated}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  );
+const variants = {
+  enter: (direction: number) => {
+    return {
+      x: direction > 0 ? 300 : -300,
+      opacity: 0,
+    };
+  },
+  center: {
+    zIndex: 1,
+    x: 0,
+    opacity: 1,
+  },
+  exit: (direction: number) => {
+    return {
+      zIndex: 0,
+      x: direction < 0 ? 300 : -300,
+      opacity: 0,
+    };
+  },
 };
 
-export default AuthSlider;
+const forms = [
+  {
+    key: "login",
+    label: "Login",
+    steps: [
+      { key: "username", component: SigninUsernameForm },
+      { key: "password", component: SigninPasswordForm },
+    ],
+  },
+  { key: "register", label: "Register", component: SignupForm },
+];
+
+export interface FormValues {
+  username?: string;
+  password?: string;
+  user?: User;
+}
+
+export default function AuthenForm() {
+  const [[currentStep, direction], setCurrentStep] = useState([0, 0]);
+  const [currentForm, setCurrentForm] = useState(forms[0].key);
+
+  const [formValues, setFormValues] = useState<FormValues>({});
+
+  const handleNextStep = () => {
+    setCurrentStep([currentStep + 1, 1]);
+  };
+
+  const handlePrevStep = () => {
+    setCurrentStep([currentStep - 1, -1]);
+  };
+
+  const updateFormValues = (newValues: Partial<FormValues>) => {
+    setFormValues((prev) => ({
+      ...prev,
+      ...newValues,
+    }));
+  };
+
+  const currentFormData = forms.find((form) => form.key === currentForm);
+  const CurrentComponent = currentFormData?.steps
+    ? currentFormData.steps[currentStep].component
+    : currentFormData?.component;
+
+  return (
+    <div className="w-full overflow-hidden">
+      <AnimatePresence mode="wait" initial={false} custom={direction}>
+        <motion.div
+          key={`${currentForm}-${currentStep}`}
+          custom={direction}
+          className="min-h-[200px] flex flex-col justify-center items-end w-full "
+          variants={variants}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          transition={{
+            x: { type: "spring", stiffness: 300, damping: 30 },
+            opacity: { duration: 0.2 },
+          }}
+        >
+          {CurrentComponent && (
+            <CurrentComponent
+              formValues={formValues}
+              handleNextStep={handleNextStep}
+              handlePrevStep={handlePrevStep}
+              updateFormValues={updateFormValues}
+            />
+          )}
+          {/* {currentForm === "login" && currentFormData?.steps && (
+              <div className="flex justify-between mt-4">
+                {currentStep > 0 && (
+                  <button
+                    onClick={handlePrevStep}
+                    className="p-2 bg-gray-300 rounded"
+                  >
+                    Previous
+                  </button>
+                )}
+                {currentStep < currentFormData.steps.length - 1 ? (
+                  <button
+                    onClick={handleNextStep}
+                    className="p-2 bg-blue-500 text-white rounded"
+                  >
+                    Next
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    className="p-2 bg-blue-500 text-white rounded"
+                  >
+                    Login
+                  </button>
+                )}
+              </div>
+            )} */}
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  );
+}
