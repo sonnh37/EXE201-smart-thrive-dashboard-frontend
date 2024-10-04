@@ -1,15 +1,14 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import SignupForm from "./signup-form";
-import SigninUsernameForm from "./signin-username-form"; // Form nhập username
-import SigninPasswordForm from "./signin-password-form"; // Form nhập password
+import SigninUsernameForm from "./signin-username-form";
+import SigninPasswordForm from "./signin-password-form";
 import { User } from "@/types/user";
 
-// Các biến định nghĩa animation
 const variants = {
   enter: (direction: number) => {
     return {
-      x: direction > 0 ? 300 : -300, // Swipe từ trái hoặc phải
+      x: direction > 0 ? 300 : -300,
       opacity: 0,
     };
   },
@@ -21,13 +20,12 @@ const variants = {
   exit: (direction: number) => {
     return {
       zIndex: 0,
-      x: direction < 0 ? 300 : -300, // Khi exit, đi về trái/phải
+      x: direction < 0 ? 300 : -300,
       opacity: 0,
     };
   },
 };
 
-// Các form cần hiển thị
 const forms = [
   {
     key: "login",
@@ -40,7 +38,6 @@ const forms = [
   { key: "register", label: "Register", component: SignupForm },
 ];
 
-// Tạo kiểu dữ liệu cho form
 export interface FormValues {
   username?: string;
   password?: string;
@@ -48,18 +45,17 @@ export interface FormValues {
 }
 
 const TestPage = () => {
-  const [[currentStep, direction], setCurrentStep] = useState([0, 0]); // Thêm direction để biết hướng
-  const [currentForm, setCurrentForm] = useState(forms[0].key); // Mặc định là form login
+  const [[currentStep, direction], setCurrentStep] = useState([0, 0]);
+  const [currentForm, setCurrentForm] = useState(forms[0].key);
 
-  // Lưu trữ giá trị của form
   const [formValues, setFormValues] = useState<FormValues>({});
 
   const handleNextStep = () => {
-    setCurrentStep([currentStep + 1, 1]); // Hướng là 1 khi tiến
+    setCurrentStep([currentStep + 1, 1]);
   };
 
   const handlePrevStep = () => {
-    setCurrentStep([currentStep - 1, -1]); // Hướng là -1 khi lùi
+    setCurrentStep([currentStep - 1, -1]);
   };
 
   const updateFormValues = (newValues: Partial<FormValues>) => {
@@ -82,7 +78,7 @@ const TestPage = () => {
             key={key}
             onClick={() => {
               setCurrentForm(key);
-              setCurrentStep([0, 0]); // Reset step và direction khi chuyển form
+              setCurrentStep([0, 0]);
             }}
             className={`mr-4 p-2 rounded ${
               currentForm === key ? "bg-blue-500 text-white" : "bg-gray-300"
@@ -94,7 +90,7 @@ const TestPage = () => {
 
         <AnimatePresence mode="wait" initial={false} custom={direction}>
           <motion.div
-            key={`${currentForm}-${currentStep}`} // Đặt key dựa trên form và bước
+            key={`${currentForm}-${currentStep}`}
             custom={direction}
             className="min-h-[200px]"
             variants={variants}

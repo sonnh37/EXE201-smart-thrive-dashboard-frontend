@@ -29,17 +29,17 @@ interface SigninPasswordFormProps {
 const SigninPasswordForm: React.FC<SigninPasswordFormProps> = ({
   formValues,
   updateFormValues,
-  handleNextStep, // Nhận hàm từ cha
-  handlePrevStep, // Nhận hàm từ cha
+  handleNextStep, 
+  handlePrevStep,
 }) => {
   const [values, setValues] = React.useState<
     Partial<z.infer<typeof formSchema>>
   >({
-    password: formValues.password || "", // Khởi tạo với giá trị từ cha
+    password: formValues.password || "", 
   });
 
   useEffect(() => {
-    updateFormValues(values as { password: string }); // Cập nhật giá trị mỗi khi thay đổi
+    updateFormValues(values as { password: string });
   }, [values]);
 
   const router = useRouter();

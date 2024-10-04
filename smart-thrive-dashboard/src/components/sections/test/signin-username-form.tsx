@@ -20,24 +20,24 @@ const formSchema = z.object({
 interface SigninUsernameFormProps {
   formValues: FormValues;
   updateFormValues: (values: FormValues) => void;
-  handleNextStep: () => void; // Thêm handleNextStep để chuyển bước
-  handlePrevStep: () => void; // Thêm handleNextStep để chuyển bước
+  handleNextStep: () => void;
+  handlePrevStep: () => void;
 }
 
 const SigninUsernameForm: React.FC<SigninUsernameFormProps> = ({
   formValues,
   updateFormValues,
-  handleNextStep, // Nhận hàm từ cha
-  handlePrevStep, // Nhận hàm từ cha
+  handleNextStep,
+  handlePrevStep,
 }) => {
   const [values, setValues] = React.useState<
     Partial<z.infer<typeof formSchema>>
   >({
-    username: formValues.username || "", // Khởi tạo với giá trị từ cha
+    username: formValues.username || "",
   });
 
   useEffect(() => {
-    updateFormValues(values as { username: string }); // Cập nhật giá trị mỗi khi thay đổi
+    updateFormValues(values as { username: string });
   }, [values]);
 
   const handleSubmit = async (data: z.infer<typeof formSchema>) => {
@@ -46,12 +46,11 @@ const SigninUsernameForm: React.FC<SigninUsernameFormProps> = ({
       console.log("check_response", response);
 
       if (response.status == 1 && response.data) {
-        const userData = response.data as User; // Giả sử response trả về user
+        const userData = response.data as User;
 
-        // Cập nhật formValues với cả username và user
         updateFormValues({
           ...values,
-          user: userData, // Gán thông tin user từ API vào formValues
+          user: userData,
         });
 
         toast.success(response.message);
