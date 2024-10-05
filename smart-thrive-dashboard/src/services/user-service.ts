@@ -44,6 +44,15 @@ export const login = (username: string, password: string): Promise<BusinessResul
     .catch(handleError);
 };
 
+export const decodeToken = (token: string): Promise<BusinessResult<DecodedToken>> => {
+  return axios
+    .post<BusinessResult<DecodedToken>>(`${Const.API_USER}/decode-token`, {
+      token: token, 
+    })
+    .then((response) => response.data)
+    .catch(handleError);
+}
+
 export const fetchUser = (id: string): Promise<BusinessResult<User>> => {
   return axios
     .get<BusinessResult<User>>(`${Const.API_USER}/${id}`)

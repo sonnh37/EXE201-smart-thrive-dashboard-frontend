@@ -1,6 +1,6 @@
 import { login } from "@/services/user-service";
 import { toast } from "sonner";
-
+import { jwtDecode } from "jwt-decode";
 // utils/auth.ts
 export const loginAuth = async (
   username: string,
@@ -10,17 +10,17 @@ export const loginAuth = async (
     const response = await login(username, password);
 
     if (response.status == 1) {
-      const token = await response.data?.token;
+      const token = response.data?.token;
       toast.success(response.message);
-      // Lưu JWT vào cookie
-      document.cookie = `token=${token}; path=/;`;
+      // Lưu JWT vào cookie với thuộc tính bảo mật
+      document.cookie = `token=${token}; path=/; secure; samesite=strict;`;
       return true;
     } else {
-        toast.error(response.message);
+      toast.error(response.message);
       return false;
     }
   } catch (error) {
-    toast.error("Error during login: "+ error);
+    toast.error("Error during login: " + error);
     return false;
   }
 };
@@ -28,6 +28,7 @@ export const loginAuth = async (
 export const logout = () => {
   // Xóa JWT từ cookie
   document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+  window.location.reload();
 };
 
 export const getTokenFromCookie = (): string | null => {
@@ -42,3 +43,5 @@ export const getTokenFromCookie = (): string | null => {
   }
   return null;
 };
+
+

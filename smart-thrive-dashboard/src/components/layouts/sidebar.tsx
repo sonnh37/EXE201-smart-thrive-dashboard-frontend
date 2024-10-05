@@ -41,7 +41,7 @@ export function Sidebar() {
           variant="link"
           asChild
         >
-          <Link href="/dashboard" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <Image
               src="/logo-exe.png"
               width={50}
