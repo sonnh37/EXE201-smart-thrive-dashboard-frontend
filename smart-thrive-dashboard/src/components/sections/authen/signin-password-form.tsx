@@ -47,7 +47,6 @@ const SigninPasswordForm: React.FC<SigninPasswordFormProps> = ({
     const response = await loginAuth(formValues.username!, data.password);
 
     if (response) { 
-      console.log("check_login", "success")
       router.push("/");
     }
   };
@@ -85,7 +84,7 @@ const SigninPasswordForm: React.FC<SigninPasswordFormProps> = ({
 
               <FormLabel>To continue, first verify it’s you</FormLabel>
               <FloatingLabelInput
-                className="w-full h-14 text-lg hide-"
+                className="w-full h-14 text-lg"
                 {...field}
                 type="password"
                 id="Password"

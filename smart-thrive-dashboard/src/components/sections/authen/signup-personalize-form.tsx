@@ -5,7 +5,7 @@ import {
   FormDescription,
   FormField,
   FormItem,
-  FormMessage
+  FormMessage,
 } from "@/components/ui/form";
 import { fetchUserByUsername } from "@/services/user-service";
 import { User } from "@/types/user";
@@ -14,7 +14,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
-import { FormValues } from "./signin-form";
+import { FormValues } from "./signup-form";
 const formSchema = z.object({
   username: z.string(),
 });
@@ -24,6 +24,7 @@ interface SignupPersonalizeFormProps {
   updateFormValues: (values: FormValues) => void;
   handleNextStep: () => void;
   handlePrevStep: () => void;
+  setCurrentStep: React.Dispatch<React.SetStateAction<[number, number]>>; // Cập nhật dòng này
 }
 
 const SignupPersonalizeForm: React.FC<SignupPersonalizeFormProps> = ({
@@ -31,6 +32,7 @@ const SignupPersonalizeForm: React.FC<SignupPersonalizeFormProps> = ({
   updateFormValues,
   handleNextStep,
   handlePrevStep,
+  setCurrentStep,
 }) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -41,19 +43,22 @@ const SignupPersonalizeForm: React.FC<SignupPersonalizeFormProps> = ({
 
   const handleSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
-      console.log("username", data.username)
-      if(data.username == "") return toast.error("Empty input")
+      if (data.username == "") return toast.error("Empty input");
       const response = await fetchUserByUsername(data.username);
-      console.log("check_response", response);
 
-      if (response.status == 1 && response.data) {
-        const userData = response.data as User;
-        updateFormValues({ ...formValues, user: userData, username: data.username });
-        toast.success(response.message);
-        handleNextStep();
-      } else {
-        toast.error(response.message);
+      if (response.status != 1) {
+        return toast.error(response.message);
       }
+
+      const userData = response.data as User;
+      updateFormValues({
+        ...formValues,
+        user: userData,
+        username: data.username,
+      });
+      toast.success(response.message);
+      handleNextStep();
+
     } catch (error) {
       console.error("Error submitting form:", error);
       toast.error("An error occurred while fetching the user.");
@@ -84,11 +89,21 @@ const SignupPersonalizeForm: React.FC<SignupPersonalizeFormProps> = ({
             </FormItem>
           )}
         />
-        <div className="w-full flex justify-end space-x-4">
-          <Button type="button" className="border-none rounded-full" variant="outline">
-            Create account
+       <div className="w-full flex justify-between">
+          <Button
+            type="button"
+            onClick={() => setCurrentStep([0, 1])}
+            className="rounded-full"
+            variant="outline"
+          >
+            {" "}
+            Previous
           </Button>
-          <Button className="rounded-full" type="submit">Next</Button>
+          <div className=" flex justify-between space-x-2">
+            <Button className="rounded-full" type="submit">
+              Next
+            </Button>
+          </div>
         </div>
       </form>
     </Form>

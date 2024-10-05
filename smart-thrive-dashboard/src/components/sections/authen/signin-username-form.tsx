@@ -7,7 +7,7 @@ import {
   FormItem,
   FormMessage
 } from "@/components/ui/form";
-import { fetchUserByUsername } from "@/services/user-service";
+import { fetchUserByUsername, loginByGoogle } from "@/services/user-service";
 import { User } from "@/types/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
@@ -15,6 +15,9 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 import { FormValues } from "./signin-form";
+import { useRouter } from "next/navigation";
+import { GoogleLogin } from "@react-oauth/google";
+import { loginAuthByGoogle } from "@/lib/auth";
 const formSchema = z.object({
   username: z.string(),
 });
@@ -32,12 +35,28 @@ const SigninUsernameForm: React.FC<SigninUsernameFormProps> = ({
   handleNextStep,
   handlePrevStep,
 }) => {
+  const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       username: formValues.username || "",
     },
   });
+
+  const handleSuccess = async (response: any) => {
+    const _response = await loginByGoogle(response.credential);
+    if (_response.status != 1) {
+      return toast.error(_response.message);
+    }
+    
+    const isLogin = loginAuthByGoogle(_response) as boolean;
+    if (isLogin == false) return;
+    router.push("/");
+  };
+
+  const handleError = () => {
+    console.log("Google login failed");
+  };
 
   const handleSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
@@ -84,8 +103,12 @@ const SigninUsernameForm: React.FC<SigninUsernameFormProps> = ({
             </FormItem>
           )}
         />
+        <GoogleLogin
+          onSuccess={handleSuccess}
+          onError={handleError}
+        />
         <div className="w-full flex justify-end space-x-4">
-          <Button type="button" className="border-none rounded-full" variant="outline">
+          <Button type="button" onClick={() => router.push("/register")} className="border-none rounded-full" variant="outline">
             Create account
           </Button>
           <Button className="rounded-full" type="submit">Next</Button>

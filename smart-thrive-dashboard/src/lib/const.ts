@@ -6,6 +6,8 @@ class Const {
   private static readonly COURSE = "courses";
   private static readonly BLOG = "blogs";
 
+  static readonly CLIENT_ID = process.env.NEXT_PUBLIC_CLIENT_ID;
+
   //#region URL FE
 
   static readonly URL_BASE = process.env.NEXT_PUBLIC_URL_BASE;

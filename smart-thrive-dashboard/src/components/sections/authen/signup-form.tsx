@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { User } from "@/types/user";
 import SignupPersonalizeForm from "./signup-personalize-form";
 import SignupSelectMethodForm from "./signup-select-method";
+import SignupGmailNewPasswordForm from "./signup-gmail-new-password";
 
 const variants = {
   enter: (direction: number) => {
@@ -30,9 +31,9 @@ const forms = [
     key: "register",
     label: "Register",
     steps: [
-      { key: "selectform", component: SignupSelectMethodForm },
-      { key: "gmail", component: SignupSelectMethodForm },
-      { key: "personalize", component: SignupSelectMethodForm },
+      { key: "select", component: SignupSelectMethodForm },
+      { key: "newpassword", component: SignupGmailNewPasswordForm },
+      { key: "personalize", component: SignupPersonalizeForm },
     ],
   },
 ];
@@ -41,6 +42,7 @@ export interface FormValues {
   username?: string;
   password?: string;
   user?: User;
+  googleToken?: string;
 }
 
 export default function SignUpForm() {
@@ -90,6 +92,7 @@ export default function SignUpForm() {
               handleNextStep={handleNextStep}
               handlePrevStep={handlePrevStep}
               updateFormValues={updateFormValues}
+              setCurrentStep={setCurrentStep} // Truyền vào
             />
           )}
           

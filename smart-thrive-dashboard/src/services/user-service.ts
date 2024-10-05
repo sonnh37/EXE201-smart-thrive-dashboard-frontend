@@ -44,6 +44,41 @@ export const login = (username: string, password: string): Promise<BusinessResul
     .catch(handleError);
 };
 
+export const register = (user: User): Promise<BusinessResult<LoginResponse>> => {
+  return axios
+    .post<BusinessResult<LoginResponse>>(`${Const.API_USER}/register`, user)
+    .then((response) => response.data)
+    .catch(handleError);
+};
+
+export const loginByGoogle = (token: string): Promise<BusinessResult<LoginResponse>> => {
+  return axios
+    .post<BusinessResult<LoginResponse>>(`${Const.API_USER}/login-by-google`, {
+      token: token,
+    })
+    .then((response) => response.data)
+    .catch(handleError);
+};
+
+export const findAccountRegisteredByGoogle = (token: string): Promise<BusinessResult<null>> => {
+  return axios
+    .post<BusinessResult<null>>(`${Const.API_USER}/find-account-registered-by-google`, {
+      token: token,
+    })
+    .then((response) => response.data)
+    .catch(handleError);
+};
+
+export const registerByGoogle = (token: string, password: string): Promise<BusinessResult<LoginResponse>> => {
+  return axios
+    .post<BusinessResult<LoginResponse>>(`${Const.API_USER}/register-by-google`, {
+      token: token,
+      password: password
+    })
+    .then((response) => response.data)
+    .catch(handleError);
+};
+
 export const decodeToken = (token: string): Promise<BusinessResult<DecodedToken>> => {
   return axios
     .post<BusinessResult<DecodedToken>>(`${Const.API_USER}/decode-token`, {

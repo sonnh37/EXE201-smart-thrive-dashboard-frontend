@@ -1,6 +1,8 @@
 import { login } from "@/services/user-service";
 import { toast } from "sonner";
 import { jwtDecode } from "jwt-decode";
+import { BusinessResult } from "@/types/response/business-result";
+import { LoginResponse } from "@/types/response/login-response";
 // utils/auth.ts
 export const loginAuth = async (
   username: string,
@@ -8,6 +10,27 @@ export const loginAuth = async (
 ): Promise<boolean> => {
   try {
     const response = await login(username, password);
+
+    if (response.status == 1) {
+      const token = response.data?.token;
+      toast.success(response.message);
+      // Lưu JWT vào cookie với thuộc tính bảo mật
+      document.cookie = `token=${token}; path=/; secure; samesite=strict;`;
+      return true;
+    } else {
+      toast.error(response.message);
+      return false;
+    }
+  } catch (error) {
+    toast.error("Error during login: " + error);
+    return false;
+  }
+};
+
+export const loginAuthByGoogle = (
+  response: BusinessResult<LoginResponse>,
+): boolean => {
+  try {
 
     if (response.status == 1) {
       const token = response.data?.token;
