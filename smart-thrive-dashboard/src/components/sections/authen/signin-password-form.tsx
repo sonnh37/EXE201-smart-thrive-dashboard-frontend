@@ -1,4 +1,5 @@
 import { FloatingLabelInput } from "@/components/common/floating-label-input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -8,16 +9,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { login } from "@/services/user-service";
-import { useRouter } from "next/navigation";
-import React, { useEffect } from "react";
-import { toast } from "sonner";
-import * as z from "zod";
-import { FormValues } from ".";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { loginAuth } from "@/lib/auth";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
+import React from "react";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { FormValues } from "./signin-form";
 
 const formSchema = z.object({
   password: z.string(),

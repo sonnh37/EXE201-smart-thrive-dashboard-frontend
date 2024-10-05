@@ -19,14 +19,14 @@ const formSchema = z.object({
   username: z.string(),
 });
 
-interface SigninUsernameFormProps {
+interface SignupPersonalizeFormProps {
   formValues: FormValues;
   updateFormValues: (values: FormValues) => void;
   handleNextStep: () => void;
   handlePrevStep: () => void;
 }
 
-const SigninUsernameForm: React.FC<SigninUsernameFormProps> = ({
+const SignupPersonalizeForm: React.FC<SignupPersonalizeFormProps> = ({
   formValues,
   updateFormValues,
   handleNextStep,
@@ -92,26 +92,7 @@ const SigninUsernameForm: React.FC<SigninUsernameFormProps> = ({
         </div>
       </form>
     </Form>
-    // <div className="mx-auto max-w-lg">
-    //   <Card className="">
-    //     <CardHeader>
-    //       <CardTitle>Enter Username</CardTitle>
-    //       <CardDescription>Enter your username to continue</CardDescription>
-    //     </CardHeader>
-
-    //     <CardContent>
-    //       <AutoForm
-    //         formSchema={formSchema}
-    //         values={values}
-    //         onValuesChange={setValues}
-    //         onSubmit={handleSubmit}
-    //       >
-    //         <AutoFormSubmit>Submit</AutoFormSubmit>
-    //       </AutoForm>
-    //     </CardContent>
-    //   </Card>
-    // </div>
   );
 };
 
-export default SigninUsernameForm;
+export default SignupPersonalizeForm;

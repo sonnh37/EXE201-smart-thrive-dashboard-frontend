@@ -35,7 +35,7 @@ const forms = [
       { key: "password", component: SigninPasswordForm },
     ],
   },
-  { key: "register", label: "Register", component: SignupForm },
+  // { key: "register", label: "Register", component: SignupForm },
 ];
 
 export interface FormValues {
@@ -44,7 +44,7 @@ export interface FormValues {
   user?: User;
 }
 
-export default function AuthenForm() {
+export default function SignInForm() {
   const [[currentStep, direction], setCurrentStep] = useState([0, 0]);
   const [currentForm, setCurrentForm] = useState(forms[0].key);
 
@@ -68,7 +68,7 @@ export default function AuthenForm() {
   const currentFormData = forms.find((form) => form.key === currentForm);
   const CurrentComponent = currentFormData?.steps
     ? currentFormData.steps[currentStep].component
-    : currentFormData?.component;
+    : undefined;
 
   return (
     <div className="w-full overflow-hidden">

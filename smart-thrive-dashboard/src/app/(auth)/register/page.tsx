@@ -1,7 +1,6 @@
 "use client";
 
-import AuthenForm from "@/components/sections/authen/signin-form";
-import AuthSlider from "@/components/sections/authen/signin-form";
+import SignUpForm from "@/components/sections/authen/signup-form";
 import Image from "next/image";
 
 export default function Page() {
@@ -23,7 +22,7 @@ export default function Page() {
         <div className="w-full flex flex-row">
           <div className="w-1/2 z-10 flex flex-col justify-between">
             <div className="w-full z-10">
-              <h1 className="text-5xl text-left ">Đăng nhập</h1>
+              <h1 className="text-5xl text-left ">Đăng kí</h1>
               <p className="text-xl my-4">
                 Sử dụng tài khoản Smart Thrive của bạn.
               </p>
@@ -66,7 +65,7 @@ export default function Page() {
           </div>
 
           <div className="w-1/2 z-10">
-            <AuthenForm />
+            <SignUpForm />
           </div>
         </div>
       </div>
