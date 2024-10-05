@@ -17,6 +17,7 @@ import { FormValues } from ".";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { loginAuth } from "@/lib/auth";
 
 const formSchema = z.object({
   password: z.string(),
@@ -45,19 +46,11 @@ const SigninPasswordForm: React.FC<SigninPasswordFormProps> = ({
   const router = useRouter();
 
   const handleSubmit = async (data: z.infer<typeof formSchema>) => {
-    try {
-      const response = await login(formValues.username!, data.password);
-      console.log("check_response", response);
+    const response = await loginAuth(formValues.username!, data.password);
 
-      if (response.status == 1) {
-        toast.success(response.message);
-        // router -> /
-        router.push("/");
-      } else {
-        toast.error(response.message);
-      }
-    } catch (error) {
-      console.error("Error submitting form:", error);
+    if (response) { 
+      console.log("check_login", "success")
+      router.push("/");
     }
   };
 

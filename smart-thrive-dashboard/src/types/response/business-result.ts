@@ -4,3 +4,4 @@ export interface BusinessResult<Tdata> {
     data?: Tdata; 
 }
 
+

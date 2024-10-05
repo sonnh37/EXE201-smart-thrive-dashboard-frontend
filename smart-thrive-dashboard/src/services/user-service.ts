@@ -4,6 +4,7 @@ import { User } from "@/types/user";
 import { UserGetAllQuery } from "@/types/request/user-query";
 import { BusinessResult } from "@/types/response/business-result";
 import axios from "axios";
+import { LoginResponse } from "@/types/response/login-response";
 
 const handleError = (error: any) => {
   console.error("API User Error:", error);
@@ -32,10 +33,10 @@ export const fetchUserByUsername = (username: string): Promise<BusinessResult<Us
     .catch(handleError);
 };
 
-export const login = (username: string, password: string): Promise<BusinessResult<User>> => {
+export const login = (username: string, password: string): Promise<BusinessResult<LoginResponse>> => {
   console.log("check_query", username + password)
   return axios
-    .post<BusinessResult<User>>(`${Const.API_USER}/login`, {
+    .post<BusinessResult<LoginResponse>>(`${Const.API_USER}/login`, {
       email: username, 
       password: password,
     })
