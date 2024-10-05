@@ -9,7 +9,7 @@ export default function Page() {
     <div className="h-screen w-screen bg-blue-100 dark:bg-blue-950 p-4 flex flex-col items-center justify-center">
       <div className="absolute bg-black opacity-30 inset-0 z-0"></div>
 
-      <div className="flex flex-col p-10 h-3/6 w-3/5 bg-transparent relative overflow-hidden rounded-3xl">
+      <div className="flex flex-col p-10  w-3/5 bg-transparent relative overflow-hidden rounded-3xl">
         <div className="absolute bg-background inset-0 z-0"></div>
         <div className="w-full z-10">
           <Image
