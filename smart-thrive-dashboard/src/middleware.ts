@@ -5,7 +5,6 @@ import type { NextRequest } from "next/server";
 export function middleware(req: NextRequest) {
   const token = req.cookies.get("token"); // Lấy token từ cookie
 
-  // Bỏ qua các yêu cầu tới các tệp CSS và các tài nguyên Next.js
   if (req.nextUrl.pathname.startsWith('/_next/')) {
     return NextResponse.next();
   }

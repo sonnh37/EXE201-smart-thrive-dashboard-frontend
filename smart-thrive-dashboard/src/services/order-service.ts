@@ -1,7 +1,8 @@
+import axiosInstance from "@/lib/axios-instance";
 import { cleanQueryParams } from "@/lib/clean-query-param";
 import { Const } from "@/lib/const";
 import { Order } from "@/types/order";
-import { OrderGetAllQuery } from "@/types/request/order-query";
+import { OrderGetAllQuery } from "@/types/queries/order-query";
 import { BusinessResult } from "@/types/response/business-result";
 import axios from "axios";
 
@@ -16,7 +17,7 @@ export const fetchOrders = (
   const cleanedQuery = cleanQueryParams(query);
   console.log("check_service_order_query", cleanedQuery.toString());
 
-  return axios
+  return axiosInstance
     .get<BusinessResult<PagedResponse<Order>>>(`${Const.API_ORDER}?${cleanedQuery}`)
     .then((response) => {
       console.log("check_result", response.data)
@@ -26,14 +27,14 @@ export const fetchOrders = (
 };
 
 export const fetchOrder = (id: string): Promise<BusinessResult<Order>> => {
-  return axios
+  return axiosInstance
     .get<BusinessResult<Order>>(`${Const.API_ORDER}/${id}`)
     .then((response) => response.data)
     .catch(handleError);
 };
 
 export const deleteOrder = (id: string): Promise<BusinessResult<null>> => {
-  return axios
+  return axiosInstance
     .delete<BusinessResult<null>>(`${Const.API_ORDER}/${id}`)
     .then((response) => response.data)
     .catch(handleError);

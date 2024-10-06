@@ -16,7 +16,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { OrderGetAllQuery } from "@/types/request/order-query";
+import { OrderGetAllQuery } from "@/types/queries/order-query";
 import { useEffect } from "react";
 import { fetchOrder, fetchOrders } from "@/services/order-service";
 import { Order } from "@/types/order";

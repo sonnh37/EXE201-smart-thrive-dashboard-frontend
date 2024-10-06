@@ -1,7 +1,8 @@
+import axiosInstance from "@/lib/axios-instance";
 import { cleanQueryParams } from "@/lib/clean-query-param";
 import { Const } from "@/lib/const";
 import { Package } from "@/types/package";
-import { PackageGetAllQuery } from "@/types/request/package-query";
+import { PackageGetAllQuery } from "@/types/queries/package-query";
 import { BusinessResult } from "@/types/response/business-result";
 import axios from "axios";
 
@@ -16,7 +17,7 @@ export const fetchPackages = (
   const cleanedQuery = cleanQueryParams(query);
   console.log("check_package_query", cleanedQuery.toString());
 
-  return axios
+  return axiosInstance
     .get<BusinessResult<PagedResponse<Package>>>(
       `${Const.API_PACKAGE}?${cleanedQuery}`
     )
@@ -28,14 +29,14 @@ export const fetchPackages = (
 };
 
 export const fetchPackage = (id: string): Promise<BusinessResult<Package>> => {
-  return axios
+  return axiosInstance
     .get<BusinessResult<Package>>(`${Const.API_PACKAGE}/${id}`)
     .then((response) => response.data)
     .catch(handleError);
 };
 
 export const deletePackage = (id: string): Promise<BusinessResult<null>> => {
-  return axios
+  return axiosInstance
     .delete<BusinessResult<null>>(`${Const.API_PACKAGE}/${id}`)
     .then((response) => response.data)
     .catch(handleError);

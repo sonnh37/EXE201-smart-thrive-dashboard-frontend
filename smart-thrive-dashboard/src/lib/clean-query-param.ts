@@ -1,4 +1,4 @@
-import { BaseQueryableQuery } from "@/types/request/base-query";
+import { BaseQueryableQuery } from "@/types/queries/base-query";
 
 export const cleanQueryParams = (query: BaseQueryableQuery) => {
   const cleanedQuery: Record<string, any> = {};

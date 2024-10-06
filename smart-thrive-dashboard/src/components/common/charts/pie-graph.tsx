@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/chart';
 import { fetchOrders } from '@/services/order-service';
 import { Order } from '@/types/order';
-import { OrderGetAllQuery } from '@/types/request/order-query';
+import { OrderGetAllQuery } from '@/types/queries/order-query';
 const chartConfig = {
   price: {
     label: 'Visitors'

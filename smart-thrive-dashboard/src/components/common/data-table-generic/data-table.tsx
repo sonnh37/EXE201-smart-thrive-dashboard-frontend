@@ -2,7 +2,7 @@ import { DataTableSkeleton } from "@/components/common/data-table-generic/data-t
 import { FormField } from "@/components/ui/form";
 import { FilterEnum } from "@/types/filter-enum";
 import { FormFilterAdvanced } from "@/types/form-filter-advanced";
-import { BaseQueryableQuery } from "@/types/request/base-query";
+import { BaseQueryableQuery } from "@/types/queries/base-query";
 import { BusinessResult } from "@/types/response/business-result";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {

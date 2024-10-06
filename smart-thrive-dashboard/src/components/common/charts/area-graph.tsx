@@ -20,7 +20,7 @@ import {
 import React, { useEffect } from "react";
 import { Order } from "@/types/order";
 import { fetchOrders } from "@/services/order-service";
-import { OrderGetAllQuery } from "@/types/request/order-query";
+import { OrderGetAllQuery } from "@/types/queries/order-query";
 
 const chartConfig = {
   order: {

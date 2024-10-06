@@ -18,7 +18,7 @@ import { Row } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
-
+  
 interface ActionsProps {
   row: Row<Blog>;
 }
@@ -29,14 +29,9 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const queryClient = useQueryClient();
 
   const handleEditClick = () => {
-    router.push(`/blog/${model.id}`);
+    router.push(`/blogs/${model.id}`);
   };
 
-  const handleBlogsClick = () => {
-    router.push(`/blog/${model.id}/photos`);
-  };
-
-  const handleDeleteClick = async () => {};
   const [showDeleteTaskDialog, setShowDeleteTaskDialog] = React.useState(false);
 
   return (
@@ -54,9 +49,6 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
             onClick={() => navigator.clipboard.writeText(model.id)}
           >
             Copy model ID
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleBlogsClick}>
-            View photos
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleEditClick}>Edit</DropdownMenuItem>

@@ -3,7 +3,6 @@ import { CalendarIcon, ChevronLeft, Upload } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-import Swal from "sweetalert2";
 
 import { Badge } from "@/components/ui/badge";
 
@@ -35,8 +34,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { createBlog, updateBlog } from "@/services/blog-service";
+import {
+  BlogCreateCommand,
+  BlogUpdateCommand,
+} from "@/types/commands/blog-command";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
 import { format } from "date-fns";
 import {
   deleteObject,
@@ -45,7 +48,9 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import { z } from "zod";
+import { storage } from "../../../../firebase";
 
 interface BlogFormProps {
   initialData: any | null;
@@ -53,21 +58,14 @@ interface BlogFormProps {
 
 const formSchema = z.object({
   id: z.string().optional(),
+  userId: z.string().optional(),
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
-  background: z.string().optional(),
+  status: z.string().optional(),
+  backgroundImage: z.string().optional(),
   createdDate: z.date().optional(),
   createdBy: z.string().optional(),
   isDeleted: z.boolean(),
-  photos: z
-    .array(
-      z.object({
-        id: z.string().optional(),
-        src: z.string().optional(),
-        title: z.string().optional(),
-      })
-    )
-    .optional(),
 });
 
 export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
@@ -78,102 +76,69 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
   const toastMessage = initialData ? "Blog updated." : "Blog created.";
   const action = initialData ? "Save changes" : "Create";
   const [firebaseLink, setFirebaseLink] = useState<string | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  // const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [date, setDate] = useState<Date>();
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null); // Lưu tạm file đã chọn
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      setImgLoading(true);
-      const storageRef = ref(storage, `Blog/${file.name}`);
-      const uploadTask = uploadBytesResumable(storageRef, file);
-
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          const progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-
-          switch (snapshot.state) {
-            case "paused":
-              console.log("Upload is paused");
-              break;
-            case "running":
-              console.log("Upload is running");
-              break;
-          }
-        },
-        (error) => {
-          console.error(error);
-          setImgLoading(false);
-        },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            setImagePreview(downloadURL);
-            setFirebaseLink(downloadURL);
-            setImgLoading(false);
-            form.setValue("background", downloadURL);
-          });
-        }
-      );
+      setFirebaseLink(URL.createObjectURL(file)); // Hiển thị preview
+      setSelectedFile(file); // Lưu file vào state thay vì upload
     }
   };
 
   const handleImageDelete = () => {
-    if (firebaseLink) {
-      const imageRef = ref(storage, firebaseLink);
-
-      deleteObject(imageRef)
-        .then(() => {
-          setImagePreview(null);
-          setFirebaseLink(null);
-          form.setValue("background", "");
-          alert("Image successfully deleted!");
-        })
-        .catch((error) => {
-          console.error("Error deleting image:", error);
-          alert("Failed to delete image.");
-        });
-    }
+    setFirebaseLink(""); // Xóa preview của hình ảnh
+    setSelectedFile(null); // Đặt file về null để xóa file đã chọn
+    form.setValue("backgroundImage", ""); // Xóa giá trị hình ảnh trong form nếu có
   };
 
+  const uploadImageFirebase = async (values: z.infer<typeof formSchema>) => {
+    if (selectedFile) {
+      const storageRef = ref(storage, `Blog/${selectedFile.name}`);
+      const uploadTask = uploadBytesResumable(storageRef, selectedFile);
+  
+      const uploadPromise = new Promise<string>((resolve, reject) => {
+        uploadTask.on(
+          "state_changed",
+          null,
+          (error) => reject(error),
+          () => {
+            getDownloadURL(uploadTask.snapshot.ref).then((url) => resolve(url));
+          }
+        );
+      });
+  
+      const downloadURL = await uploadPromise;
+      return { ...values, backgroundImage: downloadURL }; // Trả về values đã cập nhật
+    }
+    return values; // Trả về values gốc nếu không có file
+  };
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       setLoading(true);
-
+      const updatedValues = await uploadImageFirebase(values); // Chờ upload hoàn tất và nhận values mới
+      const blogCommand = {
+        id: initialData ? values.id : null,
+        title: values.title,
+        description: values.description,
+        status: values.status,
+        backgroundImage: updatedValues.backgroundImage,
+      };
       if (initialData) {
-        const response = await axios.put(
-          `https://localhost:7192/blogs`,
-          values
-        );
-        Swal.fire({
-          title: "Success!",
-          text: "Blog updated successfully",
-          icon: "success",
-          confirmButtonText: "OK",
-        });
+        const response = await updateBlog(blogCommand as BlogUpdateCommand);
+        if (response.status != 1) return toast.error(response.message);
+        toast.success(response.message);
       } else {
-        const response = await axios.post(
-          "https://localhost:7192/blogs",
-          values
-        );
-        Swal.fire({
-          title: "Success!",
-          text: "Blog created successfully",
-          icon: "success",
-          confirmButtonText: "OK",
-        });
+        const response = await createBlog(blogCommand as BlogCreateCommand);
+        if (response.status != 1) return toast.error(response.message);
+        toast.success(response.message);
       }
     } catch (error: any) {
-      console.error(error);
-      Swal.fire({
-        title: "Error!",
-        text: error.response?.data?.message || "Something went wrong",
-        icon: "error",
-        confirmButtonText: "OK",
-      });
+      toast.error(error);
     } finally {
       setLoading(false);
     }
@@ -184,10 +149,10 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
     defaultValues: {
       title: "",
       description: "",
-      background: "",
+      status: "",
+      backgroundImage: "",
       createdBy: "N/A",
       createdDate: new Date(),
-      photos: [],
       isDeleted: false,
     },
   });
@@ -197,22 +162,22 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
       form.reset({
         id: initialData.id || "",
         title: initialData.title || "",
+        status: initialData.Status || "",
         description: initialData.description || +"",
-        background: initialData.background || "",
+        backgroundImage: initialData.backgroundImage || "",
         createdDate: initialData.createdDate
           ? new Date(initialData.createdDate)
           : new Date(),
         createdBy: initialData.createdBy || "",
         isDeleted: !!initialData.isDeleted,
-        photos: initialData.photos || [],
       });
 
       setDate(
         initialData.createdDate ? new Date(initialData.createdDate) : new Date()
       );
 
-      setImagePreview(initialData.background || "");
-      setFirebaseLink(initialData.background || "");
+      //setImagePreview(initialData.backgroundImage || "");
+      setFirebaseLink(initialData.backgroundImage || "");
     } else {
       setDate(new Date());
     }
@@ -276,7 +241,24 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
                             <FormItem>
                               <FormLabel>Title</FormLabel>
                               <FormControl>
-                                <Input placeholder="shadcn" {...field} />
+                                <Input placeholder="Enter title" {...field} />
+                              </FormControl>
+                              <FormDescription>
+                                This is your public display name.
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="status"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Status</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Enter status" {...field} />
                               </FormControl>
                               <FormDescription>
                                 This is your public display name.
@@ -320,22 +302,22 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
                   <CardContent>
                     <FormField
                       control={form.control}
-                      name="background"
+                      name="backgroundImage"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Blog Background</FormLabel>
                           <FormControl>
                             <div className="grid gap-2">
-                              {imagePreview ? (
+                              {firebaseLink ? (
                                 <>
                                   <Image
                                     alt="Blog Background"
                                     className="aspect-square w-full rounded-md object-cover"
                                     height={300}
-                                    src={imagePreview}
+                                    src={firebaseLink}
                                     width={300}
                                   />
-                                  <p
+                                  {/* <p
                                     className="text-blue-500 underline"
                                     {...field}
                                   >
@@ -346,7 +328,7 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
                                     >
                                       {firebaseLink}
                                     </a>
-                                  </p>
+                                  </p> */}
                                   <Button
                                     onClick={handleImageDelete}
                                     variant="destructive"
@@ -417,7 +399,7 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
                                 selectedDate
                                   ? new Date(selectedDate)
                                   : new Date()
-                              ); 
+                              );
                             };
                             return (
                               <FormItem>

@@ -27,36 +27,35 @@ import { useEffect, useState } from "react";
 import { User } from "@/types/user";
 
 export function UserNav() {
-    const router = useRouter();
-    const [userInfo, setUserInfo] = useState<User | null>(null); // Sử dụng kiểu User
-    const token = getTokenFromCookie(); // Lấy token từ cookie
+  const router = useRouter();
+  const [userInfo, setUserInfo] = useState<User | null>(null); // Sử dụng kiểu User
+  const token = getTokenFromCookie(); // Lấy token từ cookie
 
-    useEffect(() => {
-        const fetchData = async () => {
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!token) {
+        router.push("/login");
+        return;
+      }
 
-            if (!token) {
-                router.push("/login");
-                return;
-            }
+      const response = await decodeToken(token);
+      console.log("check_deco", response ?? {})
+      const decodedToken = response.status === 1 ? response.data : null;
+      if (decodedToken === null) {
+        router.push("/login");
+        return;
+      }
 
-            const response = await decodeToken(token);
-            const decodedToken = response.status === 1 ? response.data : null;
+      const response_user = await fetchUser(decodedToken?.id!);
 
-            if (decodedToken === null) { 
-                router.push("/login");
-                return;
-            }
+      setUserInfo(response_user.data!);
+    };
 
-            const response_user = await fetchUser(decodedToken?.id!);
+    fetchData();
+  }, [token, router]);
 
-            setUserInfo(response_user.data!);
-        };
-
-        fetchData();
-    }, [token, router]);
-
-    // Nếu userInfo vẫn chưa có, có thể trả về null hoặc một spinner loading
-    if (!userInfo) return null;
+  // Nếu userInfo vẫn chưa có, có thể trả về null hoặc một spinner loading
+  if (!userInfo) return null;
   return (
     <DropdownMenu>
       <TooltipProvider disableHoverableContent>
@@ -70,7 +69,9 @@ export function UserNav() {
                 <Avatar className="h-8 w-8">
                   <AvatarImage src={userInfo.imageUrl} alt="Avatar" />
                   <AvatarFallback className="bg-transparent">
-                    {!userInfo.imageUrl ? userInfo.username?.charAt(0).toUpperCase() : userInfo.username }
+                    {!userInfo.imageUrl
+                      ? userInfo.username?.charAt(0).toUpperCase()
+                      : userInfo.username}
                   </AvatarFallback>
                 </Avatar>
               </Button>
@@ -83,7 +84,9 @@ export function UserNav() {
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{userInfo.username}</p>
+            <p className="text-sm font-medium leading-none">
+              {userInfo.username}
+            </p>
             <p className="text-xs leading-none text-muted-foreground">
               {userInfo.email}
             </p>
@@ -105,7 +108,12 @@ export function UserNav() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="hover:cursor-pointer" onClick={() => {logout()}}>
+        <DropdownMenuItem
+          className="hover:cursor-pointer"
+          onClick={() => {
+            logout();
+          }}
+        >
           <LogOut className="w-4 h-4 mr-3 text-muted-foreground" />
           Sign out
         </DropdownMenuItem>

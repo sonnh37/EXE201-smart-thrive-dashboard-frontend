@@ -1,7 +1,8 @@
+import axiosInstance from "@/lib/axios-instance";
 import { cleanQueryParams } from "@/lib/clean-query-param";
 import { Const } from "@/lib/const";
 import { Course } from "@/types/course";
-import { CourseGetAllQuery } from "@/types/request/course-query";
+import { CourseGetAllQuery } from "@/types/queries/course-query";
 import { BusinessResult } from "@/types/response/business-result";
 import axios from "axios";
 
@@ -16,7 +17,7 @@ export const fetchCourses = (
   const cleanedQuery = cleanQueryParams(query);
   console.log("check_service_course_query", cleanedQuery.toString());
 
-  return axios
+  return axiosInstance
     .get<BusinessResult<PagedResponse<Course>>>(`${Const.API_COURSE}?${cleanedQuery}`)
     .then((response) => {
       console.log("check_result", response.data)
@@ -26,14 +27,14 @@ export const fetchCourses = (
 };
 
 export const fetchCourse = (id: string): Promise<BusinessResult<Course>> => {
-  return axios
+  return axiosInstance
     .get<BusinessResult<Course>>(`${Const.API_COURSE}/${id}`)
     .then((response) => response.data)
     .catch(handleError);
 };
 
 export const deleteCourse = (id: string): Promise<BusinessResult<null>> => {
-  return axios
+  return axiosInstance
     .delete<BusinessResult<null>>(`${Const.API_COURSE}/${id}`)
     .then((response) => response.data)
     .catch(handleError);
