@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 
 import { Badge } from "@/components/ui/badge";
-
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,11 +13,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger
+} from "@/components/ui/dialog";
 
 import { Input } from "@/components/ui/input";
 
-import { Textarea } from "@/components/ui/textarea";
 
+import RichEditor from "@/components/common/react-draft-wysiwyg";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Form,
@@ -42,10 +46,9 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import {
-  deleteObject,
   getDownloadURL,
   ref,
-  uploadBytesResumable,
+  uploadBytesResumable
 } from "firebase/storage";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -76,7 +79,6 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
   const toastMessage = initialData ? "Blog updated." : "Blog created.";
   const action = initialData ? "Save changes" : "Create";
   const [firebaseLink, setFirebaseLink] = useState<string | null>(null);
-  // const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [date, setDate] = useState<Date>();
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -100,7 +102,7 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
     if (selectedFile) {
       const storageRef = ref(storage, `Blog/${selectedFile.name}`);
       const uploadTask = uploadBytesResumable(storageRef, selectedFile);
-  
+
       const uploadPromise = new Promise<string>((resolve, reject) => {
         uploadTask.on(
           "state_changed",
@@ -111,7 +113,7 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
           }
         );
       });
-  
+
       const downloadURL = await uploadPromise;
       return { ...values, backgroundImage: downloadURL }; // Trả về values đã cập nhật
     }
@@ -274,12 +276,19 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
                           name="description"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Description</FormLabel>
                               <FormControl>
-                                <Textarea
-                                  placeholder="Blog description"
-                                  {...field}
-                                />
+                                <Dialog>
+                                  <DialogTrigger asChild>
+                                    <Button variant="outline">Content</Button>
+                                  </DialogTrigger>
+                                  <DialogContent className="w-full h-full max-w-[80%] max-h-[90%]">
+                                    
+                                    <RichEditor
+                                      description={field.value || ""} // Pass the current value from form field
+                                      onChange={field.onChange} // Pass the onChange handler
+                                    />
+                                  </DialogContent>
+                                </Dialog>
                               </FormControl>
                               <FormMessage />
                             </FormItem>
