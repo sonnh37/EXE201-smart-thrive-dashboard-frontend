@@ -38,6 +38,17 @@ export const fetchUserByUsername = (
     .catch(handleError);
 };
 
+export const fetchUserByUsernameOrEmail = (
+  keyword: string
+): Promise<BusinessResult<User>> => {
+  return axiosInstance
+    .get<BusinessResult<User>>(`${Const.API_USER}/username-or-email`, {
+      params: { key: keyword } 
+    })
+    .then((response) => response.data)
+    .catch(handleError);
+};
+
 export const login = (
   username: string,
   password: string
@@ -45,7 +56,7 @@ export const login = (
   console.log("check_query", username + password);
   return axiosInstance
     .post<BusinessResult<LoginResponse>>(`${Const.API_USER}/login`, {
-      email: username,
+      usernameOrEmail: username,
       password: password,
     })
     .then((response) => response.data)

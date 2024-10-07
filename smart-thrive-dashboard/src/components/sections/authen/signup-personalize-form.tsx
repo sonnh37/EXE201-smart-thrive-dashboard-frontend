@@ -7,7 +7,7 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { fetchUserByUsername } from "@/services/user-service";
+import { fetchUserByUsername, fetchUserByUsernameOrEmail } from "@/services/user-service";
 import { User } from "@/types/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
@@ -44,7 +44,7 @@ const SignupPersonalizeForm: React.FC<SignupPersonalizeFormProps> = ({
   const handleSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
       if (data.username == "") return toast.error("Empty input");
-      const response = await fetchUserByUsername(data.username);
+      const response = await fetchUserByUsernameOrEmail(data.username);
 
       if (response.status != 1) {
         return toast.error(response.message);

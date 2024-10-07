@@ -7,7 +7,7 @@ import {
   FormItem,
   FormMessage
 } from "@/components/ui/form";
-import { fetchUserByUsername, loginByGoogle } from "@/services/user-service";
+import { fetchUserByUsername, fetchUserByUsernameOrEmail, loginByGoogle } from "@/services/user-service";
 import { User } from "@/types/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
@@ -62,7 +62,7 @@ const SigninUsernameForm: React.FC<SigninUsernameFormProps> = ({
     try {
       console.log("username", data.username)
       if(data.username == "") return toast.error("Empty input")
-      const response = await fetchUserByUsername(data.username);
+      const response = await fetchUserByUsernameOrEmail(data.username);
       console.log("check_response", response);
 
       if (response.status == 1 && response.data) {
@@ -93,8 +93,7 @@ const SigninUsernameForm: React.FC<SigninUsernameFormProps> = ({
               <FloatingLabelInput
                 className="w-full h-14 text-lg"
                 {...field}
-                id="Username"
-                label="Username"
+                label="Username or email"
               />
               <FormDescription>
                 This is your public display name.
