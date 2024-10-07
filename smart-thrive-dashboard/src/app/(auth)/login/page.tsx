@@ -1,7 +1,7 @@
 "use client";
 
-import AuthenForm from "@/components/sections/authen/signin-form";
-import AuthSlider from "@/components/sections/authen/signin-form";
+import AuthenForm from "@/components/sections/authen/signin/signin-form";
+import AuthSlider from "@/components/sections/authen/signin/signin-form";
 import Image from "next/image";
 
 export default function Page() {

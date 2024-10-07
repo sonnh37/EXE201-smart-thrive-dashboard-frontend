@@ -1,6 +1,6 @@
 "use client";
 
-import SignUpForm from "@/components/sections/authen/signup-form";
+import SignUpForm from "@/components/sections/authen/signup/signup-form";
 import Image from "next/image";
 
 export default function Page() {
