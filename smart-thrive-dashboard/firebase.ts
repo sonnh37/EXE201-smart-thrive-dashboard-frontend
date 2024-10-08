@@ -8,7 +8,7 @@ import { getStorage } from "firebase/storage";
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBhEGDwyO5YOusNNUxcSFB38ZJxvxf3m6o",
+  apiKey: process.env.NEXT_PUBLIC_APIKEY_FIREBASE,
   authDomain: "smart-thrive.firebaseapp.com",
   projectId: "smart-thrive",
   storageBucket: "smart-thrive.appspot.com",

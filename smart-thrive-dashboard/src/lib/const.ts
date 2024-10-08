@@ -1,5 +1,5 @@
 class Const {
-    static readonly CLIENT_ID = process.env.NEXT_PUBLIC_CLIENT_ID;
+    static readonly CLIENT_ID = process.env.NEXT_PUBLIC_CLIENT_ID_GOOGLE;
     static readonly URL_BASE = process.env.NEXT_PUBLIC_URL_BASE;
     //#region API
     static readonly API_BASE = process.env.NEXT_PUBLIC_API_BASE + "api";
