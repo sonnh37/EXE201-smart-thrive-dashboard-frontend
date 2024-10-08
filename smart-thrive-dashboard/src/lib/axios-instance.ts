@@ -12,6 +12,8 @@ axiosInstance.interceptors.request.use(
     async (config) => {
         // Lấy token từ localStorage hoặc cookie
         const token = localStorage.getItem("token");
+        config.headers['ngrok-skip-browser-warning'] = 'true';
+
         // Kiểm tra tính hợp lệ của token
         if (token) {
             // Đính kèm token vào header Authorization nếu có token
