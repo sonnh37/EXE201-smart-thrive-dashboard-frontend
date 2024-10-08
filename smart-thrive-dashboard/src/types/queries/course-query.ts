@@ -1,5 +1,5 @@
-import { CourseStatus, CourseType } from "../enums/course";
-import { BaseQueryableQuery } from "./base-query";
+import {CourseStatus, CourseType} from "../enums/course";
+import {BaseQueryableQuery} from "./base-query";
 
 export interface CourseGetAllQuery extends BaseQueryableQuery {
     subjectId?: string;
@@ -21,4 +21,4 @@ export interface CourseGetAllQuery extends BaseQueryableQuery {
     isActive?: boolean;
     startDate?: string;
     endDate?: string;
-  }
+}

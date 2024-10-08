@@ -1,4 +1,3 @@
-
 interface PagedResponse<TData> {
     results?: TData[];
     totalPages?: number;

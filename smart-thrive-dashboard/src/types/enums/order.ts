@@ -1,7 +1,7 @@
 export enum PaymentMethod {
-  CreditCard,
-  Paypal,
-  BankTransfer,
+    CreditCard,
+    Paypal,
+    BankTransfer,
 }
 
 export enum OrderStatus {

@@ -1,5 +1,5 @@
-import { PackageStatus } from "../enums/package";
-import { BaseQueryableQuery } from "./base-query";
+import {PackageStatus} from "../enums/package";
+import {BaseQueryableQuery} from "./base-query";
 
 export interface PackageGetAllQuery extends BaseQueryableQuery {
     name?: string;

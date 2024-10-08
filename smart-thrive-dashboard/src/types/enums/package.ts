@@ -1,5 +1,5 @@
 export enum PackageStatus {
-  Pending,
-  Approved,
-  Rejected,
+    Pending,
+    Approved,
+    Rejected,
 }

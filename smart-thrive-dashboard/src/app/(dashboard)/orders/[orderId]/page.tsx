@@ -1,11 +1,11 @@
 "use client";
-import { Breadcrumbs } from "@/components/common/breadcrumb";
-import { ContentLayout } from "@/components/common/content-layout";
-import { BlogForm } from "@/components/sections/blogs/create-update-form";
-import { fetchBlog } from "@/services/blog-service";
-import { Blog } from "@/types/blog";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import {Breadcrumbs} from "@/components/common/breadcrumb";
+import {ContentLayout} from "@/components/common/content-layout";
+import {BlogForm} from "@/components/sections/blogs/create-update-form";
+import {fetchBlog} from "@/services/blog-service";
+import {Blog} from "@/types/blog";
+import {useEffect, useState} from "react";
+import {toast} from "sonner";
 
 export default function Page({params}: { params: { blogId: string } }) {
     const [blog, setBlog] = useState<Blog | null>(null);

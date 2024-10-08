@@ -1,5 +1,5 @@
 "use client";
-import { Breadcrumbs } from "@/components/common/breadcrumb";
+import {Breadcrumbs} from "@/components/common/breadcrumb";
 import {ContentLayout} from "@/components/common/content-layout";
 import DataTableBlogs from "@/components/sections/blogs";
 

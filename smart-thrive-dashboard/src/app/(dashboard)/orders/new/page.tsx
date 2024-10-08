@@ -1,8 +1,8 @@
 "use client";
 
-import { Breadcrumbs } from "@/components/common/breadcrumb";
-import { ContentLayout } from "@/components/common/content-layout";
-import { BlogForm } from "@/components/sections/blogs/create-update-form";
+import {Breadcrumbs} from "@/components/common/breadcrumb";
+import {ContentLayout} from "@/components/common/content-layout";
+import {BlogForm} from "@/components/sections/blogs/create-update-form";
 
 const breadcrumbItems = [
     {title: "Dashboard", link: "/"},

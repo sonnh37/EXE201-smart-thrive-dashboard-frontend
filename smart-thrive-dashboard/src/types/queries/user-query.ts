@@ -1,6 +1,6 @@
-import { BaseQueryableQuery } from "./base-query";
+import {BaseQueryableQuery} from "./base-query";
 
 export interface UserGetAllQuery extends BaseQueryableQuery {
-  username?: string;
-  password?: string;
+    username?: string;
+    password?: string;
 }

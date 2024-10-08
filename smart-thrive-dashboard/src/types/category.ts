@@ -1,7 +1,7 @@
-import { BaseEntity } from "./base";
-import { Subject } from "./subject";
+import {BaseEntity} from "./base";
+import {Subject} from "./subject";
 
 export interface Category extends BaseEntity {
-  name?: string;
-  subjects?: Subject[];
+    name?: string;
+    subjects?: Subject[];
 }
