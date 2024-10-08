@@ -34,24 +34,18 @@ export function UserNav() {
             }
 
             const response = await decodeToken(token);
-            console.log("check_deco", response ?? {})
             const decodedToken = response.status === 1 ? response.data : null;
-            if (decodedToken === null) {
+            if (!decodedToken) {
                 router.push("/login");
                 return;
             }
 
-            const response_user = await fetchUser(decodedToken?.id!);
-
-            console.log("response_user", response_user.data?.imageUrl)
-
+            const response_user = await fetchUser(decodedToken.id);
             setUserInfo(response_user.data!);
         };
 
         fetchData();
-    }, [token, router]);
-
-    // Nếu userInfo vẫn chưa có, có thể trả về null hoặc một spinner loading
+    }, []);
     if (!userInfo) return null;
     return (
         <DropdownMenu>
