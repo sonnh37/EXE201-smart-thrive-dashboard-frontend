@@ -48,6 +48,8 @@ export function UserNav() {
 
       const response_user = await fetchUser(decodedToken?.id!);
 
+      console.log("response_user", response_user.data?.imageUrl)
+
       setUserInfo(response_user.data!);
     };
 

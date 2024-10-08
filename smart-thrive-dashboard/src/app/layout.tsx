@@ -16,7 +16,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const param = usePathname();
-  const isAuthPage = param.startsWith("/auth");
   const clientId = Const.CLIENT_ID;
   return (
     <html lang="en">

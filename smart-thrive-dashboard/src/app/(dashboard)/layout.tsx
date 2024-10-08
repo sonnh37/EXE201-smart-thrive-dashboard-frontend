@@ -5,7 +5,7 @@ import React from "react";
 
 const queryClient = new QueryClient();
 
-const AuthLayout = ({ children }: { children: React.ReactNode }) => {
+const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <QueryClientProvider client={queryClient}>
       <AdminPanelLayout>{children}</AdminPanelLayout>
@@ -13,4 +13,4 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export default AuthLayout;
+export default DashboardLayout;

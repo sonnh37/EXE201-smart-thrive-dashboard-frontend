@@ -44,6 +44,7 @@ const SigninUsernameForm: React.FC<SigninUsernameFormProps> = ({
   });
 
   const handleSuccess = async (response: any) => {
+    console.log("check_gg", response)
     const _response = await loginByGoogle(response.credential);
     if (_response.status != 1) {
       return toast.error(_response.message);
