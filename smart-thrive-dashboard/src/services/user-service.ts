@@ -74,6 +74,7 @@ export const register = (
 export const loginByGoogle = (
     token: string
 ): Promise<BusinessResult<LoginResponse>> => {
+    console.log("check_api_back", Const.API_BASE)
     return axiosInstance
         .post<BusinessResult<LoginResponse>>(`${Const.API_USER}/login-by-google`, {
             token: token,
