@@ -5,6 +5,7 @@ import {BusinessResult} from "@/types/response/business-result";
 import {LoginResponse} from "@/types/response/login-response";
 import {UserGetAllQuery} from "@/types/queries/user-query";
 import axiosInstance from "@/lib/axios-instance";
+import axios from "axios";
 
 const handleError = (error: any) => {
     console.error("API User Error:", error);
@@ -74,8 +75,8 @@ export const register = (
 export const loginByGoogle = (
     token: string
 ): Promise<BusinessResult<LoginResponse>> => {
-    console.log("check_api_back", Const.API_BASE)
-    return axiosInstance
+    console.log("check_api", `${Const.API_USER}/login-by-google`)
+    return axios
         .post<BusinessResult<LoginResponse>>(`${Const.API_USER}/login-by-google`, {
             token: token,
         })

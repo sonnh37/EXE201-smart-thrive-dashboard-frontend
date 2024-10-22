@@ -35,12 +35,8 @@ export function UserNav() {
 
             const response = await decodeToken(token);
             const decodedToken = response.status === 1 ? response.data : null;
-            if (!decodedToken) {
-                router.push("/login");
-                return;
-            }
-
-            const response_user = await fetchUser(decodedToken.id);
+           
+            const response_user = await fetchUser(decodedToken!.id);
             setUserInfo(response_user.data!);
         };
 
