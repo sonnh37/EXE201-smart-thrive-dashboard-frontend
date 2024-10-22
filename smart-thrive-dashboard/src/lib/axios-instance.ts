@@ -34,21 +34,21 @@ axiosInstance.interceptors.response.use(
     console.error("API Response Error:", error.response); // Log lỗi chi tiết
 
     if (error.response?.status === 401) {
-      console.warn("Token expired or invalid. Logging out..."); // Log cảnh báo
-      const token = localStorage.getItem("token");
-      if (token) {
-        IsValidToken(token).then(isValid => {
-          if (!isValid) {
-            console.warn("Token invalid. Logging out...");
-            logout();
-          } else {
-            console.warn("Token is valid, but received 401 error.");
-          }
-        });
-      } else {
-        console.warn("No token found. Logging out...");
-        logout();
-      }
+      // console.warn("Token expired or invalid. Logging out..."); // Log cảnh báo
+      // const token = localStorage.getItem("token");
+      // if (token) {
+      //   IsValidToken(token).then(isValid => {
+      //     if (!isValid) {
+      //       console.warn("Token invalid. Logging out...");
+      //       logout();
+      //     } else {
+      //       console.warn("Token is valid, but received 401 error.");
+      //     }
+      //   });
+      // } else {
+      //   console.warn("No token found. Logging out...");
+      //   logout();
+      // }
     }
     return Promise.reject(error);
   }
