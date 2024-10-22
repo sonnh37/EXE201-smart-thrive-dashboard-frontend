@@ -1,5 +1,5 @@
 import axios from "axios";
-import { logout } from "./auth";
+import { IsValidToken, logout } from "./auth";
 
 // Tạo một instance của axios (nếu cần)
 const axiosInstance = axios.create({
@@ -35,7 +35,20 @@ axiosInstance.interceptors.response.use(
 
     if (error.response?.status === 401) {
       console.warn("Token expired or invalid. Logging out..."); // Log cảnh báo
-      logout();
+      const token = localStorage.getItem("token");
+      if (token) {
+        IsValidToken(token).then(isValid => {
+          if (!isValid) {
+            console.warn("Token invalid. Logging out...");
+            logout();
+          } else {
+            console.warn("Token is valid, but received 401 error.");
+          }
+        });
+      } else {
+        console.warn("No token found. Logging out...");
+        logout();
+      }
     }
     return Promise.reject(error);
   }
