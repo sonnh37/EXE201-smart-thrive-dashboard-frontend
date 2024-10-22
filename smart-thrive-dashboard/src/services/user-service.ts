@@ -76,7 +76,7 @@ export const loginByGoogle = (
     token: string
 ): Promise<BusinessResult<LoginResponse>> => {
     console.log("check_api", `${Const.API_USER}/login-by-google`)
-    return axios
+    return axiosInstance
         .post<BusinessResult<LoginResponse>>(`${Const.API_USER}/login-by-google`, {
             token: token,
         })

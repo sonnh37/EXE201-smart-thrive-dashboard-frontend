@@ -31,8 +31,10 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Kiểm tra nếu token đã hết hạn
+    console.error("API Response Error:", error.response); // Log lỗi chi tiết
+
     if (error.response?.status === 401) {
+      console.warn("Token expired or invalid. Logging out..."); // Log cảnh báo
       logout();
     }
     return Promise.reject(error);
