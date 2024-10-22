@@ -24,24 +24,41 @@ import {User} from "@/types/user";
 export function UserNav() {
     const router = useRouter();
     const [userInfo, setUserInfo] = useState<User | null>(null); // Sử dụng kiểu User
-    const token = getTokenFromCookie(); // Lấy token từ cookie
+    const token = localStorage.getItem("token"); // Lấy token từ cookie
 
     useEffect(() => {
-        const fetchData = async () => {
-            if (!token) {
-                router.push("/login");
-                return;
-            }
+        if (!token) {
+            router.push("/login");
+            return;
+        }
 
-            const response = await decodeToken(token);
-            const decodedToken = response.status === 1 ? response.data : null;
-           
-            const response_user = await fetchUser(decodedToken!.id);
-            setUserInfo(response_user.data!);
-        };
+        // Decode token và sau đó fetch user info
+        decodeToken(token)
+            .then((response) => {
+                // Kiểm tra nếu token hợp lệ
+                if (response.status !== 1) {
+                    throw new Error("Token không hợp lệ");
+                }
 
-        fetchData();
-    }, []);
+                const decodedToken = response.data;
+
+                // Fetch thông tin người dùng
+                return fetchUser(decodedToken!.id);
+            })
+            .then((response_user) => {
+                // Kiểm tra nếu thông tin người dùng được trả về
+                if (response_user.status !== 1) {
+                    throw new Error("Không tìm thấy người dùng");
+                }
+
+                // Cập nhật state với thông tin người dùng
+                setUserInfo(response_user!.data!);
+            })
+            .catch((error) => {
+                console.error("Error in fetching data:", error);
+                router.push("/login"); // Điều hướng đến login nếu có lỗi
+            });
+    }, [token, router]);
     if (!userInfo) return null;
     return (
         <DropdownMenu>
@@ -99,6 +116,7 @@ export function UserNav() {
                     className="hover:cursor-pointer"
                     onClick={() => {
                         logout();
+                        window.location.reload();
                     }}
                 >
                     <LogOut className="w-4 h-4 mr-3 text-muted-foreground"/>

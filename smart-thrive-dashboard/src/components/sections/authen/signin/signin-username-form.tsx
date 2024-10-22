@@ -59,7 +59,12 @@ const SigninUsernameForm: React.FC<SigninUsernameFormProps> = ({
         const isLogin = loginAuthByGoogle(_response) as boolean;
         if (!isLogin) return;
 
-        router.push("/");
+        const token = localStorage.getItem("token");
+        if (token) {
+          router.push("/"); // Điều hướng sau khi có token
+        } else {
+          toast.error("Token was not set correctly");
+        }
       })
       .catch((error) => {
         console.error("Error during login process:", error);

@@ -74,7 +74,7 @@ export const getTokenFromCookie = (): string | null => {
 
 
 export const getUserByToken = async (): Promise<User> => {
-    const token: string | null = getTokenFromCookie(); // Đảm bảo token có kiểu string | null
+    const token: string | null = localStorage.getItem("token"); // Đảm bảo token có kiểu string | null
     const response = await decodeToken(token ?? "");
     // id user
     const id = response.data?.id;
