@@ -56,7 +56,7 @@ export const logout = () => {
     // Xóa token khỏi localStorage
     localStorage.removeItem("token");
     document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-    window.location.reload();
+    // window.location.reload();
 };
 
 export const getTokenFromCookie = (): string | null => {
