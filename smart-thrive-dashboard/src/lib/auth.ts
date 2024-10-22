@@ -74,7 +74,7 @@ export const getTokenFromCookie = (): string | null => {
 
 
 export const getUserByToken = async (): Promise<User> => {
-    const token: string | null = localStorage.getItem("token"); // Đảm bảo token có kiểu string | null
+    const token: string | null = getTokenFromCookie(); // Đảm bảo token có kiểu string | null
     const response = await decodeToken(token ?? "");
     // id user
     const id = response.data?.id;
@@ -83,32 +83,32 @@ export const getUserByToken = async (): Promise<User> => {
     return _response.data!;
 };
 
-export const IsValidToken = (token: string): Promise<boolean> => {
-    if (!token) {
-        return Promise.resolve(false); // Nếu không có token, trả về false ngay lập tức
-    }
-
-    return decodeToken(token)
-        .then(response => {
+export const IsValidToken = async (token: string): Promise<boolean> => {
+    let isTokenValid = true;
+    if (token) {
+        try {
+            const response = await decodeToken(token);
+            console.log("check_decoded_valid")
             const decoded = response.data;
+
             const currentTime = Date.now() / 1000; // Thời gian hiện tại tính bằng giây
 
             // Kiểm tra xem token đã hết hạn chưa
-            return decoded!.exp >= currentTime; // Trả về true nếu token còn hiệu lực
-        })
-        .catch(error => {
-            return false; // Nếu decode token bị lỗi, trả về false
-        });
-};
+            if (decoded!.exp < currentTime) {
+                isTokenValid = false;
+            } else {
+                isTokenValid = true;
+            }
+        } catch (error) {
+            isTokenValid = false; // Nếu decode token bị lỗi, coi như token không hợp lệ
+        }
+    } else {
+        isTokenValid = false;
+    }
 
-function isTokenExpired(token: string) {
-    if (!token) return true; // Nếu không có token, coi như đã hết hạn
-  
-    const payload = JSON.parse(atob(token.split('.')[1])); // Giải mã phần payload của JWT
-    const expirationTime = payload.exp * 1000; // Chuyển đổi thời gian hết hạn sang milliseconds
-  
-    return Date.now() > expirationTime; // So sánh với thời gian hiện tại
-  }
+    return isTokenValid;
+}
+
 
 
 
