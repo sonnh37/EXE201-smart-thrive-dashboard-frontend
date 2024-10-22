@@ -60,6 +60,7 @@ const SigninUsernameForm: React.FC<SigninUsernameFormProps> = ({
         if (!isLogin) return;
 
         const token = localStorage.getItem("token");
+        console.log("check_token_logingg", token)
         if (token) {
           router.push("/"); // Điều hướng sau khi có token
         } else {
