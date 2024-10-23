@@ -35,7 +35,7 @@ export function UserNav() {
             toast.error("No user");
         }
         
-    }, []);
+    }, [localStorage.getItem("user")]);
     if (!userInfo) return null;
     return (
         <DropdownMenu>
