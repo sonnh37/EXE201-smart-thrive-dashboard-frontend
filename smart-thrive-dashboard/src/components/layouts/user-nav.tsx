@@ -1,11 +1,10 @@
 "use client";
 
+import { LayoutGrid, LogOut, User as UserIcon } from "lucide-react";
 import Link from "next/link";
-import {LayoutGrid, LogOut, User as UserIcon} from "lucide-react";
 
-import {Button} from "@/components/ui/button";
-import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
-import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,} from "@/components/ui/tooltip";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -15,50 +14,28 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {getTokenFromCookie, logout} from "@/lib/auth";
-import {decodeToken, fetchUser} from "@/services/user-service";
-import {useRouter} from "next/navigation";
-import {useEffect, useState} from "react";
-import {User} from "@/types/user";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, } from "@/components/ui/tooltip";
+import { logout } from "@/lib/auth";
+import { User } from "@/types/user";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export function UserNav() {
-    const router = useRouter();
     const [userInfo, setUserInfo] = useState<User | null>(null); // Sử dụng kiểu User
-    const token = localStorage.getItem("token"); // Lấy token từ cookie
 
+    
     useEffect(() => {
-        if (!token) {
-            router.push("/login");
-            return;
+        // Chạy chỉ một lần khi component mount
+        const userString = localStorage.getItem("user");
+
+        if (userString) {
+            const user = JSON.parse(userString) as User;
+            setUserInfo(user); // Cập nhật state với thông tin người dùng
+        } else {
+            toast.error("No user");
         }
-
-        // Decode token và sau đó fetch user info
-        decodeToken(token)
-            .then((response) => {
-                // Kiểm tra nếu token hợp lệ
-                if (response.status !== 1) {
-                    throw new Error("Token không hợp lệ");
-                }
-
-                const decodedToken = response.data;
-
-                // Fetch thông tin người dùng
-                return fetchUser(decodedToken!.id);
-            })
-            .then((response_user) => {
-                // Kiểm tra nếu thông tin người dùng được trả về
-                if (response_user.status !== 1) {
-                    throw new Error("Không tìm thấy người dùng");
-                }
-
-                // Cập nhật state với thông tin người dùng
-                setUserInfo(response_user!.data!);
-            })
-            .catch((error) => {
-                console.error("Error in fetching data:", error);
-                router.push("/login"); // Điều hướng đến login nếu có lỗi
-            });
-    }, [token, router]);
+        
+    }, []);
     if (!userInfo) return null;
     return (
         <DropdownMenu>

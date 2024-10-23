@@ -20,7 +20,7 @@ import * as z from "zod";
 import { FormValues } from "./signin-form";
 import { useRouter } from "next/navigation";
 import { GoogleLogin } from "@react-oauth/google";
-import { loginAuthByGoogle } from "@/lib/auth";
+import { setLocalStorage } from "@/lib/auth";
 
 const formSchema = z.object({
   username: z.string(),
@@ -56,7 +56,7 @@ const SigninUsernameForm: React.FC<SigninUsernameFormProps> = ({
           return toast.error(_response.message);
         }
 
-        const isLogin = loginAuthByGoogle(_response) as boolean;
+        const isLogin = setLocalStorage(_response) as boolean;
         if (!isLogin) return;
 
         const token = localStorage.getItem("token");

@@ -9,7 +9,7 @@ import {useForm} from "react-hook-form";
 import * as z from "zod";
 import {registerByGoogle} from "@/services/user-service";
 import {toast} from "sonner";
-import {loginAuthByGoogle} from "@/lib/auth";
+import { setLocalStorage } from "@/lib/auth";
 
 const formSchema = z
     .object({
@@ -57,7 +57,7 @@ const SignupGmailNewPasswordForm: React.FC<SignupGmailNewPasswordFormProps> = ({
         if (_response.status != 1) {
             return toast.error(_response.message);
         }
-        const isLogin = loginAuthByGoogle(_response) as boolean;
+        const isLogin = setLocalStorage(_response) as boolean;
         if (isLogin == false) return;
         router.push("/");
     };

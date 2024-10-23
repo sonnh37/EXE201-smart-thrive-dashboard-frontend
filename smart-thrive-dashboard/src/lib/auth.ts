@@ -29,7 +29,7 @@ export const loginAuth = async (
     }
 };
 
-export const loginAuthByGoogle = (
+export const setLocalStorage = (
     response: BusinessResult<LoginResponse>,
 ): boolean => {
     try {
@@ -40,6 +40,30 @@ export const loginAuthByGoogle = (
             // Lưu JWT vào cookie với thuộc tính bảo mật
             localStorage.setItem("token", token!);
             document.cookie = `token=${token}; path=/; secure; samesite=strict;`;
+            decodeToken(token!)
+            .then((response) => {
+                // Kiểm tra nếu token hợp lệ
+                if (response.status !== 1) {
+                    toast.error(response.message);
+                    throw new Error(response.message);
+                }
+                const decodedToken = response.data;
+                localStorage.setItem("role", decodedToken!.role);
+                // Fetch thông tin người dùng
+                return fetchUser(decodedToken!.id);
+            })
+            .then((response_user) => {
+                // Kiểm tra nếu thông tin người dùng được trả về
+                if (response_user.status !== 1) {
+                    toast.error(response_user.message);
+                    throw new Error("Không tìm thấy người dùng");
+                }
+                localStorage.setItem("user", JSON.stringify(response_user.data));
+            })
+            .catch((error) => {
+                toast.error(error.message);
+                return false;
+            });
 
             return true;
         } else {
@@ -55,6 +79,8 @@ export const loginAuthByGoogle = (
 export const logout = () => {
     // Xóa token khỏi localStorage
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("role");
     document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
     // window.location.reload();
 };
