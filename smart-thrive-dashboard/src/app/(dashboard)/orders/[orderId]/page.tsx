@@ -5,6 +5,7 @@ import {Order} from "@/types/order";
 import {useEffect, useState} from "react";
 import {toast} from "sonner";
 import orderService from "@/services/order-service";
+import {OrderForm} from "@/components/sections/orders/create-update-form";
 
 export default function Page({params}: { params: { orderId: string } }) {
     const [order, setOrder] = useState<Order | null>(null);
@@ -32,7 +33,7 @@ export default function Page({params}: { params: { orderId: string } }) {
         <ContentLayout title="Service">
             <div className="space-y-6">
                 <Breadcrumbs items={breadcrumbItems}/>
-                <OrderF initialData={order}/>
+                <OrderForm initialData={order}/>
             </div>
         </ContentLayout>
     );

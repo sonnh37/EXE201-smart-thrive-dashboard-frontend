@@ -1,32 +1,32 @@
 "use client";
-import { CalendarIcon, ChevronLeft, Upload } from "lucide-react";
+import {CalendarIcon, ChevronLeft, Upload} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useForm } from "react-hook-form";
+import {useForm} from "react-hook-form";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import {Badge} from "@/components/ui/badge";
+import {Button} from "@/components/ui/button";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from "@/components/ui/card";
+import {Dialog, DialogContent, DialogTrigger} from "@/components/ui/dialog";
 
-import { Input } from "@/components/ui/input";
+import {Input} from "@/components/ui/input";
 
 
 import RichEditor from "@/components/common/react-draft-wysiwyg";
-import { Calendar } from "@/components/ui/calendar";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage, } from "@/components/ui/form";
-import { Popover, PopoverContent, PopoverTrigger, } from "@/components/ui/popover";
+import {Calendar} from "@/components/ui/calendar";
+import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage,} from "@/components/ui/form";
+import {Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover";
 import packageService from "@/services/package-service";
-import { BlogCreateCommand, BlogUpdateCommand, } from "@/types/commands/blog-command";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { format } from "date-fns";
-import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
-import { z } from "zod";
-import { storage } from "../../../../firebase";
+import {PackageCreateCommand, PackageUpdateCommand,} from "@/types/commands/package-command";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {format} from "date-fns";
+import {getDownloadURL, ref, uploadBytesResumable} from "firebase/storage";
+import {useEffect, useRef, useState} from "react";
+import {toast} from "sonner";
+import {z} from "zod";
+import {storage} from "../../../../firebase";
 
-interface BlogFormProps {
+interface PackageFormProps {
     initialData: any | null;
 }
 
@@ -42,12 +42,12 @@ const formSchema = z.object({
     isDeleted: z.boolean(),
 });
 
-export const BlogForm: React.FC<BlogFormProps> = ({initialData}) => {
+export const PackageForm: React.FC<PackageFormProps> = ({initialData}) => {
     const [loading, setLoading] = useState(false);
     const [imgLoading, setImgLoading] = useState(false);
-    const title = initialData ? "Edit blog" : "Create blog";
-    const description = initialData ? "Edit a blog." : "Add a new blog";
-    const toastMessage = initialData ? "Blog updated." : "Blog created.";
+    const title = initialData ? "Edit package" : "Create package";
+    const description = initialData ? "Edit a package." : "Add a new package";
+    const toastMessage = initialData ? "Package updated." : "Package created.";
     const action = initialData ? "Save changes" : "Create";
     const [firebaseLink, setFirebaseLink] = useState<string | null>(null);
     const [date, setDate] = useState<Date>();
@@ -71,7 +71,7 @@ export const BlogForm: React.FC<BlogFormProps> = ({initialData}) => {
 
     const uploadImageFirebase = async (values: z.infer<typeof formSchema>) => {
         if (selectedFile) {
-            const storageRef = ref(storage, `Blog/${selectedFile.name}`);
+            const storageRef = ref(storage, `Package/${selectedFile.name}`);
             const uploadTask = uploadBytesResumable(storageRef, selectedFile);
 
             const uploadPromise = new Promise<string>((resolve, reject) => {
@@ -94,7 +94,7 @@ export const BlogForm: React.FC<BlogFormProps> = ({initialData}) => {
         try {
             setLoading(true);
             const updatedValues = await uploadImageFirebase(values); // Chờ upload hoàn tất và nhận values mới
-            const blogCommand = {
+            const packageCommand = {
                 id: initialData ? values.id : null,
                 title: values.title,
                 description: values.description,
@@ -102,11 +102,11 @@ export const BlogForm: React.FC<BlogFormProps> = ({initialData}) => {
                 backgroundImage: updatedValues.backgroundImage,
             };
             if (initialData) {
-                const response = await packageService.update(blogCommand as BlogUpdateCommand);
+                const response = await packageService.update(packageCommand as PackageUpdateCommand);
                 if (response.status != 1) return toast.error(response.message);
                 toast.success(response.message);
             } else {
-                const response = await packageService.create(blogCommand as BlogCreateCommand);
+                const response = await packageService.create(packageCommand as PackageCreateCommand);
                 if (response.status != 1) return toast.error(response.message);
                 toast.success(response.message);
             }
@@ -162,7 +162,7 @@ export const BlogForm: React.FC<BlogFormProps> = ({initialData}) => {
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                     <div className="grid max-w-[59rem] flex-1 auto-rows-max gap-4">
                         <div className="flex items-center gap-4">
-                            <Link href="/blogs">
+                            <Link href="/packages">
                                 <Button variant="outline" size="icon" className="h-7 w-7">
                                     <ChevronLeft className="h-4 w-4"/>
                                     <span className="sr-only">Back</span>
@@ -170,7 +170,7 @@ export const BlogForm: React.FC<BlogFormProps> = ({initialData}) => {
                             </Link>
 
                             <h1 className="flex-1 shrink-0 whitespace-nowrap text-xl font-semibold tracking-tight sm:grow-0">
-                                Blog Controller
+                                Package Controller
                             </h1>
                             <Badge variant="outline" className="ml-auto sm:ml-0">
                                 <FormField
@@ -199,7 +199,7 @@ export const BlogForm: React.FC<BlogFormProps> = ({initialData}) => {
                             <div className="grid auto-rows-max items-start gap-4 lg:col-span-2 lg:gap-8">
                                 <Card x-chunk="dashboard-07-chunk-0">
                                     <CardHeader>
-                                        <CardTitle>Blog Details</CardTitle>
+                                        <CardTitle>Package Details</CardTitle>
                                         <CardDescription>
                                             Lipsum dolor sit amet, consectetur adipiscing elit
                                         </CardDescription>
@@ -275,7 +275,7 @@ export const BlogForm: React.FC<BlogFormProps> = ({initialData}) => {
                                     x-chunk="dashboard-07-chunk-2"
                                 >
                                     <CardHeader>
-                                        <CardTitle>Blog Background</CardTitle>
+                                        <CardTitle>Package Background</CardTitle>
                                         <CardDescription>
                                             Lipsum dolor sit amet, consectetur adipiscing elit
                                         </CardDescription>
@@ -286,13 +286,13 @@ export const BlogForm: React.FC<BlogFormProps> = ({initialData}) => {
                                             name="backgroundImage"
                                             render={({field}) => (
                                                 <FormItem>
-                                                    <FormLabel>Blog Background</FormLabel>
+                                                    <FormLabel>Package Background</FormLabel>
                                                     <FormControl>
                                                         <div className="grid gap-2">
                                                             {firebaseLink ? (
                                                                 <>
                                                                     <Image
-                                                                        alt="Blog Background"
+                                                                        alt="Package Background"
                                                                         className="aspect-square w-full rounded-md object-cover"
                                                                         height={300}
                                                                         src={firebaseLink}
@@ -321,7 +321,7 @@ export const BlogForm: React.FC<BlogFormProps> = ({initialData}) => {
                                                                 <div className="grid grid-cols-3 gap-2">
                                                                     <button
                                                                         type="button"
-                                                                        className="flex aspect-square w-full items-center justify-center rounded-md bblog bblog-dashed"
+                                                                        className="flex aspect-square w-full items-center justify-center rounded-md bpackage bpackage-dashed"
                                                                         onClick={() =>
                                                                             fileInputRef.current?.click()
                                                                         }
@@ -425,7 +425,7 @@ export const BlogForm: React.FC<BlogFormProps> = ({initialData}) => {
                                 </Card>
                                 <Card x-chunk="dashboard-07-chunk-5">
                                     <CardHeader>
-                                        <CardTitle>Archive Blog</CardTitle>
+                                        <CardTitle>Archive Package</CardTitle>
                                         <CardDescription>
                                             Lipsum dolor sit amet, consectetur adipiscing elit.
                                         </CardDescription>
@@ -433,7 +433,7 @@ export const BlogForm: React.FC<BlogFormProps> = ({initialData}) => {
                                     <CardContent>
                                         <div></div>
                                         <Button size="sm" variant="secondary">
-                                            Archive Blog
+                                            Archive Package
                                         </Button>
                                     </CardContent>
                                 </Card>
@@ -443,7 +443,7 @@ export const BlogForm: React.FC<BlogFormProps> = ({initialData}) => {
                             <Button variant="outline" size="sm">
                                 Discard
                             </Button>
-                            <Button size="sm">Save Blog</Button>
+                            <Button size="sm">Save Package</Button>
                         </div>
                     </div>
                 </form>

@@ -5,6 +5,7 @@ import {Package} from "@/types/package";
 import {useEffect, useState} from "react";
 import {toast} from "sonner";
 import packageService from "@/services/package-service";
+import {PackageForm} from "@/components/sections/packages/create-update-form";
 
 export default function Page({params}: { params: { packageId: string } }) {
     const [package_, setPackage] = useState<Package | null>(null);
@@ -31,7 +32,7 @@ export default function Page({params}: { params: { packageId: string } }) {
         <ContentLayout title="Service">
             <div className="space-y-6">
                 <Breadcrumbs items={breadcrumbItems}/>
-                <PackageF initialData={package_}/>
+                <PackageForm initialData={package_}/>
             </div>
         </ContentLayout>
     );
