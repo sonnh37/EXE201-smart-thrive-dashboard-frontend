@@ -1,8 +1,7 @@
 class Const {
     //#region Environment Variables
     static readonly CLIENT_ID = process.env.NEXT_PUBLIC_CLIENT_ID_GOOGLE;
-    static readonly URL_BASE = process.env.NEXT_PUBLIC_URL_BASE;
-    static readonly API_BASE = `${process.env.NEXT_PUBLIC_API_BASE}api`; // Sửa đổi thêm dấu "/" ở cuối
+    static readonly API_BASE = `${process.env.NEXT_PUBLIC_API_BASE}api`; 
     //#endregion
 
     //#region Animation Variants
@@ -23,30 +22,30 @@ class Const {
         show: {opacity: 1, x: 0, transition: {type: "spring", duration: 0.5}}, // Thêm duration
     };
     //#endregion
-
-    //#region API Endpoints
+    
     private static readonly USER = "users";
-    static readonly API_USER = `${this.API_BASE}/${Const.USER}`;
     private static readonly ORDER = "orders";
-    static readonly API_ORDER = `${this.API_BASE}/${Const.ORDER}`;
-    static readonly URL_ORDER = `/${Const.ORDER}`;
     private static readonly PACKAGE = "packages";
-    static readonly API_PACKAGE = `${this.API_BASE}/${Const.PACKAGE}`;
-    //#region Frontend URLs
-    static readonly URL_PACKAGE = `/${Const.PACKAGE}`;
     private static readonly BLOG = "blogs";
-    static readonly API_BLOG = `${this.API_BASE}/${Const.BLOG}`;
-    static readonly URL_BLOG = `/${Const.BLOG}`;
     private static readonly COURSE = "courses";
-    static readonly API_COURSE = `${this.API_BASE}/${Const.COURSE}`;
-    static readonly URL_COURSE = `/${Const.COURSE}`;
+    private static readonly SUBJECT = "subjects";
+    private static readonly PROVIDER = "providers";
     private static readonly NEW = "new";
-    static readonly API_USER_NEW = `${Const.API_USER}/${Const.NEW}`;
-    //#endregion
-    static readonly API_ORDER_NEW = `${Const.API_ORDER}/${Const.NEW}`;
-    static readonly API_PACKAGE_NEW = `${Const.API_PACKAGE}/${Const.NEW}`;
-    static readonly API_BLOG_NEW = `${Const.API_BLOG}/${Const.NEW}`;
-    static readonly API_COURSE_NEW = `${Const.API_COURSE}/${Const.NEW}`;
+    //#region API Endpoints
+    static readonly API_USER = `${this.API_BASE}/${Const.USER}`;
+    static readonly API_ORDER = `${this.API_BASE}/${Const.ORDER}`;
+    static readonly API_PACKAGE = `${this.API_BASE}/${Const.PACKAGE}`;
+    static readonly API_BLOG = `${this.API_BASE}/${Const.BLOG}`;
+    static readonly API_COURSE = `${this.API_BASE}/${Const.COURSE}`;
+    static readonly API_SUBJECT = `${this.API_BASE}/${Const.SUBJECT}`;
+    static readonly API_PROVIDER = `${this.API_BASE}/${Const.PROVIDER}`;
+    //#region Frontend URLs
+    
+    //#Frontend URLs
+    static readonly URL_ORDER = `/${Const.ORDER}`;
+    static readonly URL_BLOG = `/${Const.BLOG}`;
+    static readonly URL_COURSE = `/${Const.COURSE}`;
+    static readonly URL_PACKAGE = `/${Const.PACKAGE}`;
     static readonly URL_ORDER_NEW = `${Const.URL_ORDER}/${Const.NEW}`;
     static readonly URL_PACKAGE_NEW = `${Const.URL_PACKAGE}/${Const.NEW}`;
     static readonly URL_BLOG_NEW = `${Const.URL_BLOG}/${Const.NEW}`;

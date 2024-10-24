@@ -12,6 +12,11 @@ class BaseService<T> {
     }
 
     public fetchAll = (query?: BaseQueryableQuery): Promise<BusinessResult<PagedResponse<T>>> => {
+        if (query == null) {
+            query = {
+                isPagination: false,
+            }
+        }
         const cleanedQuery = cleanQueryParams(query!);
         return axiosInstance
             .get<BusinessResult<PagedResponse<T>>>(`${this.endpoint}?${cleanedQuery}`)

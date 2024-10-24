@@ -25,6 +25,14 @@ import {toast} from "sonner";
 import {z} from "zod";
 import {storage} from "../../../../firebase";
 import {CourseCreateCommand, CourseUpdateCommand} from "@/types/commands/course-command";
+import { useRouter } from "next/navigation";
+import { Const } from "@/lib/const";
+import { CourseStatus, CourseType } from "@/types/enums/course";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import providerService from "@/services/provider-service";
+import { Subject } from "@/types/subject";
+import { Provider } from "@/types/provider";
+import subjectService from "@/services/subject-service";
 
 interface CourseFormProps {
     initialData: any | null;
@@ -32,11 +40,23 @@ interface CourseFormProps {
 
 const formSchema = z.object({
     id: z.string().optional(),
-    userId: z.string().optional(),
-    title: z.string().min(1, "Title is required"),
+    subjectId: z.string().optional(),
+    providerId: z.string().optional(),
+    teacherName: z.string().optional(),
+    type: z.nativeEnum(CourseType).optional(),
+    name: z.string().min(1, "Name is required"),
+    code: z.string().optional(),
+    courseName: z.string().optional(),
     description: z.string().optional(),
-    status: z.string().optional(),
     backgroundImage: z.string().optional(),
+    price: z.number().optional(),
+    soldCourses: z.number().optional(),
+    totalSlots: z.number().optional(),
+    totalSessions: z.number().optional(),
+    startTime: z.string().optional(),
+    endTime: z.string().optional(),
+    status: z.nativeEnum(CourseStatus).optional(),
+    isActive: z.boolean(),
     createdDate: z.date().optional(),
     createdBy: z.string().optional(),
     isDeleted: z.boolean(),
@@ -51,7 +71,7 @@ export const CourseForm: React.FC<CourseFormProps> = ({initialData}) => {
     const action = initialData ? "Save changes" : "Create";
     const [firebaseLink, setFirebaseLink] = useState<string | null>(null);
     const [date, setDate] = useState<Date>();
-
+    const router = useRouter();
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null); // Lưu tạm file đã chọn
 
@@ -96,10 +116,16 @@ export const CourseForm: React.FC<CourseFormProps> = ({initialData}) => {
             const updatedValues = await uploadImageFirebase(values); // Chờ upload hoàn tất và nhận values mới
             const courseCommand = {
                 id: initialData ? values.id : null,
-                title: values.title,
+                name: values.name,
                 description: values.description,
                 status: values.status,
                 backgroundImage: updatedValues.backgroundImage,
+                price: values.price,
+                totalSlots: values.totalSlots,
+                totalSessions: values.totalSessions,
+                startTime: values.startTime,
+                endTime: values.endTime,
+                isActive: values.isActive,
             };
             if (initialData) {
                 const response = await courseService.update(courseCommand as CourseUpdateCommand);
@@ -114,16 +140,23 @@ export const CourseForm: React.FC<CourseFormProps> = ({initialData}) => {
             toast.error(error);
         } finally {
             setLoading(false);
+            router.push(Const.URL_COURSE)
         }
     };
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            title: "",
+            name: "",
             description: "",
-            status: "",
+            status: undefined,
             backgroundImage: "",
+            price: 0,
+            totalSlots: 0,
+            totalSessions: 0,
+            startTime: "",
+            endTime: "",
+            isActive: true,
             createdBy: "N/A",
             createdDate: new Date(),
             isDeleted: false,
@@ -134,10 +167,16 @@ export const CourseForm: React.FC<CourseFormProps> = ({initialData}) => {
         if (initialData) {
             form.reset({
                 id: initialData.id || "",
-                title: initialData.title || "",
-                status: initialData.Status || "",
-                description: initialData.description || +"",
+                name: initialData.name || "",
+                status: initialData.status || "",
+                description: initialData.description || "",
                 backgroundImage: initialData.backgroundImage || "",
+                price: initialData.price || 0,
+                totalSlots: initialData.totalSlots || 0,
+                totalSessions: initialData.totalSessions || 0,
+                startTime: initialData.startTime || "",
+                endTime: initialData.endTime || "",
+                isActive: !!initialData.isActive,
                 createdDate: initialData.createdDate
                     ? new Date(initialData.createdDate)
                     : new Date(),
@@ -149,13 +188,32 @@ export const CourseForm: React.FC<CourseFormProps> = ({initialData}) => {
                 initialData.createdDate ? new Date(initialData.createdDate) : new Date()
             );
 
-            //setImagePreview(initialData.backgroundImage || "");
             setFirebaseLink(initialData.backgroundImage || "");
         } else {
             setDate(new Date());
         }
     }, [initialData, form]);
 
+    const [subjects, setSubjects] = useState<Subject[]>([]);
+    const [providers, setProviders] = useState<Provider[]>([]);
+
+useEffect(() => {
+    const fetchData = async () => {
+        try {
+            // Gọi API lấy danh sách subjectId
+            const response_subjects = await providerService.fetchAll();
+            setSubjects(response_subjects.data?.results!); 
+            
+            // Gọi API lấy danh sách providerId
+            const response_providers = await subjectService.fetchAll();
+            setProviders(response_providers.data?.results!); 
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    fetchData();
+}, []);
     return (
         <>
             <Form {...form}>
@@ -209,12 +267,12 @@ export const CourseForm: React.FC<CourseFormProps> = ({initialData}) => {
                                             <div className="grid gap-3">
                                                 <FormField
                                                     control={form.control}
-                                                    name="title"
+                                                    name="name"
                                                     render={({field}) => (
                                                         <FormItem>
-                                                            <FormLabel>Title</FormLabel>
+                                                            <FormLabel>Name</FormLabel>
                                                             <FormControl>
-                                                                <Input placeholder="Enter title" {...field} />
+                                                                <Input placeholder="Enter name" {...field} />
                                                             </FormControl>
                                                             <FormDescription>
                                                                 This is your public display name.
@@ -227,45 +285,94 @@ export const CourseForm: React.FC<CourseFormProps> = ({initialData}) => {
                                                 <FormField
                                                     control={form.control}
                                                     name="status"
-                                                    render={({field}) => (
+                                                    render={({ field }) => (
                                                         <FormItem>
                                                             <FormLabel>Status</FormLabel>
                                                             <FormControl>
-                                                                <Input placeholder="Enter status" {...field} />
+                                                                <Select
+                                                                    onValueChange={(value) => field.onChange(Number(value))} // Chuyển đổi string sang number
+                                                                    value={field.value?.toString()} // Chuyển đổi number sang string
+                                                                >
+                                                                    <SelectTrigger>
+                                                                        <SelectValue placeholder="Select status" />
+                                                                    </SelectTrigger>
+                                                                    <SelectContent>
+                                                                        <SelectItem value={CourseStatus.Pending.toString()}>Pending</SelectItem>
+                                                                        <SelectItem value={CourseStatus.Approved.toString()}>Approved</SelectItem>
+                                                                        <SelectItem value={CourseStatus.Rejected.toString()}>Rejected</SelectItem>
+                                                                    </SelectContent>
+                                                                </Select>
                                                             </FormControl>
-                                                            <FormDescription>
-                                                                This is your public display name.
-                                                            </FormDescription>
-                                                            <FormMessage/>
+                                                            <FormDescription>Select the current status of the course.</FormDescription>
+                                                            <FormMessage />
                                                         </FormItem>
                                                     )}
                                                 />
+
                                             </div>
+
                                             <div className="grid gap-3">
-                                                <FormField
-                                                    control={form.control}
-                                                    name="description"
-                                                    render={({field}) => (
-                                                        <FormItem>
-                                                            <FormControl>
-                                                                <Dialog>
-                                                                    <DialogTrigger asChild>
-                                                                        <Button variant="outline">Content</Button>
-                                                                    </DialogTrigger>
-                                                                    <DialogContent
-                                                                        className="w-full h-full max-w-[80%] max-h-[90%]">
-                                                                        <RichEditor
-                                                                            description={field.value || ""} // Pass the current value from form field
-                                                                            onChange={field.onChange} // Pass the onChange handler
-                                                                        />
-                                                                    </DialogContent>
-                                                                </Dialog>
-                                                            </FormControl>
-                                                            <FormMessage/>
-                                                        </FormItem>
-                                                    )}
-                                                />
+                                            <FormField
+                                                control={form.control}
+                                                name="subjectId"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Subject</FormLabel>
+                                                        <FormControl>
+                                                            <Select
+                                                                onValueChange={(value) => field.onChange(value)}
+                                                                value={field.value}
+                                                            >
+                                                                <SelectTrigger>
+                                                                    <SelectValue placeholder="Select subject" />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    {subjects.map((subject: any) => (
+                                                                        <SelectItem key={subject.id} value={subject.id}>
+                                                                            {subject.name}
+                                                                        </SelectItem>
+                                                                    ))}
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </FormControl>
+                                                        <FormDescription>Select the subject of the course.</FormDescription>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+
+                                            <FormField
+                                                control={form.control}
+                                                name="providerId"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Provider</FormLabel>
+                                                        <FormControl>
+                                                            <Select
+                                                                onValueChange={(value) => field.onChange(value)}
+                                                                value={field.value}
+                                                            >
+                                                                <SelectTrigger>
+                                                                    <SelectValue placeholder="Select provider" />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    {providers.map((provider: any) => (
+                                                                        <SelectItem key={provider.id} value={provider.id}>
+                                                                            {provider.name}
+                                                                        </SelectItem>
+                                                                    ))}
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </FormControl>
+                                                        <FormDescription>Select the provider for this course.</FormDescription>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+
+
                                             </div>
+                                           
                                         </div>
                                     </CardContent>
                                 </Card>
