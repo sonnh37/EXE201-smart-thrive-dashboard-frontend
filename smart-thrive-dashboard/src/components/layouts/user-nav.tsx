@@ -93,7 +93,9 @@ export function UserNav() {
                     className="hover:cursor-pointer"
                     onClick={() => {
                         logout();
-                        window.location.reload();
+                        if (typeof window !== "undefined") {
+                            window.location.reload();
+                        }
                     }}
                 >
                     <LogOut className="w-4 h-4 mr-3 text-muted-foreground"/>
