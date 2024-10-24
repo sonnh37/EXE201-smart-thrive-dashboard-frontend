@@ -1,7 +1,7 @@
 import {FloatingLabelInput} from "@/components/common/floating-label-input";
 import {Button} from "@/components/ui/button";
 import {Form, FormDescription, FormField, FormItem, FormMessage,} from "@/components/ui/form";
-import {fetchUserByUsernameOrEmail} from "@/services/user-service";
+import userService from "@/services/user-service";
 import {User} from "@/types/user";
 import {zodResolver} from "@hookform/resolvers/zod";
 import React from "react";
@@ -39,7 +39,7 @@ const SignupPersonalizeForm: React.FC<SignupPersonalizeFormProps> = ({
     const handleSubmit = async (data: z.infer<typeof formSchema>) => {
         try {
             if (data.username == "") return toast.error("Empty input");
-            const response = await fetchUserByUsernameOrEmail(data.username);
+            const response = await userService.fetchUserByUsernameOrEmail(data.username);
 
             if (response.status != 1) {
                 return toast.error(response.message);

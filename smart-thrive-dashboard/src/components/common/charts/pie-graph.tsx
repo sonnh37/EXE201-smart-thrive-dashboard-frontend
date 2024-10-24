@@ -1,12 +1,12 @@
 'use client';
 
-import * as React from 'react';
 import {TrendingUp} from 'lucide-react';
+import * as React from 'react';
 import {Label, Pie, PieChart} from 'recharts';
 
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from '@/components/ui/card';
 import {ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent} from '@/components/ui/chart';
-import {fetchOrders} from '@/services/order-service';
+import orderService from '@/services/order-service';
 import {Order} from '@/types/order';
 import {OrderGetAllQuery} from '@/types/queries/order-query';
 
@@ -49,7 +49,7 @@ export const PieGraph: React.FC<PieGraphProps> = ({queryParams}) => {
                 ...queryParams,
                 isPagination: false,
             };
-            const response = await fetchOrders(params);
+            const response = await orderService.fetchAll(params);
             console.log("check_dashboard_response", response.data)
             setOrders(response.data?.results ?? []);
         };

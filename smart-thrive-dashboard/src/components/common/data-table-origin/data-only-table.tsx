@@ -17,8 +17,8 @@ import {
 } from "@tanstack/react-table"
 
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/components/ui/table"
-import { DataOnlyTableToolbar } from "./data-only-table-toolbar";
-import { DataOnlyTablePagination } from "./data-only-table-pagination";
+import {DataOnlyTableToolbar} from "./data-only-table-toolbar";
+import {DataOnlyTablePagination} from "./data-only-table-pagination";
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];

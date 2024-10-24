@@ -1,10 +1,10 @@
 // recent-sales.tsx
 import {DataTable} from "@/components/common/data-table-generic/data-table";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from "@/components/ui/card";
-import {fetchOrders} from "@/services/order-service";
 import {OrderGetAllQuery} from "@/types/queries/order-query";
 import React from "react";
 import {columns} from "./columns";
+import orderService from "@/services/order-service";
 
 interface RecentSalesProps {
     queryParams: OrderGetAllQuery;
@@ -20,7 +20,7 @@ export const RecentSales: React.FC<RecentSalesProps> = ({queryParams}) => {
             <CardContent>
                 <DataTable
                     columns={columns}
-                    fetchData={fetchOrders}
+                    fetchData={orderService.fetchAll}
                     columnSearch="id"
                     className="h-60"
                     defaultValues={queryParams}

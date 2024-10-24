@@ -1,11 +1,7 @@
 import {columns} from "./columns";
 
-import {
-    isActive_options,
-    status_package_options,
-    isDeleted_options,
-} from "@/components/common/filters";
-import {deletePackage, fetchPackages} from "@/services/package-service";
+import {isActive_options, isDeleted_options, status_package_options,} from "@/components/common/filters";
+import packageService from "@/services/package-service";
 
 import {formPackageFilterAdvancedSchema} from "@/schemas/package-schema";
 import {formFilterAdvanceds} from "./filter-advanced-form";
@@ -25,9 +21,9 @@ export default function DataTablePackages() {
 
     return (
         <DataTable
-            deleteData={deletePackage}
+            deleteData={packageService.delete}
             columns={columns}
-            fetchData={fetchPackages}
+            fetchData={packageService.fetchAll}
             columnSearch="name"
             filterEnums={filterEnums}
             formSchema={formPackageFilterAdvancedSchema}

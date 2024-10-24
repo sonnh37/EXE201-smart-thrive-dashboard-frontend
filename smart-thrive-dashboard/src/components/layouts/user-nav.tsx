@@ -1,10 +1,10 @@
 "use client";
 
-import { LayoutGrid, LogOut, User as UserIcon } from "lucide-react";
+import {LayoutGrid, LogOut, User as UserIcon} from "lucide-react";
 import Link from "next/link";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
+import {Button} from "@/components/ui/button";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -14,16 +14,16 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, } from "@/components/ui/tooltip";
-import { logout } from "@/lib/auth";
-import { User } from "@/types/user";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,} from "@/components/ui/tooltip";
+import {logout} from "@/lib/auth";
+import {User} from "@/types/user";
+import {useEffect, useState} from "react";
+import {toast} from "sonner";
 
 export function UserNav() {
     const [userInfo, setUserInfo] = useState<User | null>(null); // Sử dụng kiểu User
 
-    
+
     useEffect(() => {
         // Chạy chỉ một lần khi component mount
         const userString = localStorage.getItem("user");
@@ -34,7 +34,7 @@ export function UserNav() {
         } else {
             toast.error("No user");
         }
-        
+
     }, []);
     if (!userInfo) return null;
     return (

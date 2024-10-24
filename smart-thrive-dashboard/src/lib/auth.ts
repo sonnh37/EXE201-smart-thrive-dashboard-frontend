@@ -1,15 +1,15 @@
-import {decodeToken, fetchUser, login} from "@/services/user-service";
-import {toast} from "sonner";
+import userService from "@/services/user-service";
 import {BusinessResult} from "@/types/response/business-result";
 import {LoginResponse} from "@/types/response/login-response";
 import {User} from "@/types/user";
+import {toast} from "sonner";
 // utils/auth.ts
 export const loginAuth = async (
     username: string,
     password: string
 ): Promise<boolean> => {
     try {
-        const response = await login(username, password);
+        const response = await userService.login(username, password);
 
         if (response.status == 1) {
             const token = response.data?.token;
@@ -30,40 +30,40 @@ export const loginAuth = async (
 };
 
 export const setLocalStorage = (
-    response: BusinessResult<LoginResponse>,
+    response: BusinessResult<LoginResponse>
 ): boolean => {
     try {
-
         if (response.status == 1) {
             const token = response.data?.token;
             toast.success(response.message);
             // Lưu JWT vào cookie với thuộc tính bảo mật
             localStorage.setItem("token", token!);
             document.cookie = `token=${token}; path=/; secure; samesite=strict;`;
-            decodeToken(token!)
-            .then((response) => {
-                // Kiểm tra nếu token hợp lệ
-                if (response.status !== 1) {
-                    toast.error(response.message);
-                    throw new Error(response.message);
-                }
-                const decodedToken = response.data;
-                localStorage.setItem("role", decodedToken!.role);
-                // Fetch thông tin người dùng
-                return fetchUser(decodedToken!.id);
-            })
-            .then((response_user) => {
-                // Kiểm tra nếu thông tin người dùng được trả về
-                if (response_user.status !== 1) {
-                    toast.error(response_user.message);
-                    throw new Error("Không tìm thấy người dùng");
-                }
-                localStorage.setItem("user", JSON.stringify(response_user.data));
-            })
-            .catch((error) => {
-                toast.error(error.message);
-                return false;
-            });
+            userService
+                .decodeToken(token!)
+                .then((response) => {
+                    // Kiểm tra nếu token hợp lệ
+                    if (response.status !== 1) {
+                        toast.error(response.message);
+                        throw new Error(response.message);
+                    }
+                    const decodedToken = response.data;
+                    localStorage.setItem("role", decodedToken!.role);
+                    // Fetch thông tin người dùng
+                    return userService.fetchById(decodedToken!.id);
+                })
+                .then((response_user) => {
+                    // Kiểm tra nếu thông tin người dùng được trả về
+                    if (response_user.status !== 1) {
+                        toast.error(response_user.message);
+                        throw new Error("Không tìm thấy người dùng");
+                    }
+                    localStorage.setItem("user", JSON.stringify(response_user.data));
+                })
+                .catch((error) => {
+                    toast.error(error.message);
+                    return false;
+                });
 
             return true;
         } else {
@@ -98,14 +98,13 @@ export const getTokenFromCookie = (): string | null => {
     return null;
 };
 
-
 export const getUserByToken = async (): Promise<User> => {
     const token: string | null = getTokenFromCookie(); // Đảm bảo token có kiểu string | null
-    const response = await decodeToken(token ?? "");
+    const response = await userService.decodeToken(token ?? "");
     // id user
     const id = response.data?.id;
 
-    const _response = await fetchUser(id!);
+    const _response = await userService.fetchById(id!);
     return _response.data!;
 };
 
@@ -113,8 +112,8 @@ export const IsValidToken = async (token: string): Promise<boolean> => {
     let isTokenValid = true;
     if (token) {
         try {
-            const response = await decodeToken(token);
-            console.log("check_decoded_valid")
+            const response = await userService.decodeToken(token);
+            console.log("check_decoded_valid");
             const decoded = response.data;
 
             const currentTime = Date.now() / 1000; // Thời gian hiện tại tính bằng giây
@@ -133,8 +132,4 @@ export const IsValidToken = async (token: string): Promise<boolean> => {
     }
 
     return isTokenValid;
-}
-
-
-
-
+};

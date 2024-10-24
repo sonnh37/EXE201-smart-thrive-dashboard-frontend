@@ -4,9 +4,9 @@ import {Breadcrumbs} from "@/components/common/breadcrumb";
 import {ContentLayout} from "@/components/common/content-layout";
 import dynamic from "next/dynamic";
 
-const BlogForm = dynamic(() => import("@/components/sections/blogs/create-update-form").then((mod) => mod.BlogForm), { 
-    ssr: false 
-  });
+const BlogForm = dynamic(() => import("@/components/sections/blogs/create-update-form").then((mod) => mod.BlogForm), {
+    ssr: false
+});
 const breadcrumbItems = [
     {title: "Dashboard", link: "/"},
     {title: "Blog", link: "/blogs"},

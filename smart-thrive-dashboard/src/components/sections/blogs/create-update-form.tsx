@@ -16,7 +16,7 @@ import RichEditor from "@/components/common/react-draft-wysiwyg";
 import {Calendar} from "@/components/ui/calendar";
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage,} from "@/components/ui/form";
 import {Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover";
-import {createBlog, updateBlog} from "@/services/blog-service";
+import blogService from "@/services/blog-service";
 import {BlogCreateCommand, BlogUpdateCommand,} from "@/types/commands/blog-command";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {format} from "date-fns";
@@ -102,11 +102,11 @@ export const BlogForm: React.FC<BlogFormProps> = ({initialData}) => {
                 backgroundImage: updatedValues.backgroundImage,
             };
             if (initialData) {
-                const response = await updateBlog(blogCommand as BlogUpdateCommand);
+                const response = await blogService.update(blogCommand as BlogUpdateCommand);
                 if (response.status != 1) return toast.error(response.message);
                 toast.success(response.message);
             } else {
-                const response = await createBlog(blogCommand as BlogCreateCommand);
+                const response = await blogService.create(blogCommand as BlogCreateCommand);
                 if (response.status != 1) return toast.error(response.message);
                 toast.success(response.message);
             }
@@ -162,7 +162,7 @@ export const BlogForm: React.FC<BlogFormProps> = ({initialData}) => {
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                     <div className="grid max-w-[59rem] flex-1 auto-rows-max gap-4">
                         <div className="flex items-center gap-4">
-                            <Link href="/dashboard/blog">
+                            <Link href="/blogs">
                                 <Button variant="outline" size="icon" className="h-7 w-7">
                                     <ChevronLeft className="h-4 w-4"/>
                                     <span className="sr-only">Back</span>

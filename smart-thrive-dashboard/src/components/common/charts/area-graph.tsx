@@ -5,10 +5,10 @@ import {Area, AreaChart, CartesianGrid, XAxis} from "recharts";
 
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle,} from "@/components/ui/card";
 import {ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent,} from "@/components/ui/chart";
-import React, {useEffect} from "react";
+import orderService from "@/services/order-service";
 import {Order} from "@/types/order";
-import {fetchOrders} from "@/services/order-service";
 import {OrderGetAllQuery} from "@/types/queries/order-query";
+import React, {useEffect} from "react";
 
 const chartConfig = {
     order: {
@@ -48,7 +48,7 @@ export const AreaGraph: React.FC<AreaGraphProps> = ({queryParams}) => {
                 ...queryParams,
                 isPagination: false,
             };
-            const response = await fetchOrders(params);
+            const response = await orderService.fetchAll(params);
             console.log("check_dashboard_response", response.data);
             setOrders(response.data?.results ?? []);
         };

@@ -1,15 +1,15 @@
 import {FloatingLabelInput} from "@/components/common/floating-label-input";
 import {Button} from "@/components/ui/button";
 import {Form, FormDescription, FormField, FormItem, FormLabel, FormMessage,} from "@/components/ui/form";
-import {FormValues} from "./signup-form";
+import {setLocalStorage} from "@/lib/auth";
+import userService from "@/services/user-service";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useRouter} from "next/navigation";
 import React from "react";
 import {useForm} from "react-hook-form";
-import * as z from "zod";
-import {registerByGoogle} from "@/services/user-service";
 import {toast} from "sonner";
-import { setLocalStorage } from "@/lib/auth";
+import * as z from "zod";
+import {FormValues} from "./signup-form";
 
 const formSchema = z
     .object({
@@ -49,7 +49,7 @@ const SignupGmailNewPasswordForm: React.FC<SignupGmailNewPasswordFormProps> = ({
     const router = useRouter();
 
     const handleSubmit = async (data: z.infer<typeof formSchema>) => {
-        const _response = await registerByGoogle(
+        const _response = await userService.registerByGoogle(
             formValues.googleToken!,
             data.newPassword
         );

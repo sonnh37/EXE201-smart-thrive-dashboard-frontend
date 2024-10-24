@@ -1,7 +1,7 @@
 import {columns} from "./columns";
 
 import {isDeleted_options, payment_order_options, status_order_options,} from "@/components/common/filters";
-import {deleteOrder, fetchOrders} from "@/services/order-service";
+import orderService from "@/services/order-service";
 
 import {formOrderFilterAdvancedSchema} from "@/schemas/order-schema";
 import {formFilterAdvanceds} from "./filter-advanced-form";
@@ -21,9 +21,9 @@ export default function DataTableOrders() {
 
     return (
         <DataTable
-            deleteData={deleteOrder}
+            deleteData={orderService.delete}
             columns={columns}
-            fetchData={fetchOrders}
+            fetchData={orderService.fetchAll}
             columnSearch="description"
             filterEnums={filterEnums}
             formSchema={formOrderFilterAdvancedSchema}

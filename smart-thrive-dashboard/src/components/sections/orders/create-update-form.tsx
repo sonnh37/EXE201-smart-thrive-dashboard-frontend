@@ -3,155 +3,115 @@ import {CalendarIcon, ChevronLeft, Upload} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import {useForm} from "react-hook-form";
-import Swal from "sweetalert2";
 
 import {Badge} from "@/components/ui/badge";
-
 import {Button} from "@/components/ui/button";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from "@/components/ui/card";
+import {Dialog, DialogContent, DialogTrigger} from "@/components/ui/dialog";
 
 import {Input} from "@/components/ui/input";
 
-import {Textarea} from "@/components/ui/textarea";
 
+import RichEditor from "@/components/common/react-draft-wysiwyg";
 import {Calendar} from "@/components/ui/calendar";
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage,} from "@/components/ui/form";
 import {Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover";
+import {createBlog, updateBlog} from "@/services/blog-service";
+import {BlogCreateCommand, BlogUpdateCommand,} from "@/types/commands/blog-command";
 import {zodResolver} from "@hookform/resolvers/zod";
-import axios from "axios";
 import {format} from "date-fns";
-import {deleteObject, getDownloadURL, ref, uploadBytesResumable,} from "firebase/storage";
+import {getDownloadURL, ref, uploadBytesResumable} from "firebase/storage";
 import {useEffect, useRef, useState} from "react";
+import {toast} from "sonner";
 import {z} from "zod";
-import { storage } from "../../../../firebase";
+import {storage} from "../../../../firebase";
 
-interface OrderFormProps {
+interface BlogFormProps {
     initialData: any | null;
 }
 
 const formSchema = z.object({
     id: z.string().optional(),
+    userId: z.string().optional(),
     title: z.string().min(1, "Title is required"),
     description: z.string().optional(),
-    background: z.string().optional(),
+    status: z.string().optional(),
+    backgroundImage: z.string().optional(),
     createdDate: z.date().optional(),
     createdBy: z.string().optional(),
     isDeleted: z.boolean(),
-    photos: z
-        .array(
-            z.object({
-                id: z.string().optional(),
-                src: z.string().optional(),
-                title: z.string().optional(),
-            })
-        )
-        .optional(),
 });
 
-export const OrderForm: React.FC<OrderFormProps> = ({initialData}) => {
+export const BlogForm: React.FC<BlogFormProps> = ({initialData}) => {
     const [loading, setLoading] = useState(false);
     const [imgLoading, setImgLoading] = useState(false);
-    const title = initialData ? "Edit order" : "Create order";
-    const description = initialData ? "Edit a order." : "Add a new order";
-    const toastMessage = initialData ? "Order updated." : "Order created.";
+    const title = initialData ? "Edit blog" : "Create blog";
+    const description = initialData ? "Edit a blog." : "Add a new blog";
+    const toastMessage = initialData ? "Blog updated." : "Blog created.";
     const action = initialData ? "Save changes" : "Create";
     const [firebaseLink, setFirebaseLink] = useState<string | null>(null);
-    const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [date, setDate] = useState<Date>();
 
     const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null); // Lưu tạm file đã chọn
 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
-            setImgLoading(true);
-            const storageRef = ref(storage, `Order/${file.name}`);
-            const uploadTask = uploadBytesResumable(storageRef, file);
-
-            uploadTask.on(
-                "state_changed",
-                (snapshot) => {
-                    const progress =
-                        (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-
-                    switch (snapshot.state) {
-                        case "paused":
-                            console.log("Upload is paused");
-                            break;
-                        case "running":
-                            console.log("Upload is running");
-                            break;
-                    }
-                },
-                (error) => {
-                    console.error(error);
-                    setImgLoading(false);
-                },
-                () => {
-                    getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                        setImagePreview(downloadURL);
-                        setFirebaseLink(downloadURL);
-                        setImgLoading(false);
-                        form.setValue("background", downloadURL);
-                    });
-                }
-            );
+            setFirebaseLink(URL.createObjectURL(file)); // Hiển thị preview
+            setSelectedFile(file); // Lưu file vào state thay vì upload
         }
     };
 
     const handleImageDelete = () => {
-        if (firebaseLink) {
-            const imageRef = ref(storage, firebaseLink);
-
-            deleteObject(imageRef)
-                .then(() => {
-                    setImagePreview(null);
-                    setFirebaseLink(null);
-                    form.setValue("background", "");
-                    alert("Image successfully deleted!");
-                })
-                .catch((error) => {
-                    console.error("Error deleting image:", error);
-                    alert("Failed to delete image.");
-                });
-        }
+        setFirebaseLink(""); // Xóa preview của hình ảnh
+        setSelectedFile(null); // Đặt file về null để xóa file đã chọn
+        form.setValue("backgroundImage", ""); // Xóa giá trị hình ảnh trong form nếu có
     };
 
+    const uploadImageFirebase = async (values: z.infer<typeof formSchema>) => {
+        if (selectedFile) {
+            const storageRef = ref(storage, `Blog/${selectedFile.name}`);
+            const uploadTask = uploadBytesResumable(storageRef, selectedFile);
+
+            const uploadPromise = new Promise<string>((resolve, reject) => {
+                uploadTask.on(
+                    "state_changed",
+                    null,
+                    (error) => reject(error),
+                    () => {
+                        getDownloadURL(uploadTask.snapshot.ref).then((url) => resolve(url));
+                    }
+                );
+            });
+
+            const downloadURL = await uploadPromise;
+            return {...values, backgroundImage: downloadURL}; // Trả về values đã cập nhật
+        }
+        return values; // Trả về values gốc nếu không có file
+    };
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
             setLoading(true);
-
+            const updatedValues = await uploadImageFirebase(values); // Chờ upload hoàn tất và nhận values mới
+            const blogCommand = {
+                id: initialData ? values.id : null,
+                title: values.title,
+                description: values.description,
+                status: values.status,
+                backgroundImage: updatedValues.backgroundImage,
+            };
             if (initialData) {
-                const response = await axios.put(
-                    `https://localhost:7192/orders`,
-                    values
-                );
-                Swal.fire({
-                    title: "Success!",
-                    text: "Order updated successfully",
-                    icon: "success",
-                    confirmButtonText: "OK",
-                });
+                const response = await updateBlog(blogCommand as BlogUpdateCommand);
+                if (response.status != 1) return toast.error(response.message);
+                toast.success(response.message);
             } else {
-                const response = await axios.post(
-                    "https://localhost:7192/orders",
-                    values
-                );
-                Swal.fire({
-                    title: "Success!",
-                    text: "Order created successfully",
-                    icon: "success",
-                    confirmButtonText: "OK",
-                });
+                const response = await createBlog(blogCommand as BlogCreateCommand);
+                if (response.status != 1) return toast.error(response.message);
+                toast.success(response.message);
             }
         } catch (error: any) {
-            console.error(error);
-            Swal.fire({
-                title: "Error!",
-                text: error.response?.data?.message || "Something went wrong",
-                icon: "error",
-                confirmButtonText: "OK",
-            });
+            toast.error(error);
         } finally {
             setLoading(false);
         }
@@ -162,10 +122,10 @@ export const OrderForm: React.FC<OrderFormProps> = ({initialData}) => {
         defaultValues: {
             title: "",
             description: "",
-            background: "",
+            status: "",
+            backgroundImage: "",
             createdBy: "N/A",
             createdDate: new Date(),
-            photos: [],
             isDeleted: false,
         },
     });
@@ -175,22 +135,22 @@ export const OrderForm: React.FC<OrderFormProps> = ({initialData}) => {
             form.reset({
                 id: initialData.id || "",
                 title: initialData.title || "",
+                status: initialData.Status || "",
                 description: initialData.description || +"",
-                background: initialData.background || "",
+                backgroundImage: initialData.backgroundImage || "",
                 createdDate: initialData.createdDate
                     ? new Date(initialData.createdDate)
                     : new Date(),
                 createdBy: initialData.createdBy || "",
                 isDeleted: !!initialData.isDeleted,
-                photos: initialData.photos || [],
             });
 
             setDate(
                 initialData.createdDate ? new Date(initialData.createdDate) : new Date()
             );
 
-            setImagePreview(initialData.background || "");
-            setFirebaseLink(initialData.background || "");
+            //setImagePreview(initialData.backgroundImage || "");
+            setFirebaseLink(initialData.backgroundImage || "");
         } else {
             setDate(new Date());
         }
@@ -202,7 +162,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({initialData}) => {
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                     <div className="grid max-w-[59rem] flex-1 auto-rows-max gap-4">
                         <div className="flex items-center gap-4">
-                            <Link href="/dashboard/order">
+                            <Link href="/blogs">
                                 <Button variant="outline" size="icon" className="h-7 w-7">
                                     <ChevronLeft className="h-4 w-4"/>
                                     <span className="sr-only">Back</span>
@@ -210,7 +170,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({initialData}) => {
                             </Link>
 
                             <h1 className="flex-1 shrink-0 whitespace-nowrap text-xl font-semibold tracking-tight sm:grow-0">
-                                Order Controller
+                                Blog Controller
                             </h1>
                             <Badge variant="outline" className="ml-auto sm:ml-0">
                                 <FormField
@@ -239,7 +199,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({initialData}) => {
                             <div className="grid auto-rows-max items-start gap-4 lg:col-span-2 lg:gap-8">
                                 <Card x-chunk="dashboard-07-chunk-0">
                                     <CardHeader>
-                                        <CardTitle>Order Details</CardTitle>
+                                        <CardTitle>Blog Details</CardTitle>
                                         <CardDescription>
                                             Lipsum dolor sit amet, consectetur adipiscing elit
                                         </CardDescription>
@@ -254,7 +214,24 @@ export const OrderForm: React.FC<OrderFormProps> = ({initialData}) => {
                                                         <FormItem>
                                                             <FormLabel>Title</FormLabel>
                                                             <FormControl>
-                                                                <Input placeholder="shadcn" {...field} />
+                                                                <Input placeholder="Enter title" {...field} />
+                                                            </FormControl>
+                                                            <FormDescription>
+                                                                This is your public display name.
+                                                            </FormDescription>
+                                                            <FormMessage/>
+                                                        </FormItem>
+                                                    )}
+                                                />
+
+                                                <FormField
+                                                    control={form.control}
+                                                    name="status"
+                                                    render={({field}) => (
+                                                        <FormItem>
+                                                            <FormLabel>Status</FormLabel>
+                                                            <FormControl>
+                                                                <Input placeholder="Enter status" {...field} />
                                                             </FormControl>
                                                             <FormDescription>
                                                                 This is your public display name.
@@ -270,12 +247,20 @@ export const OrderForm: React.FC<OrderFormProps> = ({initialData}) => {
                                                     name="description"
                                                     render={({field}) => (
                                                         <FormItem>
-                                                            <FormLabel>Description</FormLabel>
                                                             <FormControl>
-                                                                <Textarea
-                                                                    placeholder="Order description"
-                                                                    {...field}
-                                                                />
+                                                                <Dialog>
+                                                                    <DialogTrigger asChild>
+                                                                        <Button variant="outline">Content</Button>
+                                                                    </DialogTrigger>
+                                                                    <DialogContent
+                                                                        className="w-full h-full max-w-[80%] max-h-[90%]">
+
+                                                                        <RichEditor
+                                                                            description={field.value || ""} // Pass the current value from form field
+                                                                            onChange={field.onChange} // Pass the onChange handler
+                                                                        />
+                                                                    </DialogContent>
+                                                                </Dialog>
                                                             </FormControl>
                                                             <FormMessage/>
                                                         </FormItem>
@@ -290,7 +275,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({initialData}) => {
                                     x-chunk="dashboard-07-chunk-2"
                                 >
                                     <CardHeader>
-                                        <CardTitle>Order Background</CardTitle>
+                                        <CardTitle>Blog Background</CardTitle>
                                         <CardDescription>
                                             Lipsum dolor sit amet, consectetur adipiscing elit
                                         </CardDescription>
@@ -298,33 +283,33 @@ export const OrderForm: React.FC<OrderFormProps> = ({initialData}) => {
                                     <CardContent>
                                         <FormField
                                             control={form.control}
-                                            name="background"
+                                            name="backgroundImage"
                                             render={({field}) => (
                                                 <FormItem>
-                                                    <FormLabel>Order Background</FormLabel>
+                                                    <FormLabel>Blog Background</FormLabel>
                                                     <FormControl>
                                                         <div className="grid gap-2">
-                                                            {imagePreview ? (
+                                                            {firebaseLink ? (
                                                                 <>
                                                                     <Image
-                                                                        alt="Order Background"
+                                                                        alt="Blog Background"
                                                                         className="aspect-square w-full rounded-md object-cover"
                                                                         height={300}
-                                                                        src={imagePreview}
+                                                                        src={firebaseLink}
                                                                         width={300}
                                                                     />
-                                                                    <p
-                                                                        className="text-blue-500 underline"
-                                                                        {...field}
-                                                                    >
-                                                                        <a
-                                                                            href={firebaseLink!}
-                                                                            target="_blank"
-                                                                            rel="noopener noreferrer"
-                                                                        >
-                                                                            {firebaseLink}
-                                                                        </a>
-                                                                    </p>
+                                                                    {/* <p
+                                    className="text-blue-500 underline"
+                                    {...field}
+                                  >
+                                    <a
+                                      href={firebaseLink!}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                    >
+                                      {firebaseLink}
+                                    </a>
+                                  </p> */}
                                                                     <Button
                                                                         onClick={handleImageDelete}
                                                                         variant="destructive"
@@ -336,7 +321,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({initialData}) => {
                                                                 <div className="grid grid-cols-3 gap-2">
                                                                     <button
                                                                         type="button"
-                                                                        className="flex aspect-square w-full items-center justify-center rounded-md border border-dashed"
+                                                                        className="flex aspect-square w-full items-center justify-center rounded-md bblog bblog-dashed"
                                                                         onClick={() =>
                                                                             fileInputRef.current?.click()
                                                                         }
@@ -440,7 +425,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({initialData}) => {
                                 </Card>
                                 <Card x-chunk="dashboard-07-chunk-5">
                                     <CardHeader>
-                                        <CardTitle>Archive Order</CardTitle>
+                                        <CardTitle>Archive Blog</CardTitle>
                                         <CardDescription>
                                             Lipsum dolor sit amet, consectetur adipiscing elit.
                                         </CardDescription>
@@ -448,7 +433,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({initialData}) => {
                                     <CardContent>
                                         <div></div>
                                         <Button size="sm" variant="secondary">
-                                            Archive Order
+                                            Archive Blog
                                         </Button>
                                     </CardContent>
                                 </Card>
@@ -458,7 +443,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({initialData}) => {
                             <Button variant="outline" size="sm">
                                 Discard
                             </Button>
-                            <Button size="sm">Save Order</Button>
+                            <Button size="sm">Save Blog</Button>
                         </div>
                     </div>
                 </form>

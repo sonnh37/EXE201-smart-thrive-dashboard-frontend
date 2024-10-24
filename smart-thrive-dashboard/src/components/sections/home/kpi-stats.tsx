@@ -1,6 +1,5 @@
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {fetchOrders} from "@/services/order-service";
-import {fetchUsers} from "@/services/user-service";
+import orderService from "@/services/order-service";
 import {Order} from "@/types/order";
 import {useEffect, useState} from "react";
 
@@ -18,7 +17,7 @@ export function KPIStats() {
     useEffect(() => {
         const getOrders = async () => {
             try {
-                const response = await fetchOrders({isPagination: false}); // Truyền query thích hợp
+                const response = await orderService.fetchAll({isPagination: false}); // Truyền query thích hợp
                 const ordersData = response.data?.results ?? [];
                 setOrders(ordersData);
                 const total = calculateTotalPrice(ordersData);
@@ -30,7 +29,7 @@ export function KPIStats() {
 
         const getUsers = async () => {
             try {
-                const response = await fetchUsers({isPagination: true}); // Truyền query thích hợp
+                const response = await orderService.fetchAll({isPagination: true}); // Truyền query thích hợp
                 const totalUserData = response.data?.totalRecords;
                 setTotalUser(totalUserData!);
             } catch (error) {

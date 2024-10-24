@@ -7,11 +7,11 @@ import {
     type_course_options,
 } from "@/components/common/filters";
 
-import {formFilterAdvanceds} from "./filter-advanced-form";
-import {FilterEnum} from "@/types/filter-enum";
 import {DataTable} from "@/components/common/data-table-generic/data-table";
 import {formCourseFilterAdvancedSchema} from "@/schemas/course-schema";
-import {deleteCourse, fetchCourses} from "@/services/course-service";
+import courseService from "@/services/course-service";
+import {FilterEnum} from "@/types/filter-enum";
+import {formFilterAdvanceds} from "./filter-advanced-form";
 
 export default function DataTableCourses() {
     const filterEnums: FilterEnum[] = [
@@ -31,9 +31,9 @@ export default function DataTableCourses() {
 
     return (
         <DataTable
-            deleteData={deleteCourse}
+            deleteData={courseService.delete}
             columns={columns}
-            fetchData={fetchCourses}
+            fetchData={courseService.fetchAll}
             columnSearch="name"
             filterEnums={filterEnums}
             formSchema={formCourseFilterAdvancedSchema}

@@ -6,9 +6,9 @@ import {Bar, BarChart, CartesianGrid, XAxis} from "recharts";
 
 import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from "@/components/ui/card";
 import {ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent,} from "@/components/ui/chart";
-import {OrderGetAllQuery} from "@/types/queries/order-query";
-import {fetchOrders} from "@/services/order-service";
+import orderService from "@/services/order-service";
 import {Order} from "@/types/order";
+import {OrderGetAllQuery} from "@/types/queries/order-query";
 
 export const description = "An interactive bar chart";
 const chartConfig = {
@@ -51,7 +51,7 @@ export const BarGraph: React.FC<BarGraphProps> = ({queryParams}) => {
                 ...queryParams,
                 isPagination: false,
             };
-            const response = await fetchOrders(params);
+            const response = await orderService.fetchAll(params);
             console.log("check_dashboard_response", response.data);
             setOrders(response.data?.results ?? []);
         };

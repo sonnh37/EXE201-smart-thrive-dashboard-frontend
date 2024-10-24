@@ -32,7 +32,7 @@ export default function RootLayout({
             </SessionProvider>
         </GoogleOAuthProvider>
         </body>
-        <Toaster position="top-center" />
+        <Toaster position="top-center"/>
         </html>
     );
 }

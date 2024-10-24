@@ -5,7 +5,7 @@ import type {Table} from "@tanstack/react-table"
 import {Button} from "@/components/ui/button"
 import {Input} from "@/components/ui/input"
 import {X} from "lucide-react"
-import { DataOnlyTableViewOptions } from "./data-only-table-view-options"
+import {DataOnlyTableViewOptions} from "./data-only-table-view-options"
 
 interface DataTableToolbarProps<TData> {
     table: Table<TData>

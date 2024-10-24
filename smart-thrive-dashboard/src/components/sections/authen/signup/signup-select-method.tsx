@@ -1,14 +1,14 @@
 import {Button} from "@/components/ui/button";
-import {motion} from "framer-motion";
-import React from "react";
-import {FcGoogle} from "react-icons/fc";
-import {CiUser} from "react-icons/ci";
-import {GoogleLogin, useGoogleOneTapLogin,} from "@react-oauth/google";
-import {FormValues} from "./signup-form";
-import {toast} from "sonner";
-import {useRouter} from "next/navigation";
+import userService from "@/services/user-service";
 import {User} from "@/types/user";
-import {findAccountRegisteredByGoogle} from "@/services/user-service";
+import {GoogleLogin, useGoogleOneTapLogin,} from "@react-oauth/google";
+import {motion} from "framer-motion";
+import {useRouter} from "next/navigation";
+import React from "react";
+import {CiUser} from "react-icons/ci";
+import {FcGoogle} from "react-icons/fc";
+import {toast} from "sonner";
+import {FormValues} from "./signup-form";
 
 interface SignupSelectMethodFormProps {
     formValues: FormValues;
@@ -29,7 +29,7 @@ const SignupSelectMethodForm: React.FC<SignupSelectMethodFormProps> = ({
 
     const handleSuccess = async (response: any) => {
         console.log("Google login success", response.credential);
-        const _response = await findAccountRegisteredByGoogle(response.credential);
+        const _response = await userService.findAccountRegisteredByGoogle(response.credential);
         const user = _response.data! as User;
 
         if (user != null) {
