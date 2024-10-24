@@ -2,10 +2,10 @@
 import {Breadcrumbs} from "@/components/common/breadcrumb";
 import {ContentLayout} from "@/components/common/content-layout";
 import {CourseForm} from "@/components/sections/courses/create-update-form";
-import {fetchCourse} from "@/services/course-service";
 import {Course} from "@/types/course";
 import {useEffect, useState} from "react";
 import {toast} from "sonner";
+import courseService from "@/services/course-service";
 
 export default function Page({params}: { params: { courseId: string } }) {
     const [course, setCourse] = useState<Course | null>(null);
@@ -13,7 +13,7 @@ export default function Page({params}: { params: { courseId: string } }) {
     // Fetch course data when params.courseId changes
     useEffect(() => {
         const fetchData = async () => {
-            const response = await fetchCourse(params.courseId);
+            const response = await courseService.fetchById(params.courseId);
             if (response.status !== 1) {
                 return toast.error(response.message);
             }

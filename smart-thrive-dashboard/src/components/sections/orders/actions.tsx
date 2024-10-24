@@ -11,7 +11,7 @@ import {
     DropdownMenuShortcut,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {deleteOrder} from "@/services/order-service";
+import orderService from "@/services/order-service";
 import {Order} from "@/types/order";
 import {useQueryClient} from "@tanstack/react-query";
 import {Row} from "@tanstack/react-table";
@@ -68,7 +68,7 @@ const Actions: React.FC<ActionsProps> = ({row}) => {
                 </DropdownMenuContent>
             </DropdownMenu>
             <DeleteBaseEntitysDialog
-                deleteData={deleteOrder}
+                deleteData={orderService.delete}
                 open={showDeleteTaskDialog}
                 onOpenChange={setShowDeleteTaskDialog}
                 list={[model]}

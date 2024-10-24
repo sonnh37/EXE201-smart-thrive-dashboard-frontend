@@ -11,13 +11,12 @@ import {Dialog, DialogContent, DialogTrigger} from "@/components/ui/dialog";
 
 import {Input} from "@/components/ui/input";
 
-
 import RichEditor from "@/components/common/react-draft-wysiwyg";
 import {Calendar} from "@/components/ui/calendar";
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage,} from "@/components/ui/form";
 import {Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover";
-import {createBlog, updateBlog} from "@/services/blog-service";
-import {BlogCreateCommand, BlogUpdateCommand,} from "@/types/commands/blog-command";
+import orderService from "@/services/order-service";
+
 import {zodResolver} from "@hookform/resolvers/zod";
 import {format} from "date-fns";
 import {getDownloadURL, ref, uploadBytesResumable} from "firebase/storage";
@@ -25,8 +24,9 @@ import {useEffect, useRef, useState} from "react";
 import {toast} from "sonner";
 import {z} from "zod";
 import {storage} from "../../../../firebase";
+import { OrderCreateCommand, OrderUpdateCommand } from "@/types/commands/order-command";
 
-interface BlogFormProps {
+interface OrderFormProps {
     initialData: any | null;
 }
 
@@ -42,12 +42,12 @@ const formSchema = z.object({
     isDeleted: z.boolean(),
 });
 
-export const BlogForm: React.FC<BlogFormProps> = ({initialData}) => {
+export const OrderForm: React.FC<OrderFormProps> = ({initialData}) => {
     const [loading, setLoading] = useState(false);
     const [imgLoading, setImgLoading] = useState(false);
-    const title = initialData ? "Edit blog" : "Create blog";
-    const description = initialData ? "Edit a blog." : "Add a new blog";
-    const toastMessage = initialData ? "Blog updated." : "Blog created.";
+    const title = initialData ? "Edit order" : "Create order";
+    const description = initialData ? "Edit a order." : "Add a new order";
+    const toastMessage = initialData ? "Order updated." : "Order created.";
     const action = initialData ? "Save changes" : "Create";
     const [firebaseLink, setFirebaseLink] = useState<string | null>(null);
     const [date, setDate] = useState<Date>();
@@ -71,7 +71,7 @@ export const BlogForm: React.FC<BlogFormProps> = ({initialData}) => {
 
     const uploadImageFirebase = async (values: z.infer<typeof formSchema>) => {
         if (selectedFile) {
-            const storageRef = ref(storage, `Blog/${selectedFile.name}`);
+            const storageRef = ref(storage, `Order/${selectedFile.name}`);
             const uploadTask = uploadBytesResumable(storageRef, selectedFile);
 
             const uploadPromise = new Promise<string>((resolve, reject) => {
@@ -94,7 +94,7 @@ export const BlogForm: React.FC<BlogFormProps> = ({initialData}) => {
         try {
             setLoading(true);
             const updatedValues = await uploadImageFirebase(values); // Chờ upload hoàn tất và nhận values mới
-            const blogCommand = {
+            const orderCommand = {
                 id: initialData ? values.id : null,
                 title: values.title,
                 description: values.description,
@@ -102,11 +102,11 @@ export const BlogForm: React.FC<BlogFormProps> = ({initialData}) => {
                 backgroundImage: updatedValues.backgroundImage,
             };
             if (initialData) {
-                const response = await updateBlog(blogCommand as BlogUpdateCommand);
+                const response = await orderService.update(orderCommand as OrderUpdateCommand);
                 if (response.status != 1) return toast.error(response.message);
                 toast.success(response.message);
             } else {
-                const response = await createBlog(blogCommand as BlogCreateCommand);
+                const response = await orderService.create(orderCommand as OrderCreateCommand);
                 if (response.status != 1) return toast.error(response.message);
                 toast.success(response.message);
             }
@@ -162,7 +162,7 @@ export const BlogForm: React.FC<BlogFormProps> = ({initialData}) => {
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                     <div className="grid max-w-[59rem] flex-1 auto-rows-max gap-4">
                         <div className="flex items-center gap-4">
-                            <Link href="/blogs">
+                            <Link href="/orders">
                                 <Button variant="outline" size="icon" className="h-7 w-7">
                                     <ChevronLeft className="h-4 w-4"/>
                                     <span className="sr-only">Back</span>
@@ -170,7 +170,7 @@ export const BlogForm: React.FC<BlogFormProps> = ({initialData}) => {
                             </Link>
 
                             <h1 className="flex-1 shrink-0 whitespace-nowrap text-xl font-semibold tracking-tight sm:grow-0">
-                                Blog Controller
+                                Order Controller
                             </h1>
                             <Badge variant="outline" className="ml-auto sm:ml-0">
                                 <FormField
@@ -199,7 +199,7 @@ export const BlogForm: React.FC<BlogFormProps> = ({initialData}) => {
                             <div className="grid auto-rows-max items-start gap-4 lg:col-span-2 lg:gap-8">
                                 <Card x-chunk="dashboard-07-chunk-0">
                                     <CardHeader>
-                                        <CardTitle>Blog Details</CardTitle>
+                                        <CardTitle>Order Details</CardTitle>
                                         <CardDescription>
                                             Lipsum dolor sit amet, consectetur adipiscing elit
                                         </CardDescription>
@@ -254,7 +254,6 @@ export const BlogForm: React.FC<BlogFormProps> = ({initialData}) => {
                                                                     </DialogTrigger>
                                                                     <DialogContent
                                                                         className="w-full h-full max-w-[80%] max-h-[90%]">
-
                                                                         <RichEditor
                                                                             description={field.value || ""} // Pass the current value from form field
                                                                             onChange={field.onChange} // Pass the onChange handler
@@ -275,7 +274,7 @@ export const BlogForm: React.FC<BlogFormProps> = ({initialData}) => {
                                     x-chunk="dashboard-07-chunk-2"
                                 >
                                     <CardHeader>
-                                        <CardTitle>Blog Background</CardTitle>
+                                        <CardTitle>Order Background</CardTitle>
                                         <CardDescription>
                                             Lipsum dolor sit amet, consectetur adipiscing elit
                                         </CardDescription>
@@ -286,30 +285,18 @@ export const BlogForm: React.FC<BlogFormProps> = ({initialData}) => {
                                             name="backgroundImage"
                                             render={({field}) => (
                                                 <FormItem>
-                                                    <FormLabel>Blog Background</FormLabel>
+                                                    <FormLabel>Order Background</FormLabel>
                                                     <FormControl>
                                                         <div className="grid gap-2">
                                                             {firebaseLink ? (
                                                                 <>
                                                                     <Image
-                                                                        alt="Blog Background"
+                                                                        alt="Order Background"
                                                                         className="aspect-square w-full rounded-md object-cover"
                                                                         height={300}
                                                                         src={firebaseLink}
                                                                         width={300}
                                                                     />
-                                                                    {/* <p
-                                    className="text-blue-500 underline"
-                                    {...field}
-                                  >
-                                    <a
-                                      href={firebaseLink!}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                    >
-                                      {firebaseLink}
-                                    </a>
-                                  </p> */}
                                                                     <Button
                                                                         onClick={handleImageDelete}
                                                                         variant="destructive"
@@ -321,7 +308,7 @@ export const BlogForm: React.FC<BlogFormProps> = ({initialData}) => {
                                                                 <div className="grid grid-cols-3 gap-2">
                                                                     <button
                                                                         type="button"
-                                                                        className="flex aspect-square w-full items-center justify-center rounded-md bblog bblog-dashed"
+                                                                        className="flex aspect-square w-full items-center justify-center rounded-md border border-dashed"
                                                                         onClick={() =>
                                                                             fileInputRef.current?.click()
                                                                         }
@@ -425,7 +412,7 @@ export const BlogForm: React.FC<BlogFormProps> = ({initialData}) => {
                                 </Card>
                                 <Card x-chunk="dashboard-07-chunk-5">
                                     <CardHeader>
-                                        <CardTitle>Archive Blog</CardTitle>
+                                        <CardTitle>Archive Order</CardTitle>
                                         <CardDescription>
                                             Lipsum dolor sit amet, consectetur adipiscing elit.
                                         </CardDescription>
@@ -433,7 +420,7 @@ export const BlogForm: React.FC<BlogFormProps> = ({initialData}) => {
                                     <CardContent>
                                         <div></div>
                                         <Button size="sm" variant="secondary">
-                                            Archive Blog
+                                            Archive Order
                                         </Button>
                                     </CardContent>
                                 </Card>
@@ -443,7 +430,7 @@ export const BlogForm: React.FC<BlogFormProps> = ({initialData}) => {
                             <Button variant="outline" size="sm">
                                 Discard
                             </Button>
-                            <Button size="sm">Save Blog</Button>
+                            <Button size="sm">Save Order</Button>
                         </div>
                     </div>
                 </form>

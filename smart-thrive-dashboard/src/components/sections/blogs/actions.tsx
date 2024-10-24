@@ -1,7 +1,7 @@
 "use client";
 
-import {DeleteBaseEntitysDialog} from "@/components/common/data-table-generic/delete-dialog-generic";
-import {Button} from "@/components/ui/button";
+import { DeleteBaseEntitysDialog } from "@/components/common/data-table-generic/delete-dialog-generic";
+import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -11,12 +11,12 @@ import {
     DropdownMenuShortcut,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {deleteBlog} from "@/services/blog-service";
-import {Blog} from "@/types/blog";
-import {useQueryClient} from "@tanstack/react-query";
-import {Row} from "@tanstack/react-table";
-import {MoreHorizontal} from "lucide-react";
-import {useRouter} from "next/navigation";
+import blogService from "@/services/blog-service";
+import { Blog } from "@/types/blog";
+import { useQueryClient } from "@tanstack/react-query";
+import { Row } from "@tanstack/react-table";
+import { MoreHorizontal } from "lucide-react";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 interface ActionsProps {
@@ -59,7 +59,7 @@ const Actions: React.FC<ActionsProps> = ({row}) => {
                 </DropdownMenuContent>
             </DropdownMenu>
             <DeleteBaseEntitysDialog
-                deleteData={deleteBlog}
+                deleteData={blogService.delete}
                 open={showDeleteTaskDialog}
                 onOpenChange={setShowDeleteTaskDialog}
                 list={[model]}

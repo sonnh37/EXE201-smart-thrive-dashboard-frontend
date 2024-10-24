@@ -1,30 +1,30 @@
 "use client";
-import {CalendarIcon, ChevronLeft, Upload} from "lucide-react";
+import { CalendarIcon, ChevronLeft, Upload } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import {useForm} from "react-hook-form";
+import { useForm } from "react-hook-form";
 
-import {Badge} from "@/components/ui/badge";
-import {Button} from "@/components/ui/button";
-import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from "@/components/ui/card";
-import {Dialog, DialogContent, DialogTrigger} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
-import {Input} from "@/components/ui/input";
+import { Input } from "@/components/ui/input";
 
 
 import RichEditor from "@/components/common/react-draft-wysiwyg";
-import {Calendar} from "@/components/ui/calendar";
-import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage,} from "@/components/ui/form";
-import {Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover";
-import {createBlog, updateBlog} from "@/services/blog-service";
-import {BlogCreateCommand, BlogUpdateCommand,} from "@/types/commands/blog-command";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {format} from "date-fns";
-import {getDownloadURL, ref, uploadBytesResumable} from "firebase/storage";
-import {useEffect, useRef, useState} from "react";
-import {toast} from "sonner";
-import {z} from "zod";
-import {storage} from "../../../../firebase";
+import { Calendar } from "@/components/ui/calendar";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage, } from "@/components/ui/form";
+import { Popover, PopoverContent, PopoverTrigger, } from "@/components/ui/popover";
+import packageService from "@/services/package-service";
+import { BlogCreateCommand, BlogUpdateCommand, } from "@/types/commands/blog-command";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { format } from "date-fns";
+import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import { z } from "zod";
+import { storage } from "../../../../firebase";
 
 interface BlogFormProps {
     initialData: any | null;
@@ -102,11 +102,11 @@ export const BlogForm: React.FC<BlogFormProps> = ({initialData}) => {
                 backgroundImage: updatedValues.backgroundImage,
             };
             if (initialData) {
-                const response = await updateBlog(blogCommand as BlogUpdateCommand);
+                const response = await packageService.update(blogCommand as BlogUpdateCommand);
                 if (response.status != 1) return toast.error(response.message);
                 toast.success(response.message);
             } else {
-                const response = await createBlog(blogCommand as BlogCreateCommand);
+                const response = await packageService.create(blogCommand as BlogCreateCommand);
                 if (response.status != 1) return toast.error(response.message);
                 toast.success(response.message);
             }
