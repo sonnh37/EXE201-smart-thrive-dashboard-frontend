@@ -28,7 +28,6 @@ const SignupSelectMethodForm: React.FC<SignupSelectMethodFormProps> = ({
     const router = useRouter();
 
     const handleSuccess = async (response: any) => {
-        console.log("Google login success", response.credential);
         const _response = await userService.findAccountRegisteredByGoogle(response.credential);
         const user = _response.data! as User;
 

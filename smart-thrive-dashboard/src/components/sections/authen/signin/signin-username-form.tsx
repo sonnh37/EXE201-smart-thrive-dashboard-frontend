@@ -39,7 +39,6 @@ const SigninUsernameForm: React.FC<SigninUsernameFormProps> = ({
     });
 
     const handleSuccess = async (response: any) => {
-        console.log("check_gg", response);
         // chưa gán token
         userService.loginByGoogle(response.credential)
             .then((_response) => {
@@ -51,7 +50,6 @@ const SigninUsernameForm: React.FC<SigninUsernameFormProps> = ({
                 if (!isLogin) return;
 
                 const token = localStorage.getItem("token");
-                console.log("check_token_logingg", token)
                 if (token) {
                     router.push("/"); // Điều hướng sau khi có token
                 } else {
@@ -69,10 +67,8 @@ const SigninUsernameForm: React.FC<SigninUsernameFormProps> = ({
 
     const handleSubmit = async (data: z.infer<typeof formSchema>) => {
         try {
-            console.log("username", data.username);
             if (data.username == "") return toast.error("Empty input");
             const response = await userService.fetchUserByUsernameOrEmail(data.username);
-            console.log("check_response", response);
 
             if (response.status == 1 && response.data) {
                 const userData = response.data as User;

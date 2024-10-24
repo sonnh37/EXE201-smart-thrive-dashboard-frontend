@@ -53,7 +53,6 @@ const SignupGmailNewPasswordForm: React.FC<SignupGmailNewPasswordFormProps> = ({
             formValues.googleToken!,
             data.newPassword
         );
-        console.log("check_login", _response)
         if (_response.status != 1) {
             return toast.error(_response.message);
         }

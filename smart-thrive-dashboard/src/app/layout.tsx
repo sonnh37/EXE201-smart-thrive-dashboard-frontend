@@ -13,7 +13,6 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     const clientId = Const.CLIENT_ID;
-    console.log("check_clientid", clientId)
     return (
         <html lang="en">
         <head>

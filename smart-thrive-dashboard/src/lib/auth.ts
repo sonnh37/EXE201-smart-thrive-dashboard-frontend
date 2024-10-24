@@ -113,7 +113,6 @@ export const IsValidToken = async (token: string): Promise<boolean> => {
     if (token) {
         try {
             const response = await userService.decodeToken(token);
-            console.log("check_decoded_valid");
             const decoded = response.data;
 
             const currentTime = Date.now() / 1000; // Thời gian hiện tại tính bằng giây

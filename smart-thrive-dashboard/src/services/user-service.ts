@@ -11,7 +11,6 @@ class UserService extends BaseService<User> {
     }
 
     public login = async (username: string, password: string): Promise<BusinessResult<LoginResponse>> => {
-        console.log("check_query", username + password);
         try {
             const response = await axiosInstance.post<BusinessResult<LoginResponse>>(
                 `${Const.API_USER}/login`,

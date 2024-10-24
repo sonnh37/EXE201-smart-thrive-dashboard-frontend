@@ -9,7 +9,6 @@ const RefreshContext = createContext<RefreshContextType | undefined>(undefined);
 
 export const RefreshProvider: React.FC<{ children: React.ReactNode }> = ({children}) => {
     const [refresh, setRefresh] = useState<() => void>(() => () => {
-        console.log('Default refresh function'); // Đặt hàm refresh mặc định để debug
     });
 
     return (

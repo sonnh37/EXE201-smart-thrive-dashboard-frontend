@@ -50,7 +50,6 @@ export const PieGraph: React.FC<PieGraphProps> = ({queryParams}) => {
                 isPagination: false,
             };
             const response = await orderService.fetchAll(params);
-            console.log("check_dashboard_response", response.data)
             setOrders(response.data?.results ?? []);
         };
 

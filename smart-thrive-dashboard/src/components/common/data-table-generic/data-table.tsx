@@ -89,10 +89,6 @@ export function DataTable<TData>({
         };
     };
 
-    useEffect(() => {
-        console.log("check_defaultValue", getDefaultValues());
-    }, [getDefaultValues()]);
-
     const defaultSchema = z.object({
         id: z.string().nullable().optional(),
         date: z
