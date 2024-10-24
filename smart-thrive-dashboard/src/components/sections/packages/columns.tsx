@@ -144,7 +144,7 @@ export const columns: ColumnDef<Package>[] = [
             if (!isDeleted) {
                 return (
                     <Image
-                        src="/check.png"
+                        src="https://firebasestorage.googleapis.com/v0/b/smart-thrive.appspot.com/o/Blog%2Fcheck.png?alt=media&token=1bdb7751-4bdc-4af1-b6e1-9b758df3a3d5"
                         width={500}
                         height={500}
                         alt="Gallery Icon"
@@ -154,7 +154,7 @@ export const columns: ColumnDef<Package>[] = [
             }
             return (
                 <Image
-                    src="/uncheck.png"
+                    src="https://firebasestorage.googleapis.com/v0/b/smart-thrive.appspot.com/o/Blog%2Funcheck.png?alt=media&token=3b2b94d3-1c59-4a96-b4c6-312033d868b1"
                     width={500}
                     height={500}
                     alt="Gallery Icon"

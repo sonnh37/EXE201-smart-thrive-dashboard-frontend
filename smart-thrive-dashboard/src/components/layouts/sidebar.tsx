@@ -42,7 +42,7 @@ export function Sidebar() {
                 >
                     <Link href="/" className="flex items-center gap-2">
                         <Image
-                            src="/logo-exe.png"
+                            src="https://firebasestorage.googleapis.com/v0/b/smart-thrive.appspot.com/o/Blog%2Flogo-exe.png?alt=media&token=e305a372-6233-4015-b3d1-1e82dcf26a7d"
                             width={50}
                             height={50}
                             alt="Gallery Icon"
