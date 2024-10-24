@@ -2,7 +2,11 @@
 
 import {Breadcrumbs} from "@/components/common/breadcrumb";
 import {ContentLayout} from "@/components/common/content-layout";
-import {PackageForm} from "@/components/sections/packages/create-update-form";
+import dynamic from "next/dynamic";
+
+const PackageForm = dynamic(() => import("@/components/sections/packages/create-update-form").then((mod) => mod.PackageForm), {
+    ssr: false
+});
 
 const breadcrumbItems = [
     {title: "Dashboard", link: "/"},
