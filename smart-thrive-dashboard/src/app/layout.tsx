@@ -6,7 +6,8 @@ import {SessionProvider} from "next-auth/react";
 import {ThemeProvider} from "next-themes";
 import {Toaster} from "sonner";
 import "./globals.css";
-
+import 'react-time-picker/dist/TimePicker.css';
+import 'react-clock/dist/Clock.css';
 export default function RootLayout({
                                        children,
                                    }: Readonly<{

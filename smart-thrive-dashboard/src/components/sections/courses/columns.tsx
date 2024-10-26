@@ -136,7 +136,7 @@ export const columns: ColumnDef<Course>[] = [
         ),
         cell: ({row}) => {
             const timeSpan = row.getValue('startTime') as string;
-
+            console.log("check_time", timeSpan)
             if (timeSpan) {
                 const [hours, minutes] = timeSpan.split(':'); // Tách giờ và phút
                 const ampm = parseInt(hours) < 12 ? 'AM' : 'PM'; // Xác định AM hoặc PM

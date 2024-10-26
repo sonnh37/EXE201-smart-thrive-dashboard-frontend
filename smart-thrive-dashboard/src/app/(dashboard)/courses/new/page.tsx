@@ -10,13 +10,13 @@ const CourseForm = dynamic(() => import("@/components/sections/courses/create-up
 
 const breadcrumbItems = [
     {title: "Dashboard", link: "/"},
-    {title: "Blog", link: "/blogs"},
-    {title: "New", link: "/blogs/new"},
+    {title: "Course", link: "/courses"},
+    {title: "New", link: "/course/new"},
 ];
 
 export default function Page() {
     return (
-        <ContentLayout title="Album">
+        <ContentLayout title="Course">
             <div className="space-y-6">
                 <Breadcrumbs items={breadcrumbItems}/>
                 <CourseForm initialData={null}/>

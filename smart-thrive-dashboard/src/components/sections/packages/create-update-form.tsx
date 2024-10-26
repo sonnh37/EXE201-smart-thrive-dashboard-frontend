@@ -179,7 +179,7 @@ export const PackageForm: React.FC<PackageFormProps> = ({initialData}) => {
                                     render={({field}) => (
                                         <FormItem>
                                             <FormControl>
-                                                <p>{field.value ? "Disactived" : "Actived"}</p>
+                                            <p>{initialData ? (field.value ? "Deleted" : "Last Updated: "+initialData.updatedDate) : "New"}</p>
                                             </FormControl>
                                             <FormMessage/>
                                         </FormItem>

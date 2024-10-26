@@ -13,7 +13,6 @@ export interface Course extends BaseEntity {
     type?: CourseType;
     name?: string;
     code?: string;
-    courseName?: string;
     description?: string;
     backgroundImage?: string;
     price?: number;
