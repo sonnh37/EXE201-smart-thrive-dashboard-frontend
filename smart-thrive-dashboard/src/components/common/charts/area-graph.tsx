@@ -42,18 +42,13 @@ export const AreaGraph: React.FC<AreaGraphProps> = ({queryParams}) => {
         });
     }, [orders]);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            const params: OrderGetAllQuery = {
-                ...queryParams,
-                isPagination: false,
-            };
-            const response = await orderService.fetchAll(params);
-            setOrders(response.data?.results ?? []);
-        };
-
-        fetchData();
-    }, [queryParams]);
+    const fetchData = async (params: OrderGetAllQuery) => {
+        const response = await orderService.fetchAll(params);
+        setOrders(response.data?.results ?? []);
+      };
+    
+      // Gọi hàm fetchData ngay lập tức
+      fetchData(queryParams);
 
     return (
         <Card>
