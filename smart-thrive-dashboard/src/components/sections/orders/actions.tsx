@@ -29,11 +29,11 @@ const Actions: React.FC<ActionsProps> = ({row}) => {
     const queryClient = useQueryClient();
 
     const handleEditClick = () => {
-        router.push(`/order/${model.id}`);
+        router.push(`/orders/${model.id}`);
     };
 
     const handleOrdersClick = () => {
-        router.push(`/order/${model.id}/photos`);
+        router.push(`/orders/${model.id}/photos`);
     };
 
     const handleDeleteClick = async () => {
