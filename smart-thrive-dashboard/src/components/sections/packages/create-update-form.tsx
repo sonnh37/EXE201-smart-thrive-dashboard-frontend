@@ -1,453 +1,422 @@
 "use client";
-import {CalendarIcon, ChevronLeft, Upload} from "lucide-react";
+import { CalendarIcon, ChevronLeft, Upload } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import {useForm} from "react-hook-form";
+import { useForm } from "react-hook-form";
 
-import {Badge} from "@/components/ui/badge";
-import {Button} from "@/components/ui/button";
-import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from "@/components/ui/card";
-import {Dialog, DialogContent, DialogTrigger} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
-import {Input} from "@/components/ui/input";
-
-
-import RichEditor from "@/components/common/react-draft-wysiwyg";
-import {Calendar} from "@/components/ui/calendar";
-import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage,} from "@/components/ui/form";
-import {Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover";
+import { Input } from "@/components/ui/input";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import packageService from "@/services/package-service";
-import {PackageCreateCommand, PackageUpdateCommand,} from "@/types/commands/package-command";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {format} from "date-fns";
-import {getDownloadURL, ref, uploadBytesResumable} from "firebase/storage";
-import {useEffect, useRef, useState} from "react";
-import {toast} from "sonner";
-import {z} from "zod";
-import {storage} from "../../../../firebase";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { format, isValid, parse } from "date-fns";
+import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import { z } from "zod";
+import { storage } from "../../../../firebase";
+import {
+  PackageCreateCommand,
+  PackageUpdateCommand,
+} from "@/types/commands/package-command";
+import { useRouter } from "next/navigation";
+import { Const } from "@/lib/const";
+import { PackageStatus } from "@/types/enums/package";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import providerService from "@/services/provider-service";
+import { Subject } from "@/types/subject";
+import { Provider } from "@/types/provider";
+import subjectService from "@/services/subject-service";
+import { Textarea } from "@/components/ui/textarea";
+import TimePicker from "react-time-picker";
+import { convertToISODate } from "@/lib/date-helper";
+import { formatCurrency } from "@/lib/currency-helper";
+import { formatTimeSpan } from "@/lib/format-timespan";
 
 interface PackageFormProps {
-    initialData: any | null;
+  initialData: any | null;
 }
 
 const formSchema = z.object({
-    id: z.string().optional(),
-    userId: z.string().optional(),
-    title: z.string().min(1, "Title is required"),
-    description: z.string().optional(),
-    status: z.string().optional(),
-    backgroundImage: z.string().optional(),
-    createdDate: z.date().optional(),
-    createdBy: z.string().optional(),
-    isDeleted: z.boolean(),
+  id: z.string().optional(),
+  name: z.string().min(1, "Name is required"),
+  totalPrice: z.number().optional(),
+  quantityCourse: z.number().optional(),
+  status: z.nativeEnum(PackageStatus).optional(),
+  isActive: z.boolean(),
+  createdDate: z.date().optional(),
+  createdBy: z.string().optional(),
+  isDeleted: z.boolean(),
 });
 
-export const PackageForm: React.FC<PackageFormProps> = ({initialData}) => {
-    const [loading, setLoading] = useState(false);
-    const [imgLoading, setImgLoading] = useState(false);
-    const title = initialData ? "Edit package" : "Create package";
-    const description = initialData ? "Edit a package." : "Add a new package";
-    const toastMessage = initialData ? "Package updated." : "Package created.";
-    const action = initialData ? "Save changes" : "Create";
-    const [firebaseLink, setFirebaseLink] = useState<string | null>(null);
-    const [date, setDate] = useState<Date>();
+export const PackageForm: React.FC<PackageFormProps> = ({ initialData }) => {
+  const [loading, setLoading] = useState(false);
+  const [imgLoading, setImgLoading] = useState(false);
+  const title = initialData ? "Edit package" : "Create package";
+  const description = initialData ? "Edit a package." : "Add a new package";
+  const toastMessage = initialData ? "Package updated." : "Package created.";
+  const action = initialData ? "Save changes" : "Create";
+  const [firebaseLink, setFirebaseLink] = useState<string | null>(null);
+  const [date, setDate] = useState<Date>();
+  const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-    const fileInputRef = useRef<HTMLInputElement | null>(null);
-    const [selectedFile, setSelectedFile] = useState<File | null>(null); // Lưu tạm file đã chọn
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      setLoading(true);
+      const packageCommand = {
+        id: initialData ? values.id : null,
+        name: values.name,
+        status: values.status,
+        totalPrice: values.totalPrice,
+        quantityCourse: values.quantityCourse,
+        isActive: values.isActive,
+      };
 
-    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (file) {
-            setFirebaseLink(URL.createObjectURL(file)); // Hiển thị preview
-            setSelectedFile(file); // Lưu file vào state thay vì upload
-        }
-    };
+      console.log("check_package", packageCommand)
 
-    const handleImageDelete = () => {
-        setFirebaseLink(""); // Xóa preview của hình ảnh
-        setSelectedFile(null); // Đặt file về null để xóa file đã chọn
-        form.setValue("backgroundImage", ""); // Xóa giá trị hình ảnh trong form nếu có
-    };
+      if (initialData) {
+        const response = await packageService.update(
+          packageCommand as PackageUpdateCommand
+        );
+        if (response.status != 1) throw new Error(response.message);
+        toast.success(response.message);
+      } else {
+        const response = await packageService.create(
+          packageCommand as PackageCreateCommand
+        );
+        if (response.status != 1) throw new Error(response.message);
+        toast.success(response.message);
+      }
 
-    const uploadImageFirebase = async (values: z.infer<typeof formSchema>) => {
-        if (selectedFile) {
-            const storageRef = ref(storage, `Package/${selectedFile.name}`);
-            const uploadTask = uploadBytesResumable(storageRef, selectedFile);
+      router.push(Const.URL_PACKAGE);
+    } catch (error: any) {
+      return toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-            const uploadPromise = new Promise<string>((resolve, reject) => {
-                uploadTask.on(
-                    "state_changed",
-                    null,
-                    (error) => reject(error),
-                    () => {
-                        getDownloadURL(uploadTask.snapshot.ref).then((url) => resolve(url));
-                    }
-                );
-            });
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      quantityCourse: 0,
+      status: PackageStatus.Pending,
+      totalPrice: 0,
+      isActive: false,
+      createdBy: "N/A",
+      createdDate: new Date(),
+      isDeleted: false,
+    },
+  });
 
-            const downloadURL = await uploadPromise;
-            return {...values, backgroundImage: downloadURL}; // Trả về values đã cập nhật
-        }
-        return values; // Trả về values gốc nếu không có file
-    };
-    const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        try {
-            setLoading(true);
-            const updatedValues = await uploadImageFirebase(values); // Chờ upload hoàn tất và nhận values mới
-            const packageCommand = {
-                id: initialData ? values.id : null,
-                title: values.title,
-                description: values.description,
-                status: values.status,
-                backgroundImage: updatedValues.backgroundImage,
-            };
-            if (initialData) {
-                const response = await packageService.update(packageCommand as PackageUpdateCommand);
-                if (response.status != 1) return toast.error(response.message);
-                toast.success(response.message);
-            } else {
-                const response = await packageService.create(packageCommand as PackageCreateCommand);
-                if (response.status != 1) return toast.error(response.message);
-                toast.success(response.message);
-            }
-        } catch (error: any) {
-            toast.error(error);
-        } finally {
-            setLoading(false);
-        }
-    };
+  useEffect(() => {
+    if (initialData) {
+      form.reset({
+        id: initialData.id || "",
+        name: initialData.name || "",
+        status: initialData.status || "",
+        totalPrice: initialData.totalPrice || 0,
+        quantityCourse: initialData.quantityCourse || 0,
+        isActive: initialData.isActive || false,
+        createdDate: initialData.createdDate
+          ? new Date(initialData.createdDate)
+          : new Date(),
+        createdBy: initialData.createdBy || "",
+        isDeleted: !!initialData.isDeleted,
+      });
+    } else {
+      setDate(new Date());
+    }
+  }, [initialData, form]);
 
-    const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-            title: "",
-            description: "",
-            status: "",
-            backgroundImage: "",
-            createdBy: "N/A",
-            createdDate: new Date(),
-            isDeleted: false,
-        },
-    });
+  return (
+    <>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <div className="grid max-w-[59rem] flex-1 auto-rows-max gap-4">
+            <div className="flex items-center gap-4">
+              <Link href="/packages">
+                <Button variant="outline" size="icon" className="h-7 w-7">
+                  <ChevronLeft className="h-4 w-4" />
+                  <span className="sr-only">Back</span>
+                </Button>
+              </Link>
 
-    useEffect(() => {
-        if (initialData) {
-            form.reset({
-                id: initialData.id || "",
-                title: initialData.title || "",
-                status: initialData.Status || "",
-                description: initialData.description || +"",
-                backgroundImage: initialData.backgroundImage || "",
-                createdDate: initialData.createdDate
-                    ? new Date(initialData.createdDate)
-                    : new Date(),
-                createdBy: initialData.createdBy || "",
-                isDeleted: !!initialData.isDeleted,
-            });
+              <h1 className="flex-1 shrink-0 whitespace-nowrap text-xl font-semibold tracking-tight sm:grow-0">
+                Package Controller
+              </h1>
+              <Badge variant="outline" className="ml-auto sm:ml-0">
+                <FormField
+                  control={form.control}
+                  name="isDeleted"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <p>
+                          {initialData
+                            ? field.value
+                              ? "Deleted"
+                              : "Last Updated: " + initialData.updatedDate
+                            : "New"}
+                        </p>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </Badge>
+              <div className="hidden items-center gap-2 md:ml-auto md:flex">
+                <Link href="/packages" passHref>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      router.push("/packages");
+                    }} // Ngăn chặn submit
+                  >
+                    Discard
+                  </Button>
+                </Link>
+                <Button type="submit" size="sm" disabled={loading}>
+                  {loading ? "Processing..." : action}
+                </Button>
+              </div>
+            </div>
+            <div className="grid gap-4 md:grid-cols-[1fr_250px] lg:grid-cols-3 lg:gap-8">
+              <div className="grid auto-rows-max items-start gap-4 lg:col-span-2 lg:gap-8">
+                <Card x-chunk="dashboard-07-chunk-0">
+                  <CardHeader>
+                    <CardTitle>Package Details</CardTitle>
 
-            setDate(
-                initialData.createdDate ? new Date(initialData.createdDate) : new Date()
-            );
+                    <CardDescription>
+                      Lipsum dolor sit amet, consectetur adipiscing elit
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid gap-6">
+                      <div className="grid gap-3">
+                        <FormField
+                          control={form.control}
+                          name="name"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Name</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Enter name" {...field} />
+                              </FormControl>
+                              <FormDescription>
+                                This is your public display name.
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
 
-            //setImagePreview(initialData.backgroundImage || "");
-            setFirebaseLink(initialData.backgroundImage || "");
-        } else {
-            setDate(new Date());
-        }
-    }, [initialData, form]);
+                        <FormField
+                          control={form.control}
+                          name="totalPrice"
+                          render={({ field }) => {
+                            const inputRef = useRef<HTMLInputElement>(null);
 
-    return (
-        <>
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                    <div className="grid max-w-[59rem] flex-1 auto-rows-max gap-4">
-                        <div className="flex items-center gap-4">
-                            <Link href="/packages">
-                                <Button variant="outline" size="icon" className="h-7 w-7">
-                                    <ChevronLeft className="h-4 w-4"/>
-                                    <span className="sr-only">Back</span>
-                                </Button>
-                            </Link>
-
-                            <h1 className="flex-1 shrink-0 whitespace-nowrap text-xl font-semibold tracking-tight sm:grow-0">
-                                Package Controller
-                            </h1>
-                            <Badge variant="outline" className="ml-auto sm:ml-0">
-                                <FormField
-                                    control={form.control}
-                                    name="isDeleted"
-                                    render={({field}) => (
-                                        <FormItem>
-                                            <FormControl>
-                                            <p>{initialData ? (field.value ? "Deleted" : "Last Updated: "+initialData.updatedDate) : "New"}</p>
-                                            </FormControl>
-                                            <FormMessage/>
-                                        </FormItem>
-                                    )}
-                                />
-                            </Badge>
-                            <div className="hidden items-center gap-2 md:ml-auto md:flex">
-                                <Button variant="outline" size="sm">
-                                    Discard
-                                </Button>
-                                <Button type="submit" size="sm" disabled={loading}>
-                                    {loading ? "Processing..." : action}
-                                </Button>
-                            </div>
-                        </div>
-                        <div className="grid gap-4 md:grid-cols-[1fr_250px] lg:grid-cols-3 lg:gap-8">
-                            <div className="grid auto-rows-max items-start gap-4 lg:col-span-2 lg:gap-8">
-                                <Card x-chunk="dashboard-07-chunk-0">
-                                    <CardHeader>
-                                        <CardTitle>Package Details</CardTitle>
-                                        <CardDescription>
-                                            Lipsum dolor sit amet, consectetur adipiscing elit
-                                        </CardDescription>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="grid gap-6">
-                                            <div className="grid gap-3">
-                                                <FormField
-                                                    control={form.control}
-                                                    name="title"
-                                                    render={({field}) => (
-                                                        <FormItem>
-                                                            <FormLabel>Title</FormLabel>
-                                                            <FormControl>
-                                                                <Input placeholder="Enter title" {...field} />
-                                                            </FormControl>
-                                                            <FormDescription>
-                                                                This is your public display name.
-                                                            </FormDescription>
-                                                            <FormMessage/>
-                                                        </FormItem>
-                                                    )}
-                                                />
-
-                                                <FormField
-                                                    control={form.control}
-                                                    name="status"
-                                                    render={({field}) => (
-                                                        <FormItem>
-                                                            <FormLabel>Status</FormLabel>
-                                                            <FormControl>
-                                                                <Input placeholder="Enter status" {...field} />
-                                                            </FormControl>
-                                                            <FormDescription>
-                                                                This is your public display name.
-                                                            </FormDescription>
-                                                            <FormMessage/>
-                                                        </FormItem>
-                                                    )}
-                                                />
-                                            </div>
-                                            <div className="grid gap-3">
-                                                <FormField
-                                                    control={form.control}
-                                                    name="description"
-                                                    render={({field}) => (
-                                                        <FormItem>
-                                                            <FormControl>
-                                                                <Dialog>
-                                                                    <DialogTrigger asChild>
-                                                                        <Button variant="outline">Content</Button>
-                                                                    </DialogTrigger>
-                                                                    <DialogContent
-                                                                        className="w-full h-full max-w-[80%] max-h-[90%]">
-
-                                                                        <RichEditor
-                                                                            description={field.value || ""} // Pass the current value from form field
-                                                                            onChange={field.onChange} // Pass the onChange handler
-                                                                        />
-                                                                    </DialogContent>
-                                                                </Dialog>
-                                                            </FormControl>
-                                                            <FormMessage/>
-                                                        </FormItem>
-                                                    )}
-                                                />
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                                <Card
-                                    className="overflow-hidden"
-                                    x-chunk="dashboard-07-chunk-2"
-                                >
-                                    <CardHeader>
-                                        <CardTitle>Package Background</CardTitle>
-                                        <CardDescription>
-                                            Lipsum dolor sit amet, consectetur adipiscing elit
-                                        </CardDescription>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <FormField
-                                            control={form.control}
-                                            name="backgroundImage"
-                                            render={({field}) => (
-                                                <FormItem>
-                                                    <FormLabel>Package Background</FormLabel>
-                                                    <FormControl>
-                                                        <div className="grid gap-2">
-                                                            {firebaseLink ? (
-                                                                <>
-                                                                    <Image
-                                                                        alt="Package Background"
-                                                                        className="aspect-square w-full rounded-md object-cover"
-                                                                        height={300}
-                                                                        src={firebaseLink}
-                                                                        width={300}
-                                                                    />
-                                                                    {/* <p
-                                    className="text-blue-500 underline"
+                            return (
+                              <FormItem>
+                                <FormLabel>Total Price</FormLabel>
+                                <FormControl>
+                                  <Input
                                     {...field}
-                                  >
-                                    <a
-                                      href={firebaseLink!}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                    >
-                                      {firebaseLink}
-                                    </a>
-                                  </p> */}
-                                                                    <Button
-                                                                        onClick={handleImageDelete}
-                                                                        variant="destructive"
-                                                                    >
-                                                                        Delete Image
-                                                                    </Button>
-                                                                </>
-                                                            ) : (
-                                                                <div className="grid grid-cols-3 gap-2">
-                                                                    <button
-                                                                        type="button"
-                                                                        className="flex aspect-square w-full items-center justify-center rounded-md bpackage bpackage-dashed"
-                                                                        onClick={() =>
-                                                                            fileInputRef.current?.click()
-                                                                        }
-                                                                    >
-                                                                        <Upload
-                                                                            className="h-4 w-4 text-muted-foreground"/>
-                                                                        <span className="sr-only">Upload</span>
-                                                                    </button>
-                                                                </div>
-                                                            )}
-                                                            <input
-                                                                type="file"
-                                                                accept="image/*"
-                                                                ref={fileInputRef}
-                                                                className="hidden"
-                                                                onChange={handleImageChange}
-                                                            />
-                                                            <FormMessage/>
-                                                        </div>
-                                                    </FormControl>
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </CardContent>
-                                </Card>
-                            </div>
-                            <div className="grid auto-rows-max items-start gap-4 lg:gap-8">
-                                <Card x-chunk="dashboard-07-chunk-3">
-                                    <CardHeader>
-                                        <CardTitle>Information</CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="grid gap-6">
-                                            <div className="grid gap-3">
-                                                <FormField
-                                                    control={form.control}
-                                                    name="createdBy"
-                                                    render={({field}) => (
-                                                        <FormItem>
-                                                            <FormLabel>Email</FormLabel>
-                                                            <FormControl>
-                                                                <Input disabled placeholder="N/A" {...field} />
-                                                            </FormControl>
-                                                            <FormMessage/>
-                                                        </FormItem>
-                                                    )}
-                                                />
-                                            </div>
-                                            <div className="grid gap-3">
-                                                <FormField
-                                                    control={form.control}
-                                                    name="createdDate"
-                                                    render={({field}) => {
-                                                        const handleDateSelect = (selectedDate: any) => {
-                                                            setDate(selectedDate);
-                                                            field.onChange(
-                                                                selectedDate
-                                                                    ? new Date(selectedDate)
-                                                                    : new Date()
-                                                            );
-                                                        };
-                                                        return (
-                                                            <FormItem>
-                                                                <FormLabel>Created Date</FormLabel>
-                                                                <FormControl>
-                                                                    <Popover>
-                                                                        <PopoverTrigger asChild>
-                                                                            <Button
-                                                                                disabled
-                                                                                variant={"outline"}
-                                                                                className={`w-[280px] justify-start text-left font-normal ${
-                                                                                    !date ? "text-muted-foreground" : ""
-                                                                                }`}
-                                                                            >
-                                                                                <CalendarIcon className="mr-2 h-4 w-4"/>
-                                                                                {date ? (
-                                                                                    format(date, "PPP")
-                                                                                ) : (
-                                                                                    <span>Pick a date</span>
-                                                                                )}
-                                                                            </Button>
-                                                                        </PopoverTrigger>
-                                                                        <PopoverContent className="w-auto p-0">
-                                                                            <Calendar
-                                                                                mode="single"
-                                                                                selected={date}
-                                                                                onSelect={handleDateSelect}
-                                                                                initialFocus
-                                                                            />
-                                                                        </PopoverContent>
-                                                                    </Popover>
-                                                                </FormControl>
-                                                                <FormMessage/>
-                                                            </FormItem>
-                                                        );
-                                                    }}
-                                                />
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                                <Card x-chunk="dashboard-07-chunk-5">
-                                    <CardHeader>
-                                        <CardTitle>Archive Package</CardTitle>
-                                        <CardDescription>
-                                            Lipsum dolor sit amet, consectetur adipiscing elit.
-                                        </CardDescription>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div></div>
-                                        <Button size="sm" variant="secondary">
-                                            Archive Package
-                                        </Button>
-                                    </CardContent>
-                                </Card>
-                            </div>
-                        </div>
-                        <div className="flex items-center justify-center gap-2 md:hidden">
-                            <Button variant="outline" size="sm">
-                                Discard
-                            </Button>
-                            <Button size="sm">Save Package</Button>
-                        </div>
+                                    ref={inputRef}
+                                    placeholder="Nhập giá..."
+                                    type="text"
+                                    className="mt-2 w-full"
+                                    min="0"
+                                    value={
+                                      field.value !== undefined
+                                        ? formatCurrency(field.value)
+                                        : ""
+                                    }
+                                    onChange={(e) => {
+                                      const rawValue = e.target.value.replace(
+                                        /[^0-9]/g,
+                                        ""
+                                      );
+                                      const parsedValue =
+                                        parseFloat(rawValue) || 0;
+
+                                      // Cập nhật giá trị trong form
+                                      field.onChange(parsedValue);
+
+                                      // Giữ vị trí con trỏ
+                                      if (inputRef.current) {
+                                        const cursorPosition =
+                                          e.target.selectionStart || 0;
+                                        setTimeout(() => {
+                                          inputRef.current?.setSelectionRange(
+                                            cursorPosition,
+                                            cursorPosition
+                                          );
+                                        }, 0);
+                                      }
+                                    }}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            );
+                          }}
+                        />
+                      </div>
                     </div>
-                </form>
-            </Form>
-        </>
-    );
+                  </CardContent>
+                </Card>
+              </div>
+              <div className="grid auto-rows-max items-start gap-4 lg:gap-8">
+                <Card x-chunk="dashboard-07-chunk-3">
+                  <CardHeader>
+                    <CardTitle>Information</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid gap-6">
+                      <div className="grid gap-3">
+                        <FormField
+                          control={form.control}
+                          name="createdBy"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Email</FormLabel>
+                              <FormControl>
+                                <Input disabled placeholder="N/A" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <div className="grid gap-3">
+                        <FormField
+                          control={form.control}
+                          name="createdDate"
+                          render={({ field }) => {
+                            const handleDateSelect = (selectedDate: any) => {
+                              setDate(selectedDate);
+                              field.onChange(
+                                selectedDate
+                                  ? new Date(selectedDate)
+                                  : new Date()
+                              );
+                            };
+                            return (
+                              <FormItem>
+                                <FormLabel>Created Date</FormLabel>
+                                <FormControl>
+                                  <Popover>
+                                    <PopoverTrigger asChild>
+                                      <Button
+                                        disabled
+                                        variant={"outline"}
+                                        className={`w-[280px] justify-start text-left font-normal ${
+                                          !date ? "text-muted-foreground" : ""
+                                        }`}
+                                      >
+                                        <CalendarIcon className="mr-2 h-4 w-4" />
+                                        {date ? (
+                                          format(date, "PPP")
+                                        ) : (
+                                          <span>Pick a date</span>
+                                        )}
+                                      </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0">
+                                      <Calendar
+                                        mode="single"
+                                        selected={date}
+                                        onSelect={handleDateSelect}
+                                        initialFocus
+                                      />
+                                    </PopoverContent>
+                                  </Popover>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            );
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card x-chunk="dashboard-07-chunk-5">
+                  <CardHeader>
+                    <CardTitle>Quantity</CardTitle>
+                    <CardDescription>
+                      Lipsum dolor sit amet, consectetur adipiscing elit.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid gap-3">
+                      <FormField
+                        control={form.control}
+                        name="quantityCourse"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Quantity courses</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field} // Kết nối field với input
+                                placeholder=""
+                                type="number"
+                                disabled // Đặt trường này ở trạng thái disabled
+                                className="mt-2 w-full"
+                                onChange={(e) =>
+                                  field.onChange(e.target.value || 0)
+                                }
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </div>
+        </form>
+      </Form>
+    </>
+  );
 };

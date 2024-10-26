@@ -29,15 +29,9 @@ const Actions: React.FC<ActionsProps> = ({row}) => {
     const queryClient = useQueryClient();
 
     const handleEditClick = () => {
-        router.push(`/package/${model.id}`);
+        router.push(`/packages/${model.id}`);
     };
 
-    const handlePackagesClick = () => {
-        router.push(`/package/${model.id}/photos`);
-    };
-
-    const handleDeleteClick = async () => {
-    };
     const [showDeleteTaskDialog, setShowDeleteTaskDialog] = React.useState(false);
 
     return (
@@ -55,9 +49,6 @@ const Actions: React.FC<ActionsProps> = ({row}) => {
                         onClick={() => navigator.clipboard.writeText(model.id)}
                     >
                         Copy model ID
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handlePackagesClick}>
-                        View photos
                     </DropdownMenuItem>
                     <DropdownMenuSeparator/>
                     <DropdownMenuItem onClick={handleEditClick}>Edit</DropdownMenuItem>

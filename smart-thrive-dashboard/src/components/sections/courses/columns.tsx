@@ -287,8 +287,8 @@ export const columns: ColumnDef<Course>[] = [
             <DataTableColumnHeader column={column} title="Is Active"/>
         ),
         cell: ({row}) => {
-            const isDeleted = row.getValue("isActive") as boolean;
-            if (!isDeleted) {
+            const isActive = row.getValue("isActive") as boolean;
+            if (isActive) {
                 return <Badge variant="default">Displaying</Badge>;
             }
             return <Badge variant="secondary">Not show</Badge>;

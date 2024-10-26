@@ -10,13 +10,13 @@ const PackageForm = dynamic(() => import("@/components/sections/packages/create-
 
 const breadcrumbItems = [
     {title: "Dashboard", link: "/"},
-    {title: "Blog", link: "/blogs"},
-    {title: "New", link: "/blogs/new"},
+    {title: "Packages", link: "/packages"},
+    {title: "New", link: "/packages/new"},
 ];
 
 export default function Page() {
     return (
-        <ContentLayout title="Album">
+        <ContentLayout title="Package">
             <div className="space-y-6">
                 <Breadcrumbs items={breadcrumbItems}/>
                 <PackageForm initialData={null}/>
