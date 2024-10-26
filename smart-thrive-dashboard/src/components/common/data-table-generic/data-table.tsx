@@ -98,7 +98,6 @@ export function DataTable<TData>({
             })
             .refine((date) => !!date.to, {message: "End Date is required."})
             .optional(),
-        description: z.string().nullable().optional(),
         isDeleted: z.boolean().nullable().optional(),
     });
 
@@ -149,6 +148,8 @@ export function DataTable<TData>({
         queryFn: () => fetchData(queryParams),
         placeholderData: keepPreviousData,
         enabled: shouldFetch,
+        refetchOnWindowFocus: false, // Ngăn tự động refetch khi lấy lại tiêu điểm
+        
     });
 
     const handleFilterClick = () => {
