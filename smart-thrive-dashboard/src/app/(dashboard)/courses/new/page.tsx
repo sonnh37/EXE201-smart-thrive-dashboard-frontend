@@ -10,7 +10,7 @@ const CourseForm = dynamic(() => import("@/components/sections/courses/create-up
 
 const breadcrumbItems = [
     {title: "Dashboard", link: "/"},
-    {title: "Course", link: "/courses"},
+    {title: "Courses", link: "/courses"},
     {title: "New", link: "/course/new"},
 ];
 

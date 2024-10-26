@@ -10,8 +10,8 @@ const OrderForm = dynamic(() => import("@/components/sections/orders/create-upda
 
 const breadcrumbItems = [
     {title: "Dashboard", link: "/"},
-    {title: "Blog", link: "/blogs"},
-    {title: "New", link: "/blogs/new"},
+    {title: "Orders", link: "/orders"},
+    {title: "New", link: "/orders/new"},
 ];
 
 export default function Page() {

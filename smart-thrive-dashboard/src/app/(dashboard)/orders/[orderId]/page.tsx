@@ -25,7 +25,7 @@ export default function Page({params}: { params: { orderId: string } }) {
 
     const breadcrumbItems = [
         {title: 'Dashboard', link: '/'},
-        {title: 'Order', link: '/orders'},
+        {title: 'Orders', link: '/orders'},
         {title: `${params.orderId}`, link: `/orders/${params.orderId}`}
     ];
 
