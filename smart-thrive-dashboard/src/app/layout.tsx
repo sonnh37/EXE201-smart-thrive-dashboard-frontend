@@ -8,6 +8,8 @@ import {Toaster} from "sonner";
 import "./globals.css";
 import 'react-time-picker/dist/TimePicker.css';
 import 'react-clock/dist/Clock.css';
+import { Provider } from 'react-redux';
+import store from "@/lib/store";
 export default function RootLayout({
                                        children,
                                    }: Readonly<{
@@ -27,7 +29,11 @@ export default function RootLayout({
                     enableSystem={true}
                     defaultTheme="light"
                 >
-                    <RefreshProvider>{children}</RefreshProvider>
+                    <RefreshProvider>
+                        <Provider store={store}>
+                            {children}
+                        </Provider>
+                    </RefreshProvider>
                 </ThemeProvider>
             </SessionProvider>
         </GoogleOAuthProvider>

@@ -15,4 +15,10 @@ export interface PackageUpdateCommand extends UpdateCommand {
     totalPrice?: number;
     isActive?: boolean;
     status?: PackageStatus;
+    packageXCourses: PackageXCourseUpdateCommand[];
+}
+
+export interface PackageXCourseUpdateCommand extends UpdateCommand {
+    courseId?: string;
+    packageId?: string;
 }

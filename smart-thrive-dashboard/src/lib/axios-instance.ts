@@ -4,7 +4,7 @@ import {logout} from "./auth";
 // Tạo một instance của axios (nếu cần)
 const axiosInstance = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_BASE, // URL cơ bản cho các request API của bạn
-    timeout: 10000, // Thời gian chờ tối đa cho request (ms)
+    timeout: 60000, // Thời gian chờ tối đa cho request (ms)
 });
 
 // Thêm Interceptor để tự động đính kèm Authorization token cho tất cả request

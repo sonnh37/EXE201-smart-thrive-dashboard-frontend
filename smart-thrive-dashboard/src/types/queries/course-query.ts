@@ -21,4 +21,6 @@ export interface CourseGetAllQuery extends BaseQueryableQuery {
     isActive?: boolean;
     startDate?: string;
     endDate?: string;
+
+    packageId?: string;
 }

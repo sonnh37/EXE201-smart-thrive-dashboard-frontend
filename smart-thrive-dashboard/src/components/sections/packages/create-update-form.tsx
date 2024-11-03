@@ -62,23 +62,35 @@ import TimePicker from "react-time-picker";
 import { convertToISODate } from "@/lib/date-helper";
 import { formatCurrency } from "@/lib/currency-helper";
 import { formatTimeSpan } from "@/lib/format-timespan";
+import { getEnumOptions } from "@/lib/utils";
+import { CourseStatus, CourseType } from "@/types/enums/course";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { DataTable } from "@/components/common/data-table-generic/data-table";
+import DataTableCourses from "./courses";
+import { Course } from "@/types/course";
 
 interface PackageFormProps {
   initialData: any | null;
 }
 
-const formSchema = z.object({
+const packageXCourseSchema = z.object({
   id: z.string().optional(),
-  name: z.string().min(1, "Name is required"),
-  totalPrice: z.number().optional(),
-  quantityCourse: z.number().optional(),
-  status: z.nativeEnum(PackageStatus).optional(),
-  isActive: z.boolean(),
-  createdDate: z.date().optional(),
-  createdBy: z.string().optional(),
-  isDeleted: z.boolean(),
+  packageId: z.string().default(""),
+  courseId: z.string().default(""),
 });
 
+const formSchema = z.object({
+  id: z.string().optional(),
+  name: z.string().min(1, "Name is required").default(""),
+  totalPrice: z.number().default(0),
+  quantityCourse: z.number().default(0),
+  status: z.nativeEnum(PackageStatus).default(PackageStatus.Pending),
+  isActive: z.boolean().default(false),
+  createdDate: z.date().default(() => new Date()), // hoặc sử dụng new Date() nếu cần giá trị cố định
+  createdBy: z.string().default("N/A"),
+  isDeleted: z.boolean().default(false),
+  packageXCourses: z.array(packageXCourseSchema).default([]),
+});
 export const PackageForm: React.FC<PackageFormProps> = ({ initialData }) => {
   const [loading, setLoading] = useState(false);
   const [imgLoading, setImgLoading] = useState(false);
@@ -94,24 +106,20 @@ export const PackageForm: React.FC<PackageFormProps> = ({ initialData }) => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       setLoading(true);
-      const packageCommand = {
-        id: initialData ? values.id : null,
-        name: values.name,
-        status: values.status,
-        totalPrice: values.totalPrice,
-        quantityCourse: values.quantityCourse,
-        isActive: values.isActive,
-      };
-
-      console.log("check_package", packageCommand)
 
       if (initialData) {
+        const packageCommand = {
+          ...values,
+        };
         const response = await packageService.update(
           packageCommand as PackageUpdateCommand
         );
         if (response.status != 1) throw new Error(response.message);
         toast.success(response.message);
       } else {
+        const packageCommand = {
+          ...values,
+        };
         const response = await packageService.create(
           packageCommand as PackageCreateCommand
         );
@@ -129,32 +137,16 @@ export const PackageForm: React.FC<PackageFormProps> = ({ initialData }) => {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      quantityCourse: 0,
-      status: PackageStatus.Pending,
-      totalPrice: 0,
-      isActive: false,
-      createdBy: "N/A",
-      createdDate: new Date(),
-      isDeleted: false,
-    },
   });
 
   useEffect(() => {
+    console.log("check_init", initialData)
     if (initialData) {
       form.reset({
-        id: initialData.id || "",
-        name: initialData.name || "",
-        status: initialData.status || "",
-        totalPrice: initialData.totalPrice || 0,
-        quantityCourse: initialData.quantityCourse || 0,
-        isActive: initialData.isActive || false,
+        ...initialData,
         createdDate: initialData.createdDate
           ? new Date(initialData.createdDate)
           : new Date(),
-        createdBy: initialData.createdBy || "",
-        isDeleted: !!initialData.isDeleted,
       });
     } else {
       setDate(new Date());
@@ -231,6 +223,51 @@ export const PackageForm: React.FC<PackageFormProps> = ({ initialData }) => {
                       <div className="grid gap-3">
                         <FormField
                           control={form.control}
+                          name="packageXCourses"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <Dialog>
+                                  <DialogTrigger asChild>
+                                    <Button variant="outline">packageXCourses</Button>
+                                  </DialogTrigger>
+                                  <DialogContent className="w-full h-full max-w-[80%] max-h-[90%] overflow-y-auto">
+                                    <DataTableCourses
+                                      packageId={
+                                        initialData && initialData.id
+                                          ? initialData.id
+                                          : undefined
+                                      }
+                                      onChange={(pxcs) => {
+                                        
+                                        console.log("check_onchange", pxcs)
+                                        field.onChange(pxcs);
+                                      }}
+                                      packageXCourses={field.value} // Truyền giá trị từ field.value
+                                    />
+                                  </DialogContent>
+                                </Dialog>
+                              </FormControl>
+                              {/* Hiển thị thông tin khóa học đã chọn */}
+                              {field.value && (
+                                <div className="mt-2">
+                                  <span className="font-bold">
+                                    Selected Course IDs:
+                                  </span>
+                                  <ul>
+                                    {field.value.map((pxc) => (
+                                      <li >{pxc.courseId}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
                           name="name"
                           render={({ field }) => (
                             <FormItem>
@@ -240,6 +277,44 @@ export const PackageForm: React.FC<PackageFormProps> = ({ initialData }) => {
                               </FormControl>
                               <FormDescription>
                                 This is your public display name.
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="status"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Status</FormLabel>
+                              <FormControl>
+                                <Select
+                                  onValueChange={(value) =>
+                                    field.onChange(Number(value))
+                                  } // Chuyển đổi string sang number
+                                  value={field.value?.toString()} // Chuyển đổi number sang string
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select status" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {getEnumOptions(PackageStatus).map(
+                                      (option) => (
+                                        <SelectItem
+                                          key={option.value}
+                                          value={option.value}
+                                        >
+                                          {option.label}
+                                        </SelectItem>
+                                      )
+                                    )}
+                                  </SelectContent>
+                                </Select>
+                              </FormControl>
+                              <FormDescription>
+                                Select the current status of the course.
                               </FormDescription>
                               <FormMessage />
                             </FormItem>
