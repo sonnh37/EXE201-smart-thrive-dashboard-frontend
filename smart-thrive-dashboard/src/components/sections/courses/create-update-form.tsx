@@ -62,6 +62,7 @@ import TimePicker from "react-time-picker";
 import { convertToISODate } from "@/lib/date-helper";
 import { formatCurrency } from "@/lib/currency-helper";
 import { formatTimeSpan } from "@/lib/format-timespan";
+import { getEnumOptions } from "@/lib/utils";
 
 interface CourseFormProps {
   initialData: any | null;
@@ -69,28 +70,28 @@ interface CourseFormProps {
 
 const formSchema = z.object({
   id: z.string().optional(),
-  subjectId: z.string().optional(),
-  providerId: z.string().optional(),
-  teacherName: z.string().optional(),
-  type: z.nativeEnum(CourseType).optional(),
-  name: z.string().min(1, "Name is required"),
-  code: z.string().optional(),
-  courseName: z.string().optional(),
-  description: z.string().optional(),
-  backgroundImage: z.string().optional(),
-  price: z.number().optional(),
-  soldCourses: z.number().optional(),
-  totalSlots: z.number().optional(),
-  totalSessions: z.number().optional(),
+  subjectId: z.string().default(""),
+  providerId: z.string().default(""),
+  teacherName: z.string().default(""),
+  type: z.nativeEnum(CourseType).default(CourseType.Online), // Đặt mặc định là Online hoặc giá trị mong muốn
+  name: z.string().min(1, "Name is required").default(""),
+  code: z.string().default(""),
+  courseName: z.string().default(""),
+  description: z.string().default(""),
+  backgroundImage: z.string().default(""),
+  price: z.number().default(0),
+  soldCourses: z.number().default(0),
+  totalSlots: z.number().default(0),
+  totalSessions: z.number().default(0),
   startDate: z.date().optional(),
   endDate: z.date().optional(),
-  startTime: z.string().optional(),
+  startTime: z.string().default(""),
   endTime: z.string().optional(),
-  status: z.nativeEnum(CourseStatus).optional(),
-  isActive: z.boolean(),
-  createdDate: z.date().optional(),
-  createdBy: z.string().optional(),
-  isDeleted: z.boolean(),
+  status: z.nativeEnum(CourseStatus).default(CourseStatus.Pending),
+  isActive: z.boolean().default(true),
+  createdDate: z.date().default(new Date()),
+  createdBy: z.string().default("N/A"),
+  isDeleted: z.boolean().default(false),
 });
 
 export const CourseForm: React.FC<CourseFormProps> = ({ initialData }) => {
@@ -145,35 +146,28 @@ export const CourseForm: React.FC<CourseFormProps> = ({ initialData }) => {
     try {
       setLoading(true);
       const updatedValues = await uploadImageFirebase(values); // Chờ upload hoàn tất và nhận values mới
-      const courseCommand = {
-        id: initialData ? values.id : null,
-        name: values.name,
-        subjectId: values.subjectId,
-        providerId: values.providerId,
-        code: values.code,
-        teacherName: values.teacherName,
-        description: values.description,
-        status: values.status,
-        backgroundImage: updatedValues.backgroundImage,
-        price: values.price,
-        type: values.type,
-        totalSlots: values.totalSlots,
-        totalSessions: values.totalSessions,
-        startDate: convertToISODate(values.startDate),
-        endDate: convertToISODate(values.endDate),
-        startTime: formatTimeSpan(values.startTime ?? ""),
-        endTime: formatTimeSpan(values.endTime ?? ""),
-        isActive: values.isActive,
-      };
-      console.log("check_new", courseCommand);
-
+      console.log("check_updatedv", updatedValues);
       if (initialData) {
+        const courseCommand = {
+          ...updatedValues,
+          startDate: convertToISODate(values.startDate),
+          endDate: convertToISODate(values.endDate),
+          startTime: formatTimeSpan(values.startTime ?? ""),
+          endTime: formatTimeSpan(values.endTime ?? ""),
+        };
         const response = await courseService.update(
           courseCommand as CourseUpdateCommand
         );
         if (response.status != 1) throw new Error(response.message);
         toast.success(response.message);
       } else {
+        const courseCommand = {
+          ...updatedValues,
+          startDate: convertToISODate(values.startDate),
+          endDate: convertToISODate(values.endDate),
+          startTime: formatTimeSpan(values.startTime ?? ""),
+          endTime: formatTimeSpan(values.endTime ?? ""),
+        };
         const response = await courseService.create(
           courseCommand as CourseCreateCommand
         );
@@ -191,60 +185,24 @@ export const CourseForm: React.FC<CourseFormProps> = ({ initialData }) => {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      subjectId: "",
-      providerId: "",
-      description: "",
-      code: "",
-      teacherName: "",
-      status: undefined,
-      type: undefined,
-      backgroundImage: "",
-      price: 0,
-      totalSlots: 0,
-      totalSessions: 0,
-      startDate: undefined,
-      endDate: undefined,
-      endTime: undefined,
-      isActive: true,
-      createdBy: "N/A",
-      createdDate: new Date(),
-      isDeleted: false,
-    },
   });
 
   useEffect(() => {
+    console.log("check_init", initialData);
+
     if (initialData) {
       form.reset({
-        id: initialData.id || "",
-        name: initialData.name || "",
-        subjectId: initialData.subjectId || "",
-        providerId: initialData.providerId || "",
-        status: initialData.status || "",
-        type: initialData.type || "",
-        description: initialData.description || "",
-        code: initialData.code || "",
-        teacherName: initialData.teacherName || "",
-        backgroundImage: initialData.backgroundImage || "",
-        price: initialData.price || 0,
-        soldCourses: initialData.soldCourses || 0,
-        totalSlots: initialData.totalSlots || 0,
-        totalSessions: initialData.totalSessions || 0,
-        startTime: initialData.startTime || "",
-        endTime: initialData.endTime || "",
+        ...initialData,
+        soldCourses: initialData.soldCourses ?? 0,
         startDate: initialData.startDate
           ? new Date(initialData.startDate)
           : undefined, // Convert to Date or set to null
         endDate: initialData.endDate
           ? new Date(initialData.endDate)
           : undefined, // Correct typo (assuming endDate is in initialData)
-        isActive: !!initialData.isActive,
         createdDate: initialData.createdDate
           ? new Date(initialData.createdDate)
           : new Date(),
-        createdBy: initialData.createdBy || "",
-        isDeleted: !!initialData.isDeleted,
       });
 
       setFirebaseLink(initialData.backgroundImage || "");
@@ -262,10 +220,8 @@ export const CourseForm: React.FC<CourseFormProps> = ({ initialData }) => {
         // Gọi API lấy danh sách subjectId
         const response_subjects = await subjectService.fetchAll();
         setSubjects(response_subjects.data?.results!);
-        console.log("check_subjects", response_subjects.data?.results!);
         // Gọi API lấy danh sách providerId
         const response_providers = await providerService.fetchAll();
-        console.log("check_providers", response_providers.data?.results!);
         setProviders(response_providers.data?.results!);
       } catch (error) {
         console.error(error);
@@ -426,21 +382,16 @@ export const CourseForm: React.FC<CourseFormProps> = ({ initialData }) => {
                                     <SelectValue placeholder="Select status" />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    <SelectItem
-                                      value={CourseStatus.Pending.toString()}
-                                    >
-                                      Pending
-                                    </SelectItem>
-                                    <SelectItem
-                                      value={CourseStatus.Approved.toString()}
-                                    >
-                                      Approved
-                                    </SelectItem>
-                                    <SelectItem
-                                      value={CourseStatus.Rejected.toString()}
-                                    >
-                                      Rejected
-                                    </SelectItem>
+                                    {getEnumOptions(CourseStatus).map(
+                                      (option) => (
+                                        <SelectItem
+                                          key={option.value}
+                                          value={option.value}
+                                        >
+                                          {option.label}
+                                        </SelectItem>
+                                      )
+                                    )}
                                   </SelectContent>
                                 </Select>
                               </FormControl>
@@ -454,46 +405,48 @@ export const CourseForm: React.FC<CourseFormProps> = ({ initialData }) => {
                         <FormField
                           control={form.control}
                           name="type"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Type</FormLabel>
-                              <FormControl>
-                                <Select
-                                  onValueChange={(value) =>
-                                    field.onChange(Number(value))
-                                  } // Chuyển đổi string sang number
-                                  value={field.value?.toString()} // Chuyển đổi number sang string
-                                >
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select type" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem
-                                      value={CourseType.Online.toString()}
-                                    >
-                                      Online
-                                    </SelectItem>
-                                    <SelectItem
-                                      value={CourseType.Offline.toString()}
-                                    >
-                                      Offline
-                                    </SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              </FormControl>
-                              <FormDescription>
-                                Select the current status of the course.
-                              </FormDescription>
-                              <FormMessage />
-                            </FormItem>
-                          )}
+                          render={({ field }) => {
+                            return (
+                              <FormItem>
+                                <FormLabel>Type</FormLabel>
+                                <FormControl>
+                                  <Select
+                                    onValueChange={(value) => {
+                                      field.onChange(Number(value));
+                                    }}
+                                    value={field.value?.toString()}
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {getEnumOptions(CourseType).map(
+                                        (option) => (
+                                          <SelectItem
+                                            key={option.value}
+                                            value={option.value}
+                                          >
+                                            {option.label}
+                                          </SelectItem>
+                                        )
+                                      )}
+                                    </SelectContent>
+                                  </Select>
+                                </FormControl>
+                                <FormDescription>
+                                  Select the current status of the course.
+                                </FormDescription>
+                                <FormMessage />
+                              </FormItem>
+                            );
+                          }}
                         />
                         <FormField
                           control={form.control}
                           name="price"
                           render={({ field }) => {
                             const inputRef = useRef<HTMLInputElement>(null);
-                        
+
                             return (
                               <FormItem>
                                 <FormLabel>Price</FormLabel>
@@ -505,19 +458,31 @@ export const CourseForm: React.FC<CourseFormProps> = ({ initialData }) => {
                                     type="text"
                                     className="mt-2 w-full"
                                     min="0"
-                                    value={field.value !== undefined ? formatCurrency(field.value) : ''}
+                                    value={
+                                      field.value !== undefined
+                                        ? formatCurrency(field.value)
+                                        : ""
+                                    }
                                     onChange={(e) => {
-                                      const rawValue = e.target.value.replace(/[^0-9]/g, '');
-                                      const parsedValue = parseFloat(rawValue) || 0;
-                        
+                                      const rawValue = e.target.value.replace(
+                                        /[^0-9]/g,
+                                        ""
+                                      );
+                                      const parsedValue =
+                                        parseFloat(rawValue) || 0;
+
                                       // Cập nhật giá trị trong form
                                       field.onChange(parsedValue);
-                        
+
                                       // Giữ vị trí con trỏ
                                       if (inputRef.current) {
-                                        const cursorPosition = e.target.selectionStart || 0;
+                                        const cursorPosition =
+                                          e.target.selectionStart || 0;
                                         setTimeout(() => {
-                                          inputRef.current?.setSelectionRange(cursorPosition, cursorPosition);
+                                          inputRef.current?.setSelectionRange(
+                                            cursorPosition,
+                                            cursorPosition
+                                          );
                                         }, 0);
                                       }
                                     }}
@@ -838,7 +803,7 @@ export const CourseForm: React.FC<CourseFormProps> = ({ initialData }) => {
                               <FormControl>
                                 <TimePicker
                                   value={field.value}
-                                  onChange={(value) => field.onChange(value)} 
+                                  onChange={(value) => field.onChange(value)}
                                   className="mt-2 w-full"
                                   clockIcon={null}
                                 />
@@ -872,7 +837,7 @@ export const CourseForm: React.FC<CourseFormProps> = ({ initialData }) => {
                               <FormControl>
                                 <TimePicker
                                   value={field.value}
-                                  onChange={(value) => field.onChange(value)} 
+                                  onChange={(value) => field.onChange(value)}
                                   className="mt-2 w-full"
                                   clockIcon={null}
                                 />

@@ -92,6 +92,22 @@ export const columns: ColumnDef<Course>[] = [
         },
     },
     {
+        accessorKey: "soldCourses",
+        header: ({column}) => (
+            <DataTableColumnHeader column={column} title="Sold Courses"/>
+        ),
+        cell: ({row}) => {
+            const amount = parseFloat(row.getValue("soldCourses"));
+
+            const formatted = new Intl.NumberFormat("vi-VN", {
+                style: "currency",
+                currency: "VND",
+            }).format(amount);
+
+            return <div className="font-medium">{formatted}</div>;
+        },
+    },
+    {
         accessorKey: "price",
         header: ({column}) => (
             <DataTableColumnHeader column={column} title="Price"/>
