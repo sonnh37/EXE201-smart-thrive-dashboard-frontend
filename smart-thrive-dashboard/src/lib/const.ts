@@ -26,6 +26,7 @@ class Const {
     private static readonly USER = "users";
     private static readonly ORDER = "orders";
     private static readonly PACKAGE = "packages";
+    private static readonly PACKAGE_X_COURSE = "packageXCourses";
     private static readonly BLOG = "blogs";
     private static readonly COURSE = "courses";
     private static readonly SUBJECT = "subjects";
@@ -35,6 +36,7 @@ class Const {
     static readonly API_USER = `${this.API_BASE}/${Const.USER}`;
     static readonly API_ORDER = `${this.API_BASE}/${Const.ORDER}`;
     static readonly API_PACKAGE = `${this.API_BASE}/${Const.PACKAGE}`;
+    static readonly API_PACKAGE_X_COURSE = `${this.API_BASE}/${Const.PACKAGE_X_COURSE}`;
     static readonly API_BLOG = `${this.API_BASE}/${Const.BLOG}`;
     static readonly API_COURSE = `${this.API_BASE}/${Const.COURSE}`;
     static readonly API_SUBJECT = `${this.API_BASE}/${Const.SUBJECT}`;

@@ -68,6 +68,8 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { DataTable } from "@/components/common/data-table-generic/data-table";
 import DataTableCourses from "./courses";
 import { Course } from "@/types/course";
+import { Package } from "@/types/package";
+import packageXCourseService from "@/services/package-x-course-service";
 
 interface PackageFormProps {
   initialData: any | null;
@@ -108,8 +110,42 @@ export const PackageForm: React.FC<PackageFormProps> = ({ initialData }) => {
       setLoading(true);
 
       if (initialData) {
+        const data = initialData as Package;
+        const initialPackageXCourses = data.packageXCourses; // Giữ lại danh sách đầy đủ các packageXCourse
+        const initialCourseIds = initialPackageXCourses!.map(
+          (course) => course.courseId
+        );
+        const newCourseIds = values.packageXCourses.map(
+          (course) => course.courseId
+        );
+
+        // Tìm các CourseId cần xóa và lấy ID của packageXCourse tương ứng
+        const packageXCoursesToRemove = initialPackageXCourses!.filter(
+          (pxc) => !newCourseIds.includes(pxc.courseId!)
+        );
+
+        // Tìm các CourseId cần thêm và tạo các đối tượng packageXCourse
+        const coursesToAdd = newCourseIds.filter(
+          (id) => !initialCourseIds.includes(id)
+        );
+        const packageXCoursesToCreate = coursesToAdd.map((courseId) => ({
+          courseId: courseId,
+          packageId: data.id, // Giả sử bạn có ID của package
+        }));
+
+        // Gọi API để xóa các packageXCourse đã tồn tại không còn trong values
+        for (const packageXCourse of packageXCoursesToRemove) {
+          await packageXCourseService.delete(packageXCourse.id);
+        }
+
+        // Gọi API để thêm các packageXCourse mới
+        for (const packageXCourse of packageXCoursesToCreate) {
+          await packageXCourseService.create(packageXCourse);
+        }
+
         const packageCommand = {
           ...values,
+          packageXCourses: [],
         };
         const response = await packageService.update(
           packageCommand as PackageUpdateCommand
@@ -119,6 +155,7 @@ export const PackageForm: React.FC<PackageFormProps> = ({ initialData }) => {
       } else {
         const packageCommand = {
           ...values,
+          packageXCourses: [],
         };
         const response = await packageService.create(
           packageCommand as PackageCreateCommand
@@ -140,7 +177,7 @@ export const PackageForm: React.FC<PackageFormProps> = ({ initialData }) => {
   });
 
   useEffect(() => {
-    console.log("check_init", initialData)
+    console.log("check_init", initialData);
     if (initialData) {
       form.reset({
         ...initialData,
@@ -229,7 +266,9 @@ export const PackageForm: React.FC<PackageFormProps> = ({ initialData }) => {
                               <FormControl>
                                 <Dialog>
                                   <DialogTrigger asChild>
-                                    <Button variant="outline">packageXCourses</Button>
+                                    <Button variant="outline">
+                                      packageXCourses
+                                    </Button>
                                   </DialogTrigger>
                                   <DialogContent className="w-full h-full max-w-[80%] max-h-[90%] overflow-y-auto">
                                     <DataTableCourses
@@ -239,8 +278,7 @@ export const PackageForm: React.FC<PackageFormProps> = ({ initialData }) => {
                                           : undefined
                                       }
                                       onChange={(pxcs) => {
-                                        
-                                        console.log("check_onchange", pxcs)
+                                        console.log("check_onchange", pxcs);
                                         field.onChange(pxcs);
                                       }}
                                       packageXCourses={field.value} // Truyền giá trị từ field.value
@@ -256,7 +294,7 @@ export const PackageForm: React.FC<PackageFormProps> = ({ initialData }) => {
                                   </span>
                                   <ul>
                                     {field.value.map((pxc) => (
-                                      <li >{pxc.courseId}</li>
+                                      <li>{pxc.courseId}</li>
                                     ))}
                                   </ul>
                                 </div>
