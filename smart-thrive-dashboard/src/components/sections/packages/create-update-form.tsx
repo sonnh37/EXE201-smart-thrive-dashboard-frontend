@@ -71,6 +71,7 @@ import DataTableCourses from "./courses";
 import { Course } from "@/types/course";
 import { Package } from "@/types/package";
 import packageXCourseService from "@/services/package-x-course-service";
+import { PackageXCourse } from "@/types/package-x-course";
 
 interface PackageFormProps {
   initialData: any | null;
@@ -106,78 +107,96 @@ export const PackageForm: React.FC<PackageFormProps> = ({ initialData }) => {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  const deletePackageXCourses = async (
+    packageXCoursesToRemove: PackageXCourse[]
+  ) => {
+    await Promise.all(
+      packageXCoursesToRemove.map((pxc) => packageXCourseService.delete(pxc.id))
+    );
+  };
+
+  const createPackageXCourses = async (
+    packageXCourseCreateCommands: PackageXCourseCreateCommand[]
+  ) => {
+    await Promise.all(
+      packageXCourseCreateCommands.map((packageXCourse) =>
+        packageXCourseService.create(packageXCourse)
+      )
+    );
+  };
+
+  const handleUpdate = async (
+    values: z.infer<typeof formSchema>,
+    initialData: Package
+  ) => {
+    const initialPackageXCourses = initialData.packageXCourses || [];
+    const initialCourseIds = initialPackageXCourses.map(
+      (course) => course.courseId
+    );
+    const newCourseIds = values.packageXCourses.map(
+      (course) => course.courseId
+    );
+
+    // Tìm các packageXCourse cần xóa
+    const packageXCoursesToRemove = initialPackageXCourses.filter(
+      (pxc) => !newCourseIds.includes(pxc.courseId!)
+    );
+    // Tìm các CourseId cần thêm
+    const coursesToAdd = newCourseIds.filter(
+      (id) => !initialCourseIds.includes(id)
+    );
+
+    // Tạo lệnh thêm packageXCourse
+    const packageXCourseCreateCommand: PackageXCourseCreateCommand[] =
+      coursesToAdd.map((courseId) => ({
+        courseId: courseId,
+        packageId: initialData.id, // Sử dụng ID của package hiện tại
+      }));
+
+    // Xóa các packageXCourse cũ và thêm các packageXCourse mới
+    await deletePackageXCourses(packageXCoursesToRemove);
+    await createPackageXCourses(packageXCourseCreateCommand);
+
+    // Cập nhật package
+    const packageCommand: PackageUpdateCommand = {
+      ...values,
+      packageXCourses: [],
+    };
+    const response = await packageService.update(packageCommand);
+
+    if (response.status !== 1) throw new Error(response.message);
+    toast.success(response.message);
+  };
+
+  const handleCreate = async (values: z.infer<typeof formSchema>) => {
+    const packageCommand: PackageCreateCommand = { ...values };
+    const response = await packageService.create(packageCommand);
+
+    if (response.status !== 1) throw new Error(response.message);
+
+    // Tạo lệnh thêm packageXCourse cho package mới
+    const packageXCourseCreateCommand: PackageXCourseCreateCommand[] =
+      values.packageXCourses.map((pxc) => ({
+        courseId: pxc.courseId,
+        packageId: response.data?.id, // ID của package mới tạo
+      }));
+
+    await createPackageXCourses(packageXCourseCreateCommand);
+    toast.success(response.message);
+  };
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       setLoading(true);
-
       if (initialData) {
-        const data = initialData as Package;
-        const initialPackageXCourses = data.packageXCourses; // Giữ lại danh sách đầy đủ các packageXCourse
-        const initialCourseIds = initialPackageXCourses!.map(
-          (course) => course.courseId
-        );
-        const newCourseIds = values.packageXCourses.map(
-          (course) => course.courseId
-        );
-
-        // Tìm các CourseId cần xóa và lấy ID của packageXCourse tương ứng
-        const packageXCoursesToRemove = initialPackageXCourses!.filter(
-          (pxc) => !newCourseIds.includes(pxc.courseId!)
-        );
-
-        // Tìm các CourseId cần thêm và tạo các đối tượng packageXCourse
-        const coursesToAdd = newCourseIds.filter(
-          (id) => !initialCourseIds.includes(id)
-        );
-        const packageXCoursesToCreate = coursesToAdd.map((courseId) => ({
-          courseId: courseId,
-          packageId: data.id, // Giả sử bạn có ID của package
-        }));
-
-        // Gọi API để xóa các packageXCourse đã tồn tại không còn trong values
-        for (const packageXCourse of packageXCoursesToRemove) {
-          await packageXCourseService.delete(packageXCourse.id);
-        }
-
-        // Gọi API để thêm các packageXCourse mới
-        for (const packageXCourse of packageXCoursesToCreate) {
-          await packageXCourseService.create(packageXCourse);
-        }
-
-        const packageCommand = {
-          ...values,
-          packageXCourses: [],
-        };
-        const response = await packageService.update(
-          packageCommand as PackageUpdateCommand
-        );
-        if (response.status != 1) throw new Error(response.message);
-        toast.success(response.message);
+        await handleUpdate(values, initialData);
       } else {
-        
-        const packageCommand: PackageCreateCommand = {
-          ...values,
-        };
-        const response = await packageService.create(
-          packageCommand
-        );
-
-        if (response.status != 1) throw new Error(response.message);
-
-        const packageXCourseCreateCommand: PackageXCourseCreateCommand[] = values.packageXCourses.map((pxc) => ({
-          courseId: pxc.courseId,  
-          packageId: response.data?.id, 
-        }));
-
-        for (const packageXCourse of packageXCourseCreateCommand) {
-          await packageXCourseService.create(packageXCourse);
-        }
-        toast.success(response.message);
+        await handleCreate(values);
       }
 
       router.push(Const.URL_PACKAGE);
     } catch (error: any) {
-      return toast.error(error.message);
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }
