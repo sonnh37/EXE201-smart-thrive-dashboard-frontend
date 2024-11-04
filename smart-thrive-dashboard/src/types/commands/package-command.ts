@@ -22,3 +22,9 @@ export interface PackageXCourseUpdateCommand extends UpdateCommand {
     courseId?: string;
     packageId?: string;
 }
+
+
+export interface PackageXCourseCreateCommand extends CreateCommand {
+    courseId?: string;
+    packageId?: string;
+}

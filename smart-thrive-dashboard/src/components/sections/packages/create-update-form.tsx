@@ -42,6 +42,7 @@ import { storage } from "../../../../firebase";
 import {
   PackageCreateCommand,
   PackageUpdateCommand,
+  PackageXCourseCreateCommand,
 } from "@/types/commands/package-command";
 import { useRouter } from "next/navigation";
 import { Const } from "@/lib/const";
@@ -153,14 +154,24 @@ export const PackageForm: React.FC<PackageFormProps> = ({ initialData }) => {
         if (response.status != 1) throw new Error(response.message);
         toast.success(response.message);
       } else {
-        const packageCommand = {
+        
+        const packageCommand: PackageCreateCommand = {
           ...values,
-          packageXCourses: [],
         };
         const response = await packageService.create(
-          packageCommand as PackageCreateCommand
+          packageCommand
         );
+
         if (response.status != 1) throw new Error(response.message);
+
+        const packageXCourseCreateCommand: PackageXCourseCreateCommand[] = values.packageXCourses.map((pxc) => ({
+          courseId: pxc.courseId,  
+          packageId: response.data?.id, 
+        }));
+
+        for (const packageXCourse of packageXCourseCreateCommand) {
+          await packageXCourseService.create(packageXCourse);
+        }
         toast.success(response.message);
       }
 
