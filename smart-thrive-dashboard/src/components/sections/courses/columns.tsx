@@ -33,6 +33,12 @@ export const columns: ColumnDef<Course>[] = [
         enableHiding: false,
     },
     {
+        id: "actions",
+        cell: ({row}) => {
+            return <Actions row={row}/>;
+        },
+    },
+    {
         accessorKey: "backgroundImage",
         header: ({column}) => (
             <DataTableColumnHeader column={column} title="Image"/>
@@ -343,10 +349,5 @@ export const columns: ColumnDef<Course>[] = [
             return value.includes(row.getValue(id));
         },
     },
-    {
-        id: "actions",
-        cell: ({row}) => {
-            return <Actions row={row}/>;
-        },
-    },
+    
 ];
